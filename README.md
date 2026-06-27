@@ -32,17 +32,61 @@ Onboarding typically takes under 10 minutes.
 
 ---
 
-## Architecture & Flows
+## Architecture
 
-**High-Level Architecture**
+```mermaid
+flowchart TB
+    subgraph Consumers["Consumer Families"]
+        Chat["Chat Apps<br/>(Grok, Claude, ChatGPT)"]
+    end
 
-![Totbox Architecture](architecture/totbox-architecture.png)
+    subgraph Totbox["Totbox Platform"]
+        MCPGen["MCP Endpoint Generator"]
+        Onboard["Onboarding & OAuth Connectors"]
+        Core["Core Orchestration<br/>(Rules, Matching, Verification)"]
+        Inbound["Inbound Automation<br/>(Voice/Text Agents)"]
+    end
 
-**Frictionless User Flows**
+    subgraph Providers["Small Local Providers"]
+        Ent["Entertainment Centers"]
+        Child["Childcare"]
+        Lawn["Lawn Care"]
+        HVAC["HVAC"]
+        Tutor["Tutoring"]
+    end
 
-![Totbox User Flows](architecture/totbox-flows.png)
+    Chat -->|MCP| MCPGen
+    MCPGen --> Onboard
+    Onboard --> Core
+    Core --> Inbound
+    Inbound --> Providers
+    Providers -->|Webhook / OAuth| Core
+```
 
-Full technical details are in the spec.
+---
+
+## User Flows
+
+```mermaid
+flowchart LR
+    subgraph Family["Family Consumer Flow"]
+        Q1["1. Query via chat app"]
+        Q2["2. Discover via MCP"]
+        Q3["3. Compare options"]
+        Q4["4. Book"]
+    end
+
+    subgraph Provider["Small Provider Flow"]
+        P1["1. MCP Endpoint + OAuth"]
+        P2["2. Receive inbound lead"]
+        P3["3. AI assist qualification/quoting"]
+        P4["4. Confirm booking sync to calendar/FSM"]
+    end
+
+    Q1 --> Q2 --> Q3 --> Q4
+    P1 --> P2 --> P3 --> P4
+    Q4 <--> P4
+```
 
 ---
 
@@ -60,7 +104,6 @@ Full technical details are in the spec.
 This is an evolving product. Feedback from families and small operators is extremely valuable.
 
 - Full product plan: [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md)
-- Architecture diagrams: `/architecture` folder
 - Issues and discussions welcome
 
 **License:** Apache-2.0
