@@ -34,58 +34,46 @@ Onboarding typically takes under 10 minutes.
 
 ## Architecture
 
-```mermaid
-flowchart TB
-    subgraph Consumers["Consumer Families"]
-        Chat["Chat Apps<br/>(Grok, Claude, ChatGPT)"]
-    end
-
-    subgraph Totbox["Totbox Platform"]
-        MCPGen["MCP Endpoint Generator"]
-        Onboard["Onboarding & OAuth Connectors"]
-        Core["Core Orchestration<br/>(Rules, Matching, Verification)"]
-        Inbound["Inbound Automation<br/>(Voice/Text Agents)"]
-    end
-
-    subgraph Providers["Small Local Providers"]
-        Ent["Entertainment Centers"]
-        Child["Childcare"]
-        Lawn["Lawn Care"]
-        HVAC["HVAC"]
-        Tutor["Tutoring"]
-    end
-
-    Chat -->|MCP| MCPGen
-    MCPGen --> Onboard
-    Onboard --> Core
-    Core --> Inbound
-    Inbound --> Providers
-    Providers -->|Webhook / OAuth| Core
+```
+Consumer Families
+       |
+       v
+Chat Apps (Grok / Claude / ChatGPT)
+       |
+       |  MCP
+       v
++-----------------------------+
+|        Totbox Platform      |
+|                             |
+|  • MCP Endpoint Generator   |
+|  • Onboarding & OAuth       |
+|    (Google Calendar, etc.)  |
+|  • Core Orchestration       |
+|    (Rules / Matching /      |
+|     Verification)           |
+|  • Inbound Automation       |
+|    (Voice / Text Agents)    |
++-----------------------------+
+       |
+       |  Webhooks / OAuth
+       v
+Small Local Providers
+  (Entertainment Centers • Childcare • Lawn Care • HVAC • Tutoring • etc.)
 ```
 
 ---
 
 ## User Flows
 
-```mermaid
-flowchart LR
-    subgraph Family["Family Consumer Flow"]
-        Q1["1. Query via chat app"]
-        Q2["2. Discover via MCP"]
-        Q3["3. Compare options"]
-        Q4["4. Book"]
-    end
-
-    subgraph Provider["Small Provider Flow"]
-        P1["1. MCP Endpoint + OAuth"]
-        P2["2. Receive inbound lead"]
-        P3["3. AI assist qualification/quoting"]
-        P4["4. Confirm booking sync to calendar/FSM"]
-    end
-
-    Q1 --> Q2 --> Q3 --> Q4
-    P1 --> P2 --> P3 --> P4
-    Q4 <--> P4
+```
+Family Consumer Flow                  Small Provider Flow
+─────────────────────────────────     ────────────────────────────────
+1. Query via chat app                 1. Add MCP Endpoint + OAuth
+2. Discover services via MCP          2. Receive inbound lead
+3. Compare options (availability,     3. AI assists with qualification
+   pricing, reviews)                     & quoting
+4. Confirm & book                     4. Booking confirmed → syncs to
+                                         their Calendar / FSM
 ```
 
 ---
