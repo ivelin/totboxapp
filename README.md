@@ -45,20 +45,21 @@ Chat Apps (Grok / Claude / ChatGPT)
 +-----------------------------+
 |        Totbox Platform      |
 |                             |
-|  • MCP Endpoint Generator   |
-|  • Onboarding & OAuth       |
+|  - MCP Endpoint Generator   |
+|  - Onboarding & OAuth       |
 |    (Google Calendar, etc.)  |
-|  • Core Orchestration       |
+|  - Core Orchestration       |
 |    (Rules / Matching /      |
 |     Verification)           |
-|  • Inbound Automation       |
+|  - Inbound Automation       |
 |    (Voice / Text Agents)    |
 +-----------------------------+
        |
        |  Webhooks / OAuth
        v
 Small Local Providers
-  (Entertainment Centers • Childcare • Lawn Care • HVAC • Tutoring • etc.)
+  (Entertainment Centers, Childcare,
+   Lawn Care, HVAC, Tutoring, etc.)
 ```
 
 ---
@@ -67,11 +68,11 @@ Small Local Providers
 
 ```
 Family Consumer Flow                  Small Provider Flow
-─────────────────────────────────     ────────────────────────────────
+---------------------------------     ---------------------------------
 1. Query via chat app                 1. Add MCP Endpoint + OAuth
 2. Discover services via MCP          2. Receive inbound lead
-3. Compare options (availability,     3. AI assists with qualification
-   pricing, reviews)                     & quoting
+3. Compare options                    3. AI assists with qualification
+   (availability, pricing, reviews)      & quoting
 4. Confirm & book                     4. Booking confirmed → syncs to
                                          their Calendar / FSM
 ```
