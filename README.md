@@ -30,6 +30,10 @@ Add the Totbox MCP endpoint in your chat app + connect your existing calendar/sc
 
 Onboarding typically takes under 10 minutes.
 
+**Connecting the MCP (Stage 3)**  
+Run `npm run dev:mcp` (serves on :3001). Add remote MCP URL `http://localhost:3001/mcp` in your client (Claude, etc.). Tools: search_services, get_provider_details, get_availability (wired to live store).
+Current tools (Stage 3): search_services, get_provider_details, get_availability.
+
 ---
 
 ## Architecture
@@ -93,7 +97,7 @@ Family Consumer Flow                  Small Provider Flow
 ```bash
 npm install
 npm run dev          # Next.js UI on :3000
-npm run dev:mcp      # Placeholder (real MCP server in Stage 3)
+npm run dev:mcp      # MCP server on :3001 (Stage 3+)
 npm run build
 ```
 
