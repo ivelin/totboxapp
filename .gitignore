@@ -3,15 +3,50 @@ docs/research/private/
 **/*.private.md
 **/totbox_home_services_research*.md
 
-# Common env and secrets
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+/dist
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log
+
+# env files (never commit secrets; example is ok)
 .env
 .env.*
 !.env.example
 
-# Dependencies and build (when app code is present)
-node_modules/
-.next/
-dist/
-coverage/
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# app local data + verification scratch
+.data/
 .verif-scratch/
-*.log

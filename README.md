@@ -14,7 +14,7 @@ Everything happens primarily in the chat apps you already use (Grok, Claude, Cha
 
 **Why:** Anonymized multi-year household coordination research shows the highest multi-turn friction here (often 6–12+ emails per decision): parallel vendor comparison, PDF/plan quotes, review research, partner approvals, FSM invoices, and forgotten preventive cadence. That is the chore stack agents should own.
 
-**Integrations:** **Tier 1** Google Calendar (built on `feat/expand-scope`). **Tier 2** ServiceTitan (jobs, Leads booking push, invoices, webhooks) — design in-repo, pilot after core brief/compare loop. Non-ST operators keep the Calendar path.
+**Integrations:** **Tier 1** Google Calendar (stages 1–5). **Tier 2** ServiceTitan (jobs, Leads booking push, invoices, webhooks) — design in-repo, pilot after core brief/compare loop. Non-ST operators keep the Calendar path.
 
 **Parallel track:** Kids’ activities, entertainment centers, childcare, tutoring, sports — still core to the long-term “family life” brand, not the Stage-0 validation path.
 
@@ -95,13 +95,33 @@ Household flow                         Provider flow
 
 ---
 
+## Development (stages 1–5+)
+
+```bash
+npm install
+npm run dev          # Next.js UI on :3000
+npm run dev:mcp      # MCP server on :3001
+npm run build
+npm test
+npm run typecheck
+```
+
+- Landing page: `/`
+- Provider dashboard (register, token, calendar connect): `/dashboard`
+- MCP: `http://localhost:3001/mcp` (pass provider token for scoped tools)
+- Current tools: `search_services`, `get_provider_details`, `get_availability`
+
+**Connecting the MCP:** Run `npm run dev:mcp`. Register on `/dashboard` (name, services, location, rules). You get a secret token + MCP URL. Add both to your chat app for scoped results.
+
+---
+
 ## Implementation status
 
 | Area | Status |
 |------|--------|
-| Product vision + v3.1 beachhead / ST annex | This branch / docs on `main` after merge |
-| Stages 1–5 (Next.js, store, MCP server, provider registration, Google Calendar availability) | `feat/expand-scope` (open PR) |
-| Stages 6–9 (briefs/compare, trust, household approval, recurring) | Spec’d; not yet built |
+| Product vision + v3.1 beachhead / ST annex | On `main` |
+| Stages 1–5 (Next.js, store, MCP, registration, Google Calendar availability) | This PR / branch |
+| Stages 6–9 (briefs/compare, trust, household approval, recurring) | Spec’d; next after merge |
 | Stages 10a–10c (ServiceTitan design → prototype → pilot) | Spec’d in ST annex |
 | Stage 11 (dual-sided referrals) | Spec’d; after core loop |
 
@@ -123,6 +143,7 @@ Feedback from households and small operators is extremely valuable.
 - Product plan: [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md)
 - Anonymized research insights: [`docs/research/home_services_email_insights.md`](docs/research/home_services_email_insights.md)
 - Research privacy rules: [`docs/research/README.md`](docs/research/README.md)
+- Agent hard rule (public repo, no PII): [`AGENTS.md`](AGENTS.md)
 - Issues and discussions welcome
 
 **License:** Apache-2.0
