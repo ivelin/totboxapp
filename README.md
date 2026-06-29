@@ -88,6 +88,20 @@ Family Consumer Flow                  Small Provider Flow
 
 ---
 
+## Development (Stage 1+)
+
+```bash
+npm install
+npm run dev          # Next.js UI on :3000
+npm run dev:mcp      # Placeholder (real MCP server in Stage 3)
+npm run build
+```
+
+- Landing page is at `/`
+- Placeholder provider dashboard at `/dashboard`
+- See the staged implementation plan for PRs (session plan.md in the worktree).
+- Original product vision lives in `docs/totbox_product_spec.md`.
+
 ## Contributing / Early Collaboration
 
 This is an evolving product. Feedback from families and small operators is extremely valuable.
