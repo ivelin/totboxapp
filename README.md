@@ -50,6 +50,10 @@ Add the Totbox MCP endpoint in your chat setup and connect your existing **calen
 
 Onboarding target: under 10 minutes for the calendar path; ST connect documented separately (~10–15 min design target).
 
+**Connecting the MCP (Stage 3)**  
+Run `npm run dev:mcp` (serves on :3001). Add remote MCP URL `http://localhost:3001/mcp` in your client (Claude, etc.). Tools: search_services, get_provider_details, get_availability (wired to live store).
+Current tools (Stage 3): search_services, get_provider_details, get_availability.
+
 ---
 
 ## Architecture
