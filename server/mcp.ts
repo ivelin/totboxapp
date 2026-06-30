@@ -105,7 +105,8 @@ mcpServer.registerTool(
     const body = req.body || {};
     const method = body.method || (body.jsonrpc ? 'unknown' : 'no-method');
     const id = body.id ?? 1;
-    console.error('[MCP POST]', method, 'id=', id, 'params keys=', Object.keys(body.params || {}), 'token?', body.params?.arguments?.token);
+    const toolName = (method === 'tools/call') ? (body.params?.name || '?') : '';
+    console.error('[MCP POST]', method, toolName ? `name=${toolName}` : '', 'id=', id, 'params keys=', Object.keys(body.params || {}), 'token?', body.params?.arguments?.token, 'STAGE5LOG');
 
     try {
       if (method === 'initialize' || method === 'notifications/initialized' || method === 'unknown' || !method) {
