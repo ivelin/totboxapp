@@ -26,6 +26,9 @@ npm-debug.log*
 # vercel
 .vercel
 .yarn/*
+
+# verification scratch (local only, cleaned by verify scripts)
+.verif-scratch/
 yarn-debug.log*
 yarn-error.log*
 !.yarn/patches

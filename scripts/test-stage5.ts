@@ -6,9 +6,10 @@
  * - also exercises via MCP POST if MCP running (for verif-4)
  * Captures to stdout for redirect to {SCRATCH}/stage5-*.log
  */
-import { registerProvider, setCalendarBusyMock, getAvailabilityForToken, connectCalendar } from '../src/lib/store.js';
+import { registerProvider, setCalendarBusyMock, getAvailabilityForToken, connectCalendar, mergeWithBusy } from '../src/lib/store.js';
 
-const SCRATCH = process.env.SCRATCH || '/tmp/grok-goal-de43eae9ef8b/implementer';
+// SCRATCH only used if the caller wants to redirect; no default writes to grok-goal paths.
+const SCRATCH = process.env.SCRATCH || '';
 
 async function main() {
   console.log('=== Stage 5 availability test (direct store path) ===');
@@ -33,12 +34,19 @@ async function main() {
   const conn = getAvailabilityForToken(prov.id, date);
   console.log('CONNECTED (busy 10-11) slots:', JSON.stringify(conn.slots));
 
-  // assert behavior: unconn available, connected has at least one unavailable due to overlap
+  // direct mergeWithBusy exercise (shipped function, called from driver)
+  const ruleSlots = [{date, start:'09:00', end:'17:00', available:true}];
+  const busy = [{start:'10:00', end:'11:00'}];
+  const mergedDirect = mergeWithBusy(ruleSlots, busy);
+  console.log('DIRECT mergeWithBusy result:', JSON.stringify(mergedDirect));
+
+  // assert behavior: unconn available, connected has unavailable, direct merge too
   const unconnAvailable = unconn.slots[0]?.available;
   const connHasUnavailable = conn.slots.some((s: any) => s.available === false);
-  console.log('unconn available?', unconnAvailable, 'conn has unavailable slot?', connHasUnavailable);
+  const directUnavailable = mergedDirect[0]?.available === false;
+  console.log('unconn available?', unconnAvailable, 'conn unavailable?', connHasUnavailable, 'direct merge unavailable?', directUnavailable);
 
-  if (!unconnAvailable || !connHasUnavailable) {
+  if (!unconnAvailable || !connHasUnavailable || !directUnavailable) {
     console.error('FAIL: expected merge behavior not observed');
     process.exit(1);
   }

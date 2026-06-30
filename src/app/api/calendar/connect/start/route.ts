@@ -26,8 +26,10 @@ export async function GET(req: NextRequest) {
   // For demo when no real client id, short circuit directly to callback with demo code
   if (clientId === 'demo-client-id' || !process.env.GOOGLE_CLIENT_ID) {
     const demoCb = new URL(redirectUri);
+    const demoDate = searchParams.get('demoDate') || '2026-07-07';
     demoCb.searchParams.set('code', 'demo-code-for-' + id);
     demoCb.searchParams.set('state', id);
+    demoCb.searchParams.set('demoDate', demoDate);
     return NextResponse.redirect(demoCb.toString());
   }
 

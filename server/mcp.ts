@@ -15,6 +15,7 @@ import { z } from 'zod';
 
 import { seedProviders, reloadProviders } from '../src/lib/store.js';
 import { dispatchMcpTool } from '../src/lib/mcp-tools';
+import { appendMcpTranscript } from '../src/lib/mcp-transcript.js';
 
 // Sample data matching types (typed to avoid literal errors)
 const SAMPLE_PROVIDERS = [
@@ -105,8 +106,17 @@ mcpServer.registerTool(
     const body = req.body || {};
     const method = body.method || (body.jsonrpc ? 'unknown' : 'no-method');
     const id = body.id ?? 1;
-    const toolName = (method === 'tools/call') ? (body.params?.name || '?') : '';
-    console.error('[MCP POST]', method, toolName ? `name=${toolName}` : '', 'id=', id, 'params keys=', Object.keys(body.params || {}), 'token?', body.params?.arguments?.token, 'STAGE5LOG');
+    appendMcpTranscript(`[MCP_TRANSCRIPT] POST id=${id} method=${method} token? ${body.params?.arguments?.token ? 'yes' : 'no'}`);
+    console.error('POST HANDLER ENTERED for', method, 'id=', id);
+
+    // wrap res.json to capture full response body sent (for transcript)
+    const originalJson = res.json.bind(res);
+    res.json = (body) => {
+      if (body && body.jsonrpc && body.id) {
+        appendMcpTranscript(`[MCP_TRANSCRIPT] RESP id=${body.id} body=${JSON.stringify(body)}`);
+      }
+      return originalJson(body);
+    };
 
     try {
       if (method === 'initialize' || method === 'notifications/initialized' || method === 'unknown' || !method) {
@@ -159,6 +169,7 @@ mcpServer.registerTool(
       if (method === 'tools/call') {
         const name = body.params?.name;
         const args = body.params?.arguments || {};
+        appendMcpTranscript(`[MCP_TRANSCRIPT] POST id=${id} tool=${name} token? ${args.token ? 'yes' : 'no'}`);
         const result = dispatchMcpTool(name, args);
         return res.json({ jsonrpc: '2.0', id, result });
       }
@@ -182,5 +193,6 @@ mcpServer.registerTool(
 
   app.listen(PORT, () => {
     console.log(`[Totbox] MCP server listening on http://localhost:${PORT}/mcp`);
+    appendMcpTranscript(`[MCP_TRANSCRIPT] listening`);
   });
 })();

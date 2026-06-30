@@ -1,19 +1,15 @@
 /**
- * Verification driver for Stage 5 (per strategist restructure).
- * Single orchestrator.
- * - wipes canonical logs: stage5-availability.log, stage5-mcp.log, mcp-real.log
- * - runs direct store x2 (test-stage5.ts)
- * - spawns dev:mcp with stdout/stderr tee to mcp-real.log
- * - runs MCP x2 (test-stage5-mcp.ts), appends client to stage5-mcp.log
- * - asserts >=4 tools/call name=get_availability in mcp-real.log
- * - build, etc.
- * Run with: SCRATCH=/tmp/grok-goal-de43eae9ef8b/implementer npx tsx scripts/verify-stage5.ts
+ * Verification driver for Stage 5.
+ * Use SCRATCH=... to control where logs are written (defaults to a local temp dir
+ * that can be cleaned easily). Do not hardcode goal-specific /tmp paths.
  */
 import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 
-const SCRATCH = process.env.SCRATCH || '/tmp/grok-goal-de43eae9ef8b/implementer';
+const defaultScratch = path.join(process.cwd(), '.verif-scratch');
+const SCRATCH = process.env.SCRATCH || defaultScratch;
 
 function logTo(file: string, msg: string) {
   fs.appendFileSync(path.join(SCRATCH, file), msg + '\n');
@@ -24,12 +20,14 @@ function writeLog(file: string, msg: string) {
 }
 
 async function run() {
+  // Clean previous run artifacts so we don't accumulate junk in the scratch dir.
+  try { fs.rmSync(SCRATCH, { recursive: true, force: true }); } catch {}
   fs.mkdirSync(SCRATCH, { recursive: true });
 
   // clear canonical logs
   writeLog('stage5-availability.log', '');
   writeLog('stage5-mcp.log', '');
-  writeLog('mcp-real.log', '=== mcp server log (teed) ===\n');
+  writeLog('mcp-real.log', '=== mcp server log (from transcript) ===\n');
 
   console.log('Starting Stage 5 verification...');
 
@@ -41,33 +39,48 @@ async function run() {
   }
   writeLog('stage5-availability.log', availLog);
 
-  // Step 4: bg dev:mcp with tee to server log, then MCP test x2
-  console.log('Starting external dev:mcp (tee to mcp-real.log)...');
+  // Step 4: bg dev:mcp via proper spawn (env for transcript path, stdio ignore), client x2; hard asserts on server transcript + client
+  console.log('Starting external dev:mcp ...');
   const mcpLogPath = path.join(SCRATCH, 'mcp-real.log');
-  // use --no-cache to pick latest source changes (e.g. logging name)
-  const mcpProc = spawn('sh', ['-c', `npx tsx --no-cache server/mcp.ts 2>&1 | tee -a ${mcpLogPath}`], { detached: true });
-  await sleep(5000); // wait ready
+  fs.writeFileSync(mcpLogPath, '=== mcp server log (from transcript) ===\n');
+  const mcpProc = spawn('npm', ['run', 'dev:mcp'], {
+    detached: true,
+    stdio: 'ignore',
+    env: { ...process.env, MCP_TRANSCRIPT_PATH: mcpLogPath }
+  });
+  // poll for genuine server listening emission (up to ~12s)
+  let waited = 0;
+  const pollMs = 400;
+  while (waited < 12000) {
+    try {
+      const content = fs.readFileSync(mcpLogPath, 'utf8');
+      if (content.includes('[MCP_TRANSCRIPT] listening')) break;
+    } catch {}
+    await sleep(pollMs);
+    waited += pollMs;
+  }
+  await sleep(800); // small extra settle for transport
 
   let mcpLog = '=== 4. mcp get_availability x2 (real fetch) ===\n';
   for (let i = 1; i <= 2; i++) {
     const out = await exec(`npx tsx scripts/test-stage5-mcp.ts ${i}`);
     mcpLog += `run${i}:\n` + out + '\n';
   }
-  // append client transcript (do not overwrite server tee)
   fs.appendFileSync(path.join(SCRATCH, 'stage5-mcp.log'), mcpLog);
 
-  // assert in server log: >=4 tools/call for get_availability (2 runs x 2 calls)
-  const countStr = await exec(`grep -c 'tools/call' ${mcpLogPath} || echo 0`);
-  const count = parseInt(countStr.trim(), 10);
-  console.log('tools/call count in server log:', count);
-  if (count < 4) {
-    console.error('FAIL: expected at least 4 tools/call in mcp server log for the x2 MCP fetches');
-    try { if (mcpProc.pid) process.kill(-mcpProc.pid); } catch {}
+  try { if (mcpProc.pid) process.kill(-mcpProc.pid); } catch {}
+  await sleep(300);
+
+  // hard asserts (server transcript has listening + full RESPs; client stdout has full bodies)
+  const serverListening = (await exec(`grep -c '\\[MCP_TRANSCRIPT\\] listening' ${mcpLogPath} || echo 0`)).trim();
+  const serverResp = (await exec(`grep -c '\\[MCP_TRANSCRIPT\\] RESP' ${mcpLogPath} || echo 0`)).trim();
+  const clientBodies = (await exec(`grep -c '"jsonrpc"' ${path.join(SCRATCH, 'stage5-mcp.log')} || echo 0`)).trim();
+  console.log('server listening:', serverListening, 'RESPs:', serverResp, 'client bodies:', clientBodies);
+  if (parseInt(serverListening) < 1 || parseInt(serverResp) < 4 || parseInt(clientBodies) < 4) {
+    console.error('FAIL: missing server transcript (listening+RESPs) or client bodies for x2');
     process.exit(1);
   }
 
-  try { if (mcpProc.pid) process.kill(-mcpProc.pid); } catch {}
-  await sleep(1000);
 
   // build
   const build = await exec('npm run build');

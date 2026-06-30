@@ -173,8 +173,11 @@ export function createBooking(b: Omit<Booking, 'id' | 'status'> & { status?: Boo
 }
 
 // Pure rules-based (refactored for Stage 5 reuse)
+// Use UTC day to make weekday deterministic across timezones / test runs
 function computeRulesOnly(rule: ProviderRule['availability'], date: string): AvailabilitySlot[] {
-  const dayName = new Date(date).toLocaleDateString('en-US', { weekday: 'short' });
+  // Parse as UTC date to avoid local TZ skew (e.g. 2026-07-08 may be Tue locally but Wed UTC)
+  const d = new Date(date + 'T00:00:00Z');
+  const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getUTCDay()];
 
   const isAllowedDay = rule.days.some(d => 
     d.toLowerCase().startsWith(dayName.toLowerCase()) || 
@@ -201,7 +204,8 @@ function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string): b
 }
 
 // Merge rules slots with busy periods (mark unavailable on overlap; simple for MVP)
-function mergeWithBusy(ruleSlots: AvailabilitySlot[], busy: Array<{start: string; end: string}>): AvailabilitySlot[] {
+// Exported for direct test/driver exercise (Stage 5 verif requirement)
+export function mergeWithBusy(ruleSlots: AvailabilitySlot[], busy: Array<{start: string; end: string}>): AvailabilitySlot[] {
   if (busy.length === 0) return ruleSlots;
   return ruleSlots.map(slot => {
     const overlapsBusy = busy.some(b => overlaps(slot.start, slot.end, b.start, b.end));
@@ -211,6 +215,7 @@ function mergeWithBusy(ruleSlots: AvailabilitySlot[], busy: Array<{start: string
 
 // Very naive availability for Stage 2 (rules only, calendar in Stage 5)
 export function computeAvailability(providerId: string, date: string): AvailabilitySlot[] {
+  reloadProviders();
   const p = getProvider(providerId);
   if (!p) return [];
 
@@ -245,13 +250,19 @@ export function getAvailabilityForToken(providerId: string, date: string, token?
   return { providerId, date, slots };
 }
 
+type ProviderWithCalendar = Provider & {
+  calendarBusy?: Record<string, Array<{start: string; end: string}>>;
+  calendarTokens?: { accessToken: string; refreshToken?: string };
+};
+
 /** Stage 5: connect calendar for a provider (persists tokens; demo uses plain tokens) */
 export function connectCalendar(id: string, tokens: { accessToken: string; refreshToken?: string }) {
   reloadProviders();
   const p = getProvider(id);
   if (!p) return false;
-  p.calendarConnected = true;
-  (p as any).calendarTokens = { ...tokens };
+  const pe = p as ProviderWithCalendar;
+  pe.calendarConnected = true;
+  pe.calendarTokens = { ...tokens };
   saveProviders();
   return true;
 }
@@ -260,8 +271,9 @@ export function disconnectCalendar(id: string) {
   reloadProviders();
   const p = getProvider(id);
   if (!p) return false;
-  p.calendarConnected = false;
-  delete (p as any).calendarTokens;
+  const pe = p as ProviderWithCalendar;
+  pe.calendarConnected = false;
+  delete pe.calendarTokens;
   saveProviders();
   return true;
 }
@@ -271,12 +283,13 @@ export function setCalendarBusyMock(id: string, date: string, busy: Array<{start
   reloadProviders();
   const p = getProvider(id);
   if (!p) return false;
-  if (!p.calendarConnected) {
-    p.calendarConnected = true;
+  const pe = p as ProviderWithCalendar;
+  if (!pe.calendarConnected) {
+    pe.calendarConnected = true;
   }
   const key = `busy_${date}`;
-  if (!(p as any).calendarBusy) (p as any).calendarBusy = {};
-  (p as any).calendarBusy[key] = busy;
+  if (!pe.calendarBusy) pe.calendarBusy = {};
+  pe.calendarBusy[key] = busy;
   saveProviders();
   return true;
 }
@@ -285,6 +298,7 @@ export function getCalendarBusyMock(id: string, date: string): Array<{start: str
   reloadProviders();
   const p = getProvider(id);
   if (!p || !p.calendarConnected) return [];
+  const pe = p as ProviderWithCalendar;
   const key = `busy_${date}`;
-  return (p as any).calendarBusy?.[key] || [];
+  return pe.calendarBusy?.[key] || [];
 }

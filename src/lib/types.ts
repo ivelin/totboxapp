@@ -41,6 +41,7 @@ export const ProviderSchema = z.object({
     accessToken: z.string(),
     refreshToken: z.string().optional(),
   }).optional(), // Stage 5 (demo/plain for local; real would encrypt)
+  calendarBusy: z.record(z.array(z.object({start: z.string(), end: z.string()}))).optional(), // date -> busy slots, persisted for demo (Stage 5)
   token: z.string().optional(), // bearer for MCP scoping (Stage 4+)
 });
 

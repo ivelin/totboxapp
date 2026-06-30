@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:mcp": "tsx server/mcp.ts",
+    "dev:mcp": "tsx --no-cache server/mcp.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
