@@ -43,6 +43,7 @@ async function main() {
   const cJ = await cRes.json();
   const cText = cJ.result?.content?.[0]?.text || '{}';
   const cParsed = JSON.parse(cText);
+  console.log(`mcp conn full (${cId}):`, JSON.stringify(cJ));  // log full jsonrpc body for transcript
   console.log(`mcp conn (${cId}):`, cParsed);
   const connHasFalse = Array.isArray(cParsed.slots) && cParsed.slots.some((s: any) => s.available === false);
   if (!connHasFalse) {
@@ -56,6 +57,7 @@ async function main() {
   const uJ = await uRes.json();
   const uText = uJ.result?.content?.[0]?.text || '{}';
   const uParsed = JSON.parse(uText);
+  console.log(`mcp unconn full (${uId}):`, JSON.stringify(uJ));  // log full jsonrpc body for transcript
   console.log(`mcp unconn (${uId}):`, uParsed);
   const unconnHasTrue = Array.isArray(uParsed.slots) && uParsed.slots.some((s: any) => s.available === true);
   if (!unconnHasTrue) {
