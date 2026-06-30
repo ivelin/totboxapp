@@ -77,7 +77,7 @@ mcpServer.registerTool(
 mcpServer.registerTool(
   'get_availability',
   {
-    description: 'Get availability slots for a provider on a date (rules-based). Supply token to scope (Stage 4).',
+    description: 'Get availability slots for a provider on a date (rules + calendar if connected, Stage 5). Supply token to scope.',
     inputSchema: { providerId: z.string(), date: z.string(), token: z.string().optional() },
   },
   async (args) => {

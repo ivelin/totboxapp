@@ -9,6 +9,7 @@ type Registered = {
   services: string[];
   token: string;
   category?: string;
+  calendarConnected?: boolean;
 };
 
 export default function ProviderDashboard() {
@@ -30,6 +31,18 @@ export default function ProviderDashboard() {
       if (saved) setRegistered(JSON.parse(saved));
     } catch {}
   }, []);
+
+  // Handle calendar connect callback redirect params (Stage 5)
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('calendar_connected') && registered) {
+      const updated = { ...registered, calendarConnected: true };
+      persistCurrent(updated);
+      // clean url
+      window.history.replaceState({}, '', '/dashboard');
+    }
+  }, [registered]); // run after load
 
   function persistCurrent(r: Registered | null) {
     setRegistered(r);
@@ -77,6 +90,13 @@ export default function ProviderDashboard() {
       const updated = { ...registered, token: d.token };
       persistCurrent(updated);
     } catch (e:any) { setError(e.message); } finally { setLoading(false); }
+  }
+
+  function connectCalendar() {
+    if (!registered) return;
+    // Stage 5 minimal connect: hits start which redirects to callback (demo or real)
+    const startUrl = `/api/calendar/connect/start?id=${encodeURIComponent(registered.id)}`;
+    window.location.href = startUrl;
   }
 
   return (
@@ -159,6 +179,23 @@ export default function ProviderDashboard() {
             <div className="mb-4">
               <div className="text-sm mb-1">Services</div>
               <div className="text-sm">{registered.services.join(', ')}</div>
+            </div>
+
+            {/* Stage 5: Connect Google Calendar (minimal) */}
+            <div className="mb-4">
+              <div className="text-sm mb-1">Calendar</div>
+              {registered.calendarConnected ? (
+                <div className="text-sm text-emerald-600">✓ Google Calendar connected</div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={connectCalendar}
+                  className="text-sm px-3 py-1 rounded border bg-white dark:bg-zinc-800 hover:bg-zinc-100"
+                >
+                  Connect Google Calendar
+                </button>
+              )}
+              <div className="text-xs text-zinc-500 mt-1">(demo flow sets connected + dummy token)</div>
             </div>
 
             <div>
