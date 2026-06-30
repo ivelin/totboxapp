@@ -37,6 +37,10 @@ export const ProviderSchema = z.object({
   rules: ProviderRuleSchema,
   // populated later
   calendarConnected: z.boolean().default(false),
+  calendarTokens: z.object({
+    accessToken: z.string(),
+    refreshToken: z.string().optional(),
+  }).optional(), // Stage 5 (demo/plain for local; real would encrypt)
   token: z.string().optional(), // bearer for MCP scoping (Stage 4+)
 });
 

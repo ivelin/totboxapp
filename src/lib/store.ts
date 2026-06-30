@@ -172,13 +172,9 @@ export function createBooking(b: Omit<Booking, 'id' | 'status'> & { status?: Boo
   return booking;
 }
 
-// Very naive availability for Stage 2 (rules only, calendar in Stage 5)
-export function computeAvailability(providerId: string, date: string): AvailabilitySlot[] {
-  const p = getProvider(providerId);
-  if (!p) return [];
-
-  const rule = p.rules.availability;
-  const dayName = new Date(date).toLocaleDateString('en-US', { weekday: 'short' }); // "Thu"
+// Pure rules-based (refactored for Stage 5 reuse)
+function computeRulesOnly(rule: ProviderRule['availability'], date: string): AvailabilitySlot[] {
+  const dayName = new Date(date).toLocaleDateString('en-US', { weekday: 'short' });
 
   const isAllowedDay = rule.days.some(d => 
     d.toLowerCase().startsWith(dayName.toLowerCase()) || 
@@ -189,13 +185,40 @@ export function computeAvailability(providerId: string, date: string): Availabil
     return [];
   }
 
-  // Return simple slots from first window
   const win = rule.windows[0] || '09:00-17:00';
   const [start, end] = win.split('-');
 
-  return [
-    { date, start, end, available: true },
-  ];
+  return [{ date, start, end, available: true }];
+}
+
+function timeToMinutes(t: string): number {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string): boolean {
+  return timeToMinutes(aStart) < timeToMinutes(bEnd) && timeToMinutes(bStart) < timeToMinutes(aEnd);
+}
+
+// Merge rules slots with busy periods (mark unavailable on overlap; simple for MVP)
+function mergeWithBusy(ruleSlots: AvailabilitySlot[], busy: Array<{start: string; end: string}>): AvailabilitySlot[] {
+  if (busy.length === 0) return ruleSlots;
+  return ruleSlots.map(slot => {
+    const overlapsBusy = busy.some(b => overlaps(slot.start, slot.end, b.start, b.end));
+    return { ...slot, available: slot.available && !overlapsBusy };
+  });
+}
+
+// Very naive availability for Stage 2 (rules only, calendar in Stage 5)
+export function computeAvailability(providerId: string, date: string): AvailabilitySlot[] {
+  const p = getProvider(providerId);
+  if (!p) return [];
+
+  const ruleSlots = computeRulesOnly(p.rules.availability, date);
+  if (!p.calendarConnected) return ruleSlots;
+
+  const busy = getCalendarBusyMock(providerId, date);
+  return mergeWithBusy(ruleSlots, busy);
 }
 
 export function listAllBookings(): Booking[] {
@@ -220,4 +243,48 @@ export function getAvailabilityForToken(providerId: string, date: string, token?
   // invalid/unknown token retains prior unseeded behavior (compute slots like no-token)
   const slots = computeAvailability(providerId, date);
   return { providerId, date, slots };
+}
+
+/** Stage 5: connect calendar for a provider (persists tokens; demo uses plain tokens) */
+export function connectCalendar(id: string, tokens: { accessToken: string; refreshToken?: string }) {
+  reloadProviders();
+  const p = getProvider(id);
+  if (!p) return false;
+  p.calendarConnected = true;
+  (p as any).calendarTokens = { ...tokens };
+  saveProviders();
+  return true;
+}
+
+export function disconnectCalendar(id: string) {
+  reloadProviders();
+  const p = getProvider(id);
+  if (!p) return false;
+  p.calendarConnected = false;
+  delete (p as any).calendarTokens;
+  saveProviders();
+  return true;
+}
+
+/** For demo / testing: allow injecting sample busy periods without real OAuth */
+export function setCalendarBusyMock(id: string, date: string, busy: Array<{start: string; end: string}>) {
+  reloadProviders();
+  const p = getProvider(id);
+  if (!p) return false;
+  if (!p.calendarConnected) {
+    p.calendarConnected = true;
+  }
+  const key = `busy_${date}`;
+  if (!(p as any).calendarBusy) (p as any).calendarBusy = {};
+  (p as any).calendarBusy[key] = busy;
+  saveProviders();
+  return true;
+}
+
+export function getCalendarBusyMock(id: string, date: string): Array<{start: string; end: string}> {
+  reloadProviders();
+  const p = getProvider(id);
+  if (!p || !p.calendarConnected) return [];
+  const key = `busy_${date}`;
+  return (p as any).calendarBusy?.[key] || [];
 }
