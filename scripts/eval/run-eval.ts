@@ -35,7 +35,7 @@ function loadProvider(json: unknown): Provider {
 }
 
 interface AvailabilityCase {
-  providerSeed: ProviderSeed;
+  providerSeed: unknown;
   connectTokens?: { accessToken: string };
   busy?: Array<{start: string; end: string}>;
   date: string;
@@ -71,12 +71,13 @@ function runAvailabilityEval(cases: AvailabilityCase[]): { passed: number; faile
   for (const c of cases) {
     try {
       setupProvider(c);
-      const slots = computeAvailability(c.providerSeed.id, c.date);
+      const p = loadProvider(c.providerSeed);
+      const slots = computeAvailability(p.id, c.date);
       const firstAvailable = slots.length > 0 ? slots[0].available : false;
       if (firstAvailable === c.expectedFirstSlotAvailable) {
         passed++;
         // also drive via MCP dispatch for real path
-        const mcpRes = dispatchMcpTool('get_availability', { providerId: c.providerSeed.id, date: c.date, token: c.providerSeed.token });
+        const mcpRes = dispatchMcpTool('get_availability', { providerId: p.id, date: c.date, token: p.token });
         const parsed = JSON.parse(mcpRes.content[0].text);
         const mcpAvail = parsed.slots?.[0]?.available;
         if (mcpAvail !== firstAvailable) {
@@ -85,11 +86,12 @@ function runAvailabilityEval(cases: AvailabilityCase[]): { passed: number; faile
         }
       } else {
         failed++;
-        details.push(`FAIL availability: ${c.description || c.providerSeed.id} on ${c.date} expected ${c.expectedFirstSlotAvailable} got ${firstAvailable}`);
+        details.push(`FAIL availability: ${c.description || p.id} on ${c.date} expected ${c.expectedFirstSlotAvailable} got ${firstAvailable}`);
       }
     } catch (e: unknown) {
+      const p = loadProvider(c.providerSeed);
       failed++;
-      details.push(`ERROR availability ${c.providerSeed.id}: ${(e as Error).message}`);
+      details.push(`ERROR availability ${p.id}: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
   return { passed, failed, details };
@@ -107,7 +109,7 @@ function runSearchEval(cases: SearchCase[]): { passed: number; failed: number; d
         seedProviders([p]);
       } else {
         // fallback
-        seedProviders([{
+        const fallback: Provider = {
           id: 'prov_eval_search',
           name: 'Eval Search Provider',
           category: 'kids_activities',
@@ -116,7 +118,8 @@ function runSearchEval(cases: SearchCase[]): { passed: number; failed: number; d
           rules: { availability: { days: ['Tue'], windows: ['09:00-17:00'] } },
           calendarConnected: false,
           token: 'tok_eval_s',
-        } as unknown as Provider]);
+        };
+        seedProviders([fallback]);
       }
       const results = searchProviders(c.args, c.token);
       const okCount = results.length >= (c.expectedCountMin || 0);
@@ -131,7 +134,8 @@ function runSearchEval(cases: SearchCase[]): { passed: number; failed: number; d
       }
     } catch (e: unknown) {
       failed++;
-      details.push(`ERROR search: ${(e as Error).message}`);
+      const msg = e instanceof Error ? e.message : String(e);
+      details.push(`ERROR search: ${msg}`);
     }
   }
   return { passed, failed, details };
