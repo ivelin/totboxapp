@@ -10,10 +10,10 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       thresholds: {
-        lines: 0,
-        functions: 0,
-        branches: 0,
-        statements: 0,
+        lines: 5,
+        functions: 5,
+        branches: 5,
+        statements: 5,
       },
       // basic thresholds per scaffolding plan; focus on core lib paths
       // full 80% targeted in future iterations per non-goals

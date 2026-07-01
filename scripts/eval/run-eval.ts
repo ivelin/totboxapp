@@ -30,6 +30,7 @@ function loadJson<T>(name: string): T {
 }
 
 interface AvailabilityCase {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   providerSeed: any;
   connectTokens?: { accessToken: string };
   busy?: Array<{start: string; end: string}>;
@@ -39,6 +40,8 @@ interface AvailabilityCase {
 }
 
 interface SearchCase {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  providerSeed?: any;
   args: { query?: string; category?: string; location?: string; limit?: number };
   token?: string;
   expectedCountMin: number;
@@ -81,9 +84,9 @@ function runAvailabilityEval(cases: AvailabilityCase[]): { passed: number; faile
         failed++;
         details.push(`FAIL availability: ${c.description || c.providerSeed.id} on ${c.date} expected ${c.expectedFirstSlotAvailable} got ${firstAvailable}`);
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       failed++;
-      details.push(`ERROR availability ${c.providerSeed.id}: ${e.message}`);
+      details.push(`ERROR availability ${c.providerSeed.id}: ${(e as Error).message}`);
     }
   }
   return { passed, failed, details };
@@ -96,20 +99,24 @@ function runSearchEval(cases: SearchCase[]): { passed: number; failed: number; d
   for (const c of cases) {
     try {
       resetStore();
-      // ensure at least one provider for search smoke
-      seedProviders([{
-        id: 'prov_eval_search',
-        name: 'Eval Search Provider',
-        category: 'kids_activities',
-        location: 'Testville',
-        services: ['test'],
-        rules: { availability: { days: ['Tue'], windows: ['09:00-17:00'] } },
-        calendarConnected: false,
-        token: 'tok_eval_s',
-      }]);
+      if (c.providerSeed) {
+        seedProviders([c.providerSeed]);
+      } else {
+        // fallback
+        seedProviders([{
+          id: 'prov_eval_search',
+          name: 'Eval Search Provider',
+          category: 'kids_activities',
+          location: 'Testville',
+          services: ['test'],
+          rules: { availability: { days: ['Tue'], windows: ['09:00-17:00'] } },
+          calendarConnected: false,
+          token: 'tok_eval_s',
+        }]);
+      }
       const results = searchProviders(c.args, c.token);
       const okCount = results.length >= (c.expectedCountMin || 0);
-      const okIds = !c.expectedIdsContain || c.expectedIdsContain.every(id => results.some((r: any) => r.id === id));
+      const okIds = !c.expectedIdsContain || c.expectedIdsContain.every(id => results.some((r: {id?: string}) => r.id === id));
       if (okCount && okIds) {
         passed++;
         // drive via mcp dispatch too
@@ -118,9 +125,9 @@ function runSearchEval(cases: SearchCase[]): { passed: number; failed: number; d
         failed++;
         details.push(`FAIL search: ${c.description || JSON.stringify(c.args)} got ${results.length}`);
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       failed++;
-      details.push(`ERROR search: ${e.message}`);
+      details.push(`ERROR search: ${(e as Error).message}`);
     }
   }
   return { passed, failed, details };

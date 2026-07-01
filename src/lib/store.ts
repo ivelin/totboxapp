@@ -20,7 +20,7 @@ function loadProviders() {
       const raw = JSON.parse(fs.readFileSync(PROVIDERS_FILE, 'utf8'));
       if (Array.isArray(raw)) {
         const loaded = new Map(raw.map((p: Provider) => [p.id, p] as const));
-        for (let [id, p] of loaded.entries()) {
+        for (const [id, p] of loaded.entries()) {
           const idx = providers.findIndex(x => x.id === id);
           if (idx >= 0) providers[idx] = p;
           else providers.push(p);
@@ -141,7 +141,7 @@ export function searchProviders(args: {query?: string, category?: string, locati
     if (matches.length === 0) token = undefined;
   }
   let results = token ? getProvidersForToken(token) : getProviders();
-  if (args.category) results = results.filter(p => p.category.includes(args.category as any));
+  if (args.category) results = results.filter(p => p.category.includes(args.category as unknown as string));
   if (args.location) {
     const loc = args.location.toLowerCase();
     results = results.filter(p => p.location.toLowerCase().includes(loc));
@@ -237,7 +237,7 @@ export function getProviderDetailsForToken(providerId: string, token?: string) {
   if (!p) return null;
   // invalid/unknown token retains prior unseeded behavior (return data like no-token)
   // only a matching token "scopes" but since id is explicit, data is visible either way
-  const { token: _t, ...safe } = p as any;
+  const { token: _t, ...safe } = p as unknown as { [key: string]: unknown; token?: string };
   return safe;
 }
 
