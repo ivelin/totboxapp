@@ -21,6 +21,7 @@ import {
   computeAvailability,
 } from '../../src/lib/store';
 import { dispatchMcpTool } from '../../src/lib/mcp-tools';
+import { Provider, ProviderSchema } from '../../src/lib/types';
 
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
@@ -29,15 +30,8 @@ function loadJson<T>(name: string): T {
   return JSON.parse(readFileSync(full, 'utf8'));
 }
 
-interface ProviderSeed {
-  id: string;
-  name: string;
-  category: string;
-  location: string;
-  services: string[];
-  rules: { availability: { days: string[]; windows: string[] } };
-  calendarConnected: boolean;
-  token: string;
+function loadProvider(json: unknown): Provider {
+  return ProviderSchema.parse(json);
 }
 
 interface AvailabilityCase {
@@ -50,7 +44,7 @@ interface AvailabilityCase {
 }
 
 interface SearchCase {
-  providerSeed?: ProviderSeed;
+  providerSeed?: unknown;
   args: { query?: string; category?: string; location?: string; limit?: number };
   token?: string;
   expectedCountMin: number;
@@ -60,7 +54,7 @@ interface SearchCase {
 
 function setupProvider(caseItem: AvailabilityCase) {
   resetStore();
-  const p = { ...caseItem.providerSeed } as any;
+  const p = loadProvider(caseItem.providerSeed);
   seedProviders([p]);
   if (caseItem.connectTokens) {
     connectCalendar(p.id, caseItem.connectTokens);
@@ -109,7 +103,8 @@ function runSearchEval(cases: SearchCase[]): { passed: number; failed: number; d
     try {
       resetStore();
       if (c.providerSeed) {
-        seedProviders([c.providerSeed as any]);
+        const p = loadProvider(c.providerSeed);
+        seedProviders([p]);
       } else {
         // fallback
         seedProviders([{
@@ -121,7 +116,7 @@ function runSearchEval(cases: SearchCase[]): { passed: number; failed: number; d
           rules: { availability: { days: ['Tue'], windows: ['09:00-17:00'] } },
           calendarConnected: false,
           token: 'tok_eval_s',
-        }]);
+        } as unknown as Provider]);
       }
       const results = searchProviders(c.args, c.token);
       const okCount = results.length >= (c.expectedCountMin || 0);

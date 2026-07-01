@@ -16,7 +16,7 @@ jobs:
           node-version: 20
           cache: 'npm'
       - run: npm ci
-      - run: npx eslint src/lib src/app/api scripts/eval scripts/verify-scaffolding.ts
+      - run: npm run lint:ci
       - run: npm run typecheck
 
   test-coverage:
