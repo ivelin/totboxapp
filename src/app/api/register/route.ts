@@ -5,20 +5,20 @@ import { registerProvider } from '@/lib/store';
 // Body: { name, services, location, rules? }
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json() as Record<string, unknown>;
+    const body = await req.json();
     if (!body.name || !body.location) {
       return NextResponse.json({ error: 'name and location required' }, { status: 400 });
     }
     const result = registerProvider({
-      name: String(body.name),
-      location: String(body.location),
-      services: (body.services as string[]) || [],
-      rules: body.rules as Parameters<typeof registerProvider>[0]['rules'],
-      category: body.category as Parameters<typeof registerProvider>[0]['category'],
+      name: body.name,
+      location: body.location,
+      services: body.services || [],
+      rules: body.rules,
+      category: body.category,
     });
     // Return full including secret token (display once on client)
     return NextResponse.json({ ok: true, provider: result });
-  } catch (e: unknown) {
-    return NextResponse.json({ error: (e as Error)?.message || 'register failed' }, { status: 500 });
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message || 'register failed' }, { status: 500 });
   }
 }

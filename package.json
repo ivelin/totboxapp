@@ -14,7 +14,8 @@
     "test:coverage": "vitest run --coverage",
     "test:eval": "tsx scripts/eval/run-eval.ts",
     "typecheck": "tsc --noEmit",
-    "verify": "tsx scripts/verify-stage5.ts"
+    "verify": "tsx scripts/verify-stage5.ts",
+    "capture:evidence": "tsx scripts/capture-scaffolding-evidence.ts"
   },
   "dependencies": {
     "@hono/mcp": "^0.3.0",

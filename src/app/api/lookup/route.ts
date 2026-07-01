@@ -11,6 +11,6 @@ export async function GET(req: NextRequest) {
   if (matches.length === 0) return NextResponse.json({ error: 'not found' }, { status: 404 });
   const p = matches[0];
   // return without the secret token for safety in this lookup
-  const { token: _t, ...publicP } = p as unknown as Record<string, unknown>;
+  const { token: _t, ...publicP } = p as any;
   return NextResponse.json({ provider: publicP });
 }
