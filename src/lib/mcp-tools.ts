@@ -17,12 +17,17 @@ export function dispatchMcpTool(name: string, args: LooseArgs) {
     return { content: [{ type: 'text' as const, text: JSON.stringify(sliced, null, 2) }] };
   }
   if (name === 'get_provider_details') {
-    const res = getProviderDetailsForToken(getStr(args.providerId)!, getStr(args.token));
+    const pid = getStr(args.providerId) || '';
+    const t = getStr(args.token);
+    const res = getProviderDetailsForToken(pid, t);
     if (!res) return { content: [{ type: 'text' as const, text: 'Provider not found' }] };
     return { content: [{ type: 'text' as const, text: JSON.stringify(res, null, 2) }] };
   }
   if (name === 'get_availability') {
-    const res = getAvailabilityForToken(getStr(args.providerId)!, getStr(args.date)!, getStr(args.token));
+    const pid = getStr(args.providerId) || '';
+    const d = getStr(args.date) || '';
+    const t = getStr(args.token);
+    const res = getAvailabilityForToken(pid, d, t);
     return { content: [{ type: 'text' as const, text: JSON.stringify(res, null, 2) }] };
   }
   return { content: [{ type: 'text' as const, text: JSON.stringify({ error: 'unknown tool ' + name }) }] };
