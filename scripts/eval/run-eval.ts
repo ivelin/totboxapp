@@ -29,9 +29,19 @@ function loadJson<T>(name: string): T {
   return JSON.parse(readFileSync(full, 'utf8'));
 }
 
+interface ProviderSeed {
+  id: string;
+  name: string;
+  category: string;
+  location: string;
+  services: string[];
+  rules: { availability: { days: string[]; windows: string[] } };
+  calendarConnected: boolean;
+  token: string;
+}
+
 interface AvailabilityCase {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  providerSeed: any;
+  providerSeed: ProviderSeed;
   connectTokens?: { accessToken: string };
   busy?: Array<{start: string; end: string}>;
   date: string;
@@ -40,8 +50,7 @@ interface AvailabilityCase {
 }
 
 interface SearchCase {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  providerSeed?: any;
+  providerSeed?: ProviderSeed;
   args: { query?: string; category?: string; location?: string; limit?: number };
   token?: string;
   expectedCountMin: number;
@@ -51,7 +60,7 @@ interface SearchCase {
 
 function setupProvider(caseItem: AvailabilityCase) {
   resetStore();
-  const p = { ...caseItem.providerSeed };
+  const p = { ...caseItem.providerSeed } as any;
   seedProviders([p]);
   if (caseItem.connectTokens) {
     connectCalendar(p.id, caseItem.connectTokens);
@@ -100,7 +109,7 @@ function runSearchEval(cases: SearchCase[]): { passed: number; failed: number; d
     try {
       resetStore();
       if (c.providerSeed) {
-        seedProviders([c.providerSeed]);
+        seedProviders([c.providerSeed as any]);
       } else {
         // fallback
         seedProviders([{

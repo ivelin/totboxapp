@@ -1,9 +1,19 @@
 import { searchProviders, getProviderDetailsForToken, getAvailabilityForToken } from './store';
 
-export function dispatchMcpTool(name: string, args: Record<string, unknown>) {
-  const getStr = (v: unknown) => (v != null ? String(v) : undefined);
+type LooseArgs = Record<string, unknown>;
+
+function getStr(v: unknown): string | undefined {
+  return v != null ? String(v) : undefined;
+}
+
+export function dispatchMcpTool(name: string, args: LooseArgs) {
   if (name === 'search_services') {
-    const sliced = searchProviders(args as any, getStr(args.token));
+    const sliced = searchProviders({
+      query: getStr(args.query),
+      category: getStr(args.category),
+      location: getStr(args.location),
+      limit: typeof args.limit === 'number' ? args.limit : undefined,
+    }, getStr(args.token));
     return { content: [{ type: 'text' as const, text: JSON.stringify(sliced, null, 2) }] };
   }
   if (name === 'get_provider_details') {
