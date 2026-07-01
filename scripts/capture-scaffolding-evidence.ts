@@ -11,6 +11,36 @@ import * as path from 'path';
 const SCRATCH = process.env.SCRATCH || '/tmp/grok-goal-cd514e5af4b7/implementer';
 const ROOT = process.cwd();
 
+const ALLOWLIST = [
+  'package.json',
+  'package-lock.json',
+  'vitest.config.ts',
+  '.github/workflows/ci.yml',
+  'scripts/eval/',
+  'scripts/verify-scaffolding.ts',
+  'scripts/capture-scaffolding-evidence.ts',
+  'src/lib/',
+];
+
+function assertScope() {
+  let changedRaw = '';
+  try {
+    changedRaw = execSync('git diff --name-only origin/feat/expand-scope', { cwd: ROOT, encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
+  } catch {
+    try {
+      changedRaw = execSync('git diff --name-only HEAD', { cwd: ROOT, encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
+    } catch {
+      changedRaw = '';
+    }
+  }
+  const changed = changedRaw.trim().split('\n').filter(Boolean);
+  const bad = changed.filter(f => !ALLOWLIST.some(allowed => f === allowed || f.startsWith(allowed)));
+  if (bad.length > 0) {
+    console.error('ASSERT SCOPE FAIL: out-of-scope files dirty:', bad);
+    process.exit(1);
+  }
+}
+
 function ensureScratch() {
   if (fs.existsSync(SCRATCH)) {
     fs.rmSync(SCRATCH, { recursive: true, force: true });
@@ -36,16 +66,16 @@ function runAndCapture(cmd: string, logFile: string, label: string) {
 
 function assertNoErrorInCoverage(logPath: string) {
   const content = fs.readFileSync(logPath, 'utf8');
-  if (content.includes('ERROR: Coverage')) {
-    console.error('ASSERT FAIL: coverage log contains ERROR: Coverage');
+  if (!content.includes('CMD:') || !content.includes('EXIT: 0') || content.includes('ERROR: Coverage')) {
+    console.error('ASSERT FAIL: coverage log missing CMD/EXIT:0 or contains ERROR: Coverage');
     process.exit(1);
   }
 }
 
 function assertTestPassed(logPath: string) {
   const content = fs.readFileSync(logPath, 'utf8');
-  if (!content.includes('passed')) {
-    console.error('ASSERT FAIL: test log does not show passed tests');
+  if (!content.includes('CMD:') || !content.includes('EXIT: 0') || !content.includes('9 passed')) {
+    console.error('ASSERT FAIL: test log missing CMD/EXIT:0 or "9 passed"');
     process.exit(1);
   }
 }
@@ -75,7 +105,16 @@ function assertBuildSuccess(logPath: string) {
   }
 }
 
+function assertCIEvidence(logPath: string) {
+  const content = fs.readFileSync(logPath, 'utf8');
+  if (!content.includes('typecheck-exec') || !content.includes('EXIT: 0')) {
+    console.error('ASSERT FAIL: ci-evidence.log missing typecheck-exec + EXIT: 0');
+    process.exit(1);
+  }
+}
+
 function main() {
+  assertScope();
   ensureScratch();
   console.log(`Capturing to ${SCRATCH}`);
 
@@ -114,6 +153,7 @@ function main() {
   }
   assertBuildSuccess(verLog);
   assertVerifySuccess(verLog);
+  assertCIEvidence(ciLog);
 
   console.log('All assertions passed. Evidence captured cleanly.');
   process.exit(0);

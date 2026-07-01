@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 
 type Registered = {
   id: string;
@@ -29,10 +28,7 @@ export default function ProviderDashboard() {
   React.useEffect(() => {
     try {
       const saved = localStorage.getItem('totbox_current_provider');
-      if (saved) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setRegistered(JSON.parse(saved));
-      }
+      if (saved) setRegistered(JSON.parse(saved));
     } catch {}
   }, []);
 
@@ -77,8 +73,8 @@ export default function ProviderDashboard() {
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error || 'Registration failed');
       persistCurrent(data.provider);
-    } catch (err: unknown) {
-      setError((err as Error).message || 'Failed');
+    } catch (err: any) {
+      setError(err.message || 'Failed');
     } finally {
       setLoading(false);
     }
@@ -93,7 +89,7 @@ export default function ProviderDashboard() {
       if (!r.ok || !d.ok) throw new Error(d.error || 'rotate failed');
       const updated = { ...registered, token: d.token };
       persistCurrent(updated);
-    } catch (e: unknown) { setError((e as Error).message); } finally { setLoading(false); }
+    } catch (e:any) { setError(e.message); } finally { setLoading(false); }
   }
 
   function connectCalendar() {
@@ -108,7 +104,7 @@ export default function ProviderDashboard() {
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <Link href="/" className="text-sm text-zinc-500 hover:underline">← Back to Totbox</Link>
+            <a href="/" className="text-sm text-zinc-500 hover:underline">← Back to Totbox</a>
             <h1 className="text-3xl font-semibold tracking-tight mt-1">Provider Dashboard</h1>
             <p className="text-zinc-600 dark:text-zinc-400">Stage 4: Register + MCP Endpoint Generator</p>
           </div>
@@ -129,7 +125,7 @@ export default function ProviderDashboard() {
                 if (!r.ok) throw new Error(d.error || 'not found');
                 // restore with token for owner actions
                 persistCurrent({ ...d.provider, token: loadToken });
-              } catch (e: unknown) { setError((e as Error).message); } finally { setLoading(false); }
+              } catch (e:any) { setError(e.message); } finally { setLoading(false); }
             }} className="px-3 py-1 border rounded text-sm">Load</button>
           </div>
         </div>
