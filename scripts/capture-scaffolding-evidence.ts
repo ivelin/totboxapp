@@ -66,6 +66,15 @@ function assertVerifySuccess(logPath: string) {
   }
 }
 
+function assertBuildSuccess(logPath: string) {
+  const content = fs.readFileSync(logPath, 'utf8');
+  const buildExits = (content.match(/build-run[\s\S]*?EXIT: 0/g) || []).length;
+  if (buildExits < 2) {
+    console.error('ASSERT FAIL: build runs did not both exit 0');
+    process.exit(1);
+  }
+}
+
 function main() {
   ensureScratch();
   console.log(`Capturing to ${SCRATCH}`);
@@ -76,7 +85,7 @@ function main() {
   const ciLog = path.join(SCRATCH, 'ci-evidence.log');
   const verLog = path.join(SCRATCH, 'scaffolding-verify.log');
 
-  // STEP 1: test and coverage , twice
+  // STEP 1: test and coverage , twice -- using the exact piped as in Verification plan
   for (let i = 1; i <= 2; i++) {
     runAndCapture('npm run test 2>&1 | tail -10', testLog, `test-run${i}`);
     runAndCapture('npm run test:coverage 2>&1 | tail -10', covLog, `coverage-run${i}`);
@@ -102,6 +111,7 @@ function main() {
     runAndCapture('npm run build 2>&1 | tail -5', verLog, `build-run${i}`);
     runAndCapture('npx tsx scripts/verify-scaffolding.ts 2>&1', verLog, `verify-run${i}`);
   }
+  assertBuildSuccess(verLog);
   assertVerifySuccess(verLog);
 
   console.log('All assertions passed. Evidence captured cleanly.');
