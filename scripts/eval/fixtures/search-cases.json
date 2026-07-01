@@ -1,0 +1,12 @@
+[
+  {
+    "args": { "query": "Eval" },
+    "expectedCountMin": 1,
+    "description": "search finds seeded eval provider"
+  },
+  {
+    "args": { "location": "Testville" },
+    "expectedCountMin": 1,
+    "description": "search by location"
+  }
+]

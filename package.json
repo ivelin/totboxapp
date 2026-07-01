@@ -7,7 +7,13 @@
     "dev:mcp": "tsx --no-cache server/mcp.ts",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:eval": "tsx scripts/eval/run-eval.ts",
+    "typecheck": "tsc --noEmit",
+    "verify": "tsx scripts/verify-stage5.ts"
   },
   "dependencies": {
     "@hono/mcp": "^0.3.0",
@@ -33,6 +39,8 @@
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
     "tsx": "^4.22.4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^1.6.0",
+    "@vitest/coverage-v8": "^1.6.0"
   }
 }

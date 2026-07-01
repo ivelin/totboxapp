@@ -1,0 +1,34 @@
+[
+  {
+    "providerSeed": {
+      "id": "prov_eval_unconn",
+      "name": "Eval Unconn",
+      "category": "kids_activities",
+      "location": "Testville",
+      "services": ["test"],
+      "rules": { "availability": { "days": ["Tue"], "windows": ["09:00-17:00"] } },
+      "calendarConnected": false,
+      "token": "tok_eval_unconn"
+    },
+    "date": "2026-07-07",
+    "expectedFirstSlotAvailable": true,
+    "description": "unconnected rules-only Tuesday"
+  },
+  {
+    "providerSeed": {
+      "id": "prov_eval_conn",
+      "name": "Eval Conn",
+      "category": "kids_activities",
+      "location": "Testville",
+      "services": ["test"],
+      "rules": { "availability": { "days": ["Tue"], "windows": ["09:00-17:00"] } },
+      "calendarConnected": true,
+      "token": "tok_eval_conn"
+    },
+    "connectTokens": { "accessToken": "demo" },
+    "busy": [{ "start": "10:00", "end": "11:00" }],
+    "date": "2026-07-07",
+    "expectedFirstSlotAvailable": false,
+    "description": "connected with busy overlap -> merged false"
+  }
+]
