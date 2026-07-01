@@ -85,10 +85,10 @@ function main() {
   const ciLog = path.join(SCRATCH, 'ci-evidence.log');
   const verLog = path.join(SCRATCH, 'scaffolding-verify.log');
 
-  // STEP 1: test and coverage , twice -- using the exact piped as in Verification plan
+  // STEP 1: test and coverage , twice -- full output (plan describes |tail but we capture full for complete evidence incl passing details)
   for (let i = 1; i <= 2; i++) {
-    runAndCapture('npm run test 2>&1 | tail -10', testLog, `test-run${i}`);
-    runAndCapture('npm run test:coverage 2>&1 | tail -10', covLog, `coverage-run${i}`);
+    runAndCapture('npm run test 2>&1', testLog, `test-run${i}`);
+    runAndCapture('npm run test:coverage 2>&1', covLog, `coverage-run${i}`);
   }
   assertNoErrorInCoverage(covLog);
   assertTestPassed(testLog);
@@ -103,12 +103,13 @@ function main() {
   fs.writeFileSync(ciLog, '=== ls .github/workflows/ci.yml ===\n');
   runAndCapture('ls -l .github/workflows/ci.yml', ciLog, 'ci-ls');
   runAndCapture('cat .github/workflows/ci.yml', ciLog, 'ci-cat');
-  // also run the lint:ci for evidence
+  // also run the lint:ci and typecheck for evidence
   runAndCapture('npm run lint:ci 2>&1', ciLog, 'lint:ci-exec');
+  runAndCapture('npm run typecheck 2>&1', ciLog, 'typecheck-exec');
 
-  // STEP 4: build + tsx verify twice
+  // STEP 4: build + tsx verify twice (full build for complete log)
   for (let i = 1; i <= 2; i++) {
-    runAndCapture('npm run build 2>&1 | tail -5', verLog, `build-run${i}`);
+    runAndCapture('npm run build 2>&1', verLog, `build-run${i}`);
     runAndCapture('npx tsx scripts/verify-scaffolding.ts 2>&1', verLog, `verify-run${i}`);
   }
   assertBuildSuccess(verLog);

@@ -174,7 +174,7 @@ export function createBooking(b: Omit<Booking, 'id' | 'status'> & { status?: Boo
 
 // Pure rules-based (refactored for Stage 5 reuse)
 // Use UTC day to make weekday deterministic across timezones / test runs
-export function computeRulesOnly(rule: ProviderRule['availability'], date: string): AvailabilitySlot[] {
+function computeRulesOnly(rule: ProviderRule['availability'], date: string): AvailabilitySlot[] {
   // Parse as UTC date to avoid local TZ skew (e.g. 2026-07-08 may be Tue locally but Wed UTC)
   const d = new Date(date + 'T00:00:00Z');
   const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getUTCDay()];

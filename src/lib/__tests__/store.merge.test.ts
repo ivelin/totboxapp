@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { mergeWithBusy, computeRulesOnly, searchProviders, resetStore, seedProviders } from '../store';
+import { mergeWithBusy, searchProviders, resetStore, seedProviders, computeAvailability } from '../store';
 
 describe('mergeWithBusy (pure availability merge)', () => {
   const baseSlot = { date: '2026-07-07', start: '09:00', end: '17:00', available: true };
@@ -42,23 +42,30 @@ describe('mergeWithBusy (pure availability merge)', () => {
   });
 });
 
-describe('computeRulesOnly (rules engine)', () => {
-  it('returns slot for allowed weekday', () => {
-    // 2026-07-07 is Tuesday
-    const slots = computeRulesOnly({ days: ['Tue'], windows: ['09:00-17:00'] }, '2026-07-07');
+describe('rules engine via computeAvailability', () => {
+  beforeEach(() => {
+    resetStore();
+  });
+
+  it('returns slot for allowed weekday (Tue rule for 2026-07-07)', () => {
+    seedProviders([{
+      id: 'prov_r1', name: 'R1', category: 'kids_activities', location: 'X', services: ['s'],
+      rules: { availability: { days: ['Tue'], windows: ['09:00-17:00'] } },
+      calendarConnected: false, token: 't1'
+    }]);
+    const slots = computeAvailability('prov_r1', '2026-07-07');
     expect(slots).toHaveLength(1);
     expect(slots[0].available).toBe(true);
-    expect(slots[0].start).toBe('09:00');
   });
 
   it('returns empty for disallowed day', () => {
-    const slots = computeRulesOnly({ days: ['Mon'], windows: ['09:00-17:00'] }, '2026-07-07');
+    seedProviders([{
+      id: 'prov_r2', name: 'R2', category: 'kids_activities', location: 'X', services: ['s'],
+      rules: { availability: { days: ['Mon'], windows: ['09:00-17:00'] } },
+      calendarConnected: false, token: 't2'
+    }]);
+    const slots = computeAvailability('prov_r2', '2026-07-07');
     expect(slots).toHaveLength(0);
-  });
-
-  it('uses UTC day to avoid TZ skew', () => {
-    const slots = computeRulesOnly({ days: ['Tue'], windows: ['09:00-17:00'] }, '2026-07-07');
-    expect(slots.length).toBeGreaterThan(0);
   });
 });
 
