@@ -30,6 +30,10 @@ Add the Totbox MCP endpoint in your chat app + connect your existing calendar/sc
 
 Onboarding typically takes under 10 minutes.
 
+**Connecting the MCP (Stage 4)**  
+Run `npm run dev:mcp`. Go to /dashboard to register (name, services, location, rules). You get a secret token + the MCP URL (http://localhost:3001/mcp). Add to your chat app with the token for scoped results. Tools now support optional `token` arg for scoping to your provider only.
+Current tools (Stage 3): search_services, get_provider_details, get_availability.
+
 ---
 
 ## Architecture
@@ -87,6 +91,20 @@ Family Consumer Flow                  Small Provider Flow
 - Clear path to quick wins while building defensibility through standardization.
 
 ---
+
+## Development (Stage 1+)
+
+```bash
+npm install
+npm run dev          # Next.js UI on :3000
+npm run dev:mcp      # MCP server on :3001 (Stage 3+)
+npm run build
+```
+
+- Landing page is at `/`
+- Placeholder provider dashboard at `/dashboard`
+- See the staged implementation plan for PRs (session plan.md in the worktree).
+- Original product vision lives in `docs/totbox_product_spec.md`.
 
 ## Contributing / Early Collaboration
 

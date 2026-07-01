@@ -1,0 +1,37 @@
+
+/build
+/coverage
+.data/
+# debug
+# dependencies
+.DS_Store
+.env*
+# env files (can opt-in for committing if needed)
+# misc
+/.next/
+next-env.d.ts
+# next.js
+/node_modules
+npm-debug.log*
+/out/
+*.pem
+.pnp.*
+/.pnp
+.pnpm-debug.log*
+# production
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# testing
+*.tsbuildinfo
+# typescript
+# vercel
+.vercel
+.yarn/*
+
+# verification scratch (local only, cleaned by verify scripts)
+.verif-scratch/
+yarn-debug.log*
+yarn-error.log*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions

@@ -1,0 +1,32 @@
+[
+  {
+    "providerSeed": {
+      "id": "prov_eval_search1",
+      "name": "Eval Search Provider One",
+      "category": "kids_activities",
+      "location": "Testville",
+      "services": ["test service"],
+      "rules": { "availability": { "days": ["Tue"], "windows": ["09:00-17:00"] } },
+      "calendarConnected": false,
+      "token": "tok_eval_s1"
+    },
+    "args": { "query": "Eval" },
+    "expectedCountMin": 1,
+    "description": "search finds seeded eval provider"
+  },
+  {
+    "providerSeed": {
+      "id": "prov_eval_search2",
+      "name": "Eval Search Provider Two",
+      "category": "home_maintenance",
+      "location": "Testville",
+      "services": ["test"],
+      "rules": { "availability": { "days": ["Tue"], "windows": ["09:00-17:00"] } },
+      "calendarConnected": false,
+      "token": "tok_eval_s2"
+    },
+    "args": { "location": "Testville" },
+    "expectedCountMin": 1,
+    "description": "search by location"
+  }
+]

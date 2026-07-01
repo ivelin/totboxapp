@@ -1,0 +1,48 @@
+{
+  "name": "feat-expand-scope-plan",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "dev:mcp": "tsx --no-cache server/mcp.ts",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "lint:ci": "eslint src/lib scripts/eval scripts/verify-scaffolding.ts scripts/capture-scaffolding-evidence.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:eval": "tsx scripts/eval/run-eval.ts",
+    "typecheck": "tsc --noEmit",
+    "verify": "tsx scripts/verify-stage5.ts",
+    "capture:evidence": "tsx scripts/capture-scaffolding-evidence.ts"
+  },
+  "dependencies": {
+    "@hono/mcp": "^0.3.0",
+    "@hono/node-server": "^2.0.6",
+    "@modelcontextprotocol/client": "^2.0.0-alpha.3",
+    "@modelcontextprotocol/express": "^2.0.0-alpha.3",
+    "@modelcontextprotocol/node": "^2.0.0-alpha.3",
+    "@modelcontextprotocol/server": "^2.0.0-alpha.3",
+    "express": "^5.2.1",
+    "hono": "^4.12.27",
+    "next": "16.2.9",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/express": "^5.0.6",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.9",
+    "tailwindcss": "^4",
+    "tsx": "^4.22.4",
+    "typescript": "^5",
+    "vitest": "^1.6.0",
+    "@vitest/coverage-v8": "^1.6.0"
+  }
+}
