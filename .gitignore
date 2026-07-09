@@ -1,0 +1,17 @@
+# Local / private research (may contain PII) — never commit
+docs/research/private/
+**/*.private.md
+**/totbox_home_services_research*.md
+
+# Common env and secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies and build (when app code is present)
+node_modules/
+.next/
+dist/
+coverage/
+.verif-scratch/
+*.log
