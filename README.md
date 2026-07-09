@@ -99,7 +99,36 @@ Household flow                         Provider flow
 
 ---
 
-## Development (stages 1–5+)
+## House-owner test path (consumer persona)
+
+Stop here and try the discovery → compare loop as a homeowner. **No chat app required.**
+
+```bash
+npm install
+npm run seed                 # fictional HVAC + cleaning (+ tree) demo operators
+npm run smoke:house-owner    # brief + multi-provider compare (store + MCP dispatch)
+```
+
+Optional live MCP (second terminal):
+
+```bash
+npm run dev:mcp              # listens on http://localhost:3001/mcp
+# then:
+npm run smoke:house-owner -- --live
+```
+
+**Sample jobs the smoke uses (you can rephrase similarly):**
+
+- HVAC: *“Find AC maintenance plans for my area in the next 2 weeks under $300 with good recent reviews”*
+- Cleaning: *“Book a 3hr priority clean focusing on blinds, windows, under beds, corners — share options before I confirm”*
+
+**What you should see:** 2+ demo providers per job, with names plus price/membership/cancel/inclusions-style terms. All operators are fictional (`Demo …`); no real household data.
+
+MCP tools involved: `create_service_brief`, `compare_options` (also `search_services`, `get_provider_details`, `get_availability`).
+
+---
+
+## Development (stages 1–6+)
 
 ```bash
 npm install
@@ -108,13 +137,14 @@ npm run dev:mcp      # MCP server on :3001
 npm run build
 npm test
 npm run typecheck
+npm run smoke:house-owner
 ```
 
 - Landing page: `/`
 - Provider dashboard (register, token, calendar connect): `/dashboard`
 - MCP: `http://localhost:3001/mcp` (pass provider token for scoped tools)
 - Tools: `search_services`, `get_provider_details`, `get_availability`, `create_service_brief`, `compare_options`
-- Beachhead seed: fictional HVAC + cleaning (+ tree) demo operators (`npx tsx scripts/seed.ts`)
+- Beachhead seed: fictional HVAC + cleaning (+ tree) demo operators (`npm run seed`)
 
 **Connecting the MCP:** Run `npm run dev:mcp`. Register on `/dashboard` (name, services, location, rules). You get a secret token + MCP URL. Add both to your chat app for scoped results.
 
@@ -126,7 +156,7 @@ npm run typecheck
 |------|--------|
 | Product vision + v3.1 beachhead / ST annex | On `main` |
 | Stages 1–5 (Next.js, store, MCP, registration, Google Calendar availability) | On `main` |
-| Stage 6 (service briefs, compare, HVAC/cleaning seeds) | This branch |
+| Stage 6 (service briefs, compare, HVAC/cleaning seeds, house-owner smoke) | This branch / PR #3 |
 | Stages 7–9 (trust, household approval, recurring) | Spec’d; next |
 | Stages 10a–10c (ServiceTitan design → prototype → pilot) | Spec’d in ST annex |
 | Stage 11 (dual-sided referrals) | Spec’d; after core loop |

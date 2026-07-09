@@ -179,6 +179,41 @@ mcpServer.registerTool(
                 description: 'Get availability slots for a provider on a date.',
                 inputSchema: { type: 'object', properties: { providerId: { type: 'string' }, date: { type: 'string' }, token: { type: 'string' } }, required: ['providerId', 'date'] },
               },
+              {
+                name: 'create_service_brief',
+                description:
+                  'Capture a natural-language home-services job as a structured service brief (Stage 6).',
+                inputSchema: {
+                  type: 'object',
+                  properties: {
+                    naturalLanguage: { type: 'string' },
+                    category: { type: 'string' },
+                    serviceType: { type: 'string' },
+                    priorities: { type: 'array', items: { type: 'string' } },
+                    budgetUsd: { type: 'number' },
+                    location: { type: 'string' },
+                    dateWindow: { type: 'string' },
+                  },
+                  required: ['naturalLanguage'],
+                },
+              },
+              {
+                name: 'compare_options',
+                description:
+                  'Parallel multi-provider comparison (price, membership, cancel fee, inclusions, trust stub).',
+                inputSchema: {
+                  type: 'object',
+                  properties: {
+                    naturalLanguage: { type: 'string' },
+                    briefId: { type: 'string' },
+                    category: { type: 'string' },
+                    location: { type: 'string' },
+                    budgetUsd: { type: 'number' },
+                    query: { type: 'string' },
+                    limit: { type: 'number' },
+                  },
+                },
+              },
             ],
           },
         });
@@ -203,9 +238,16 @@ mcpServer.registerTool(
   app.get('/', (_req, res) => {
     res.json({
       service: 'Totbox MCP Server',
-      version: 'stage-3',
+      version: 'stage-6',
       mcpEndpoint: `http://localhost:${PORT}/mcp`,
-      tools: ['search_services', 'get_provider_details', 'get_availability'],
+      tools: [
+        'search_services',
+        'get_provider_details',
+        'get_availability',
+        'create_service_brief',
+        'compare_options',
+      ],
+      beachhead: 'hvac + cleaning (+ tree) demo operators',
     });
   });
 
