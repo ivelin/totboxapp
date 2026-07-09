@@ -17,7 +17,8 @@
     "verify": "tsx scripts/verify-stage5.ts",
     "capture:evidence": "tsx scripts/capture-scaffolding-evidence.ts",
     "smoke:house-owner": "tsx scripts/house-owner-smoke.ts",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "household": "tsx scripts/household-cli.ts"
   },
   "dependencies": {
     "@hono/mcp": "^0.3.0",

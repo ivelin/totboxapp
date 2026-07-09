@@ -14,23 +14,31 @@ Everything happens primarily in the chat apps you already use (Grok, Claude, Cha
 
 **Why:** Anonymized multi-year household coordination research shows the highest multi-turn friction here (often 6–12+ emails per decision): parallel vendor comparison, PDF/plan quotes, review research, partner approvals, FSM invoices, and forgotten preventive cadence. That is the chore stack agents should own.
 
-**Integrations:** **Tier 1** Google Calendar (stages 1–5). **Tier 2** ServiceTitan (jobs, Leads booking push, invoices, webhooks) — design in-repo, pilot after core brief/compare loop. Non-ST operators keep the Calendar path.
+**Integrations (priority order):**
+1. **Human channels** (phone / email / SMS / web forms) for **maximum provider coverage** — default book path.  
+2. **Local MCP + CLI** so developers run Totbox on their own machine for real household chores.  
+3. Optional Google Calendar (availability).  
+4. **FSM APIs** (ServiceTitan, Jobber, …) **later / selective** — depth for multi-truck partners only, not required for coverage.
 
-**Parallel track:** Kids’ activities, entertainment centers, childcare, tutoring, sports — still core to the long-term “family life” brand, not the Stage-0 validation path.
+**Parallel track:** Kids’ activities, entertainment centers, childcare, tutoring, sports — still core to the long-term brand, not Stage-0.
 
-Full plan: [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md)  
-Research insights: [`docs/research/home_services_email_insights.md`](docs/research/home_services_email_insights.md)  
-ServiceTitan annex: [`docs/research/servicetitan_integration.md`](docs/research/servicetitan_integration.md)  
-Research privacy (public repo): [`docs/research/README.md`](docs/research/README.md)
+| Doc | Purpose |
+|-----|---------|
+| [`docs/provider_onboarding_matrix.md`](docs/provider_onboarding_matrix.md) | **One-page** provider matrix + no-FSM-first strategy |
+| [`docs/local_household_runbook.md`](docs/local_household_runbook.md) | **Dev/local** MCP + CLI household runbook |
+| [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md) | Full product plan |
+| [`docs/research/`](docs/research/) | Anonymized research + ST annex (future depth) |
+| [`AGENTS.md`](AGENTS.md) | Public repo: no PII in commits |
 
 ---
 
 ## Core approach
 
-- **Minimal friction:** Chat + MCP + OAuth. Humans keep only high-value gates (final book/pay, access details, non-standard scope).
-- **Dual-sided value:** Households get one conversational loop. Small operators get structured inbound and less admin (stay in Calendar / ServiceTitan).
-- **Built on real pain:** Collapse discovery → quote/scope → household approval → schedule → records → recurring reminders.
-- **Growth (after the loop works):** Easy resident “tell a neighbor” + provider peer invites — measured referrals, not growth theater first.
+- **Coverage first:** Onboard any provider via human interfaces; do **not** require ServiceTitan/Jobber.
+- **Local-first:** Clone the repo; run MCP/CLI for your own house; `.data/` stays private on disk.
+- **Minimal friction for residents:** Chat/MCP/CLI → structured brief → compare → **you** confirm offline.
+- **Hosted service later:** Only after local usefulness is proven for developers/power users.
+- **FSM APIs optional:** High-volume HVAC partners only, after the human loop works.
 
 ---
 
@@ -99,32 +107,41 @@ Household flow                         Provider flow
 
 ---
 
-## House-owner test path (consumer persona)
+## Local household use (developers — recommended path)
 
-Stop here and try the discovery → compare loop as a homeowner. **No chat app required.**
+Run Totbox **on your computer** as MCP and/or CLI. No hosted account. No FSM API required.
+
+Full walkthrough: [`docs/local_household_runbook.md`](docs/local_household_runbook.md)  
+Provider strategy matrix: [`docs/provider_onboarding_matrix.md`](docs/provider_onboarding_matrix.md)
 
 ```bash
+git clone https://github.com/ivelin/totboxapp.git && cd totboxapp
 npm install
-npm run seed                 # fictional HVAC + cleaning (+ tree) demo operators
-npm run smoke:house-owner    # brief + multi-provider compare (store + MCP dispatch)
+
+# Learn the loop with fictional demos
+npm run seed
+npm run smoke:house-owner
+
+# Your real vendors (data stays in local .data/ — gitignored)
+npm run household -- add --name "Preferred AC Co" --category hvac --location "Austin, TX" \
+  --price 245 --membership "Bi-annual" --cancel-fee 120 --inclusions "Inspection,Coil clean" \
+  --contact "their phone or email (local only)"
+npm run household -- list
+npm run household -- compare --text "AC maintenance under \$300 next 2 weeks"
+npm run household -- draft --text "AC tune-up next week" --provider-id <id from list>
+
+# Optional: MCP for Grok / Claude / OpenClaw / etc.
+npm run dev:mcp   # http://localhost:3001/mcp
 ```
 
-Optional live MCP (second terminal):
+**House-owner smoke (demo providers):**
 
 ```bash
-npm run dev:mcp              # listens on http://localhost:3001/mcp
-# then:
-npm run smoke:house-owner -- --live
+npm run smoke:house-owner              # no server
+npm run smoke:house-owner -- --live    # with npm run dev:mcp running
 ```
 
-**Sample jobs the smoke uses (you can rephrase similarly):**
-
-- HVAC: *“Find AC maintenance plans for my area in the next 2 weeks under $300 with good recent reviews”*
-- Cleaning: *“Book a 3hr priority clean focusing on blinds, windows, under beds, corners — share options before I confirm”*
-
-**What you should see:** 2+ demo providers per job, with names plus price/membership/cancel/inclusions-style terms. All operators are fictional (`Demo …`); no real household data.
-
-MCP tools involved: `create_service_brief`, `compare_options` (also `search_services`, `get_provider_details`, `get_availability`).
+Sample jobs: AC under $300; priority clean focusing on blinds/windows/under beds. Expect multi-option prices/terms. Book offline via phone/email/form.
 
 ---
 
