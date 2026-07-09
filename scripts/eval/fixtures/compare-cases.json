@@ -1,0 +1,28 @@
+[
+  {
+    "description": "HVAC compare under budget prefers lower priceFromUsd",
+    "seedBeachhead": true,
+    "args": {
+      "naturalLanguage": "Find AC maintenance under $200 in Austin",
+      "category": "hvac",
+      "location": "Austin",
+      "budgetUsd": 200,
+      "limit": 5
+    },
+    "expectedMinOptions": 2,
+    "expectedTopWithinBudget": true,
+    "expectedIdsContain": ["prov_hvac_002"]
+  },
+  {
+    "description": "Cleaning compare returns cleaning providers",
+    "seedBeachhead": true,
+    "args": {
+      "naturalLanguage": "Book priority clean focusing on blinds, windows, under beds",
+      "category": "cleaning",
+      "location": "Austin",
+      "limit": 5
+    },
+    "expectedMinOptions": 1,
+    "expectedCategories": ["cleaning"]
+  }
+]

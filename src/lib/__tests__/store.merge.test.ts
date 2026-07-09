@@ -1,5 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { mergeWithBusy, searchProviders, resetStore, seedProviders, computeAvailability } from '../store';
+import {
+  mergeWithBusy,
+  searchProviders,
+  resetStore,
+  seedProviders,
+  computeAvailability,
+  beachheadSampleProviders,
+  createServiceBrief,
+  compareOptions,
+} from '../store';
 
 describe('mergeWithBusy (pure availability merge)', () => {
   const baseSlot = { date: '2026-07-07', start: '09:00', end: '17:00', available: true };
@@ -93,5 +102,50 @@ describe('searchProviders (real search logic)', () => {
   it('respects limit using real fn', () => {
     const res = searchProviders({ limit: 1 });
     expect(res.length).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('Stage 6 service briefs + compare', () => {
+  beforeEach(() => {
+    resetStore();
+    seedProviders(beachheadSampleProviders());
+  });
+
+  it('creates brief with inferred hvac category and budget', () => {
+    const brief = createServiceBrief({
+      naturalLanguage: 'Find AC maintenance plans under $300 in Austin next 2 weeks',
+    });
+    expect(brief.category).toBe('hvac');
+    expect(brief.budgetUsd).toBe(300);
+    expect(brief.id).toMatch(/^brief_/);
+  });
+
+  it('infers cleaning priorities from natural language', () => {
+    const brief = createServiceBrief({
+      naturalLanguage: 'Book 3hr priority clean focusing on blinds, windows, under beds',
+    });
+    expect(brief.category).toBe('cleaning');
+    expect(brief.priorities?.length).toBeGreaterThan(0);
+  });
+
+  it('compares hvac options and ranks within-budget higher', () => {
+    const { options } = compareOptions({
+      naturalLanguage: 'AC tune-up under $200 Austin',
+      category: 'hvac',
+      location: 'Austin',
+      budgetUsd: 200,
+    });
+    expect(options.length).toBeGreaterThanOrEqual(2);
+    const metro = options.find(o => o.providerId === 'prov_hvac_002');
+    const hill = options.find(o => o.providerId === 'prov_hvac_001');
+    expect(metro?.withinBudget).toBe(true);
+    expect(hill?.withinBudget).toBe(false);
+    expect(options[0].matchScore).toBeGreaterThanOrEqual(options[1].matchScore);
+  });
+
+  it('search by category hvac returns beachhead providers', () => {
+    const res = searchProviders({ category: 'hvac', location: 'Austin' });
+    expect(res.some(p => p.category === 'hvac')).toBe(true);
+    expect(res[0].offer).toBeDefined();
   });
 });
