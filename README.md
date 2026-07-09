@@ -2,97 +2,127 @@
 
 **Disappear the logistics of family life.**
 
-Totbox helps small local operators in family life services reduce back-office admin and booking hassle so they can focus on in-person experiences. At the same time, it helps busy families cut the chore of researching, comparing, and booking these services.
+Totbox helps small local operators reduce back-office admin and booking hassle so they can focus on in-person experiences. At the same time, it helps busy families cut the chore of researching, comparing, coordinating, and booking services.
 
-We start with high-frequency, high-pain categories (kids’ activities & entertainment centers, childcare/after-school, tutoring, sports programs, lawn care, pest control, recurring home maintenance like HVAC and cleaning) and expand from there.
-
-**Core Approach**
-- Minimal friction: No new app fatigue. Everything happens primarily in the chat apps you already use (Grok, Claude, ChatGPT, etc.) via simple MCP endpoints + OAuth.
-- Dual-sided value: Families get fast discovery and booking. Small providers get less admin and more time delivering great in-person experiences.
-- Built on real pain: High-frequency coordination and scheduling friction that affects both families and small local operators.
-
-**Current Focus (Beachhead)**  
-Family life services — starting with entertainment centers, kids’ activities, childcare, tutoring, lawn care, pest control, and recurring home maintenance.
-
-See the full detailed plan in [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md).
+Everything happens primarily in the chat apps you already use (Grok, Claude, ChatGPT, etc.) via simple **MCP** endpoints + OAuth — not another consumer app to install.
 
 ---
 
-## Quick Start
+## Current beachhead (v3.1)
 
-**For Families**  
-Just open your favorite chat app and start asking naturally:
-- “Find weekend birthday party options for an 8-year-old in Austin under $300”
-- “Book 2 HVAC tune-ups next week and after-school care”
+**Primary MVP:** Recurring **home services** in Austin — **HVAC preventive maintenance** and **house cleaning**, with **tree/arborist** next (seasonal rules).
 
-**For Providers (Small Operators)**  
-Add the Totbox MCP endpoint in your chat app + connect your existing calendar/scheduling tool (Google Calendar or basic scheduler). Inbound requests get qualified and booked with minimal manual work.
+**Why:** Anonymized multi-year household coordination research shows the highest multi-turn friction here (often 6–12+ emails per decision): parallel vendor comparison, PDF/plan quotes, review research, partner approvals, FSM invoices, and forgotten preventive cadence. That is the chore stack agents should own.
 
-Onboarding typically takes under 10 minutes.
+**Integrations:** **Tier 1** Google Calendar (built on `feat/expand-scope`). **Tier 2** ServiceTitan (jobs, Leads booking push, invoices, webhooks) — design in-repo, pilot after core brief/compare loop. Non-ST operators keep the Calendar path.
+
+**Parallel track:** Kids’ activities, entertainment centers, childcare, tutoring, sports — still core to the long-term “family life” brand, not the Stage-0 validation path.
+
+Full plan: [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md)  
+Research insights: [`docs/research/home_services_email_insights.md`](docs/research/home_services_email_insights.md)  
+ServiceTitan annex: [`docs/research/servicetitan_integration.md`](docs/research/servicetitan_integration.md)  
+Research privacy (public repo): [`docs/research/README.md`](docs/research/README.md)
+
+---
+
+## Core approach
+
+- **Minimal friction:** Chat + MCP + OAuth. Humans keep only high-value gates (final book/pay, access details, non-standard scope).
+- **Dual-sided value:** Households get one conversational loop. Small operators get structured inbound and less admin (stay in Calendar / ServiceTitan).
+- **Built on real pain:** Collapse discovery → quote/scope → household approval → schedule → records → recurring reminders.
+- **Growth (after the loop works):** Easy resident “tell a neighbor” + provider peer invites — measured referrals, not growth theater first.
+
+---
+
+## Quick start (product vision)
+
+**For households**
+
+Ask naturally, for example:
+
+- “Find AC maintenance plans for my area in the next 2 weeks under $300 with good recent reviews”
+- “Book a 3hr priority clean focusing on blinds, windows, under beds, corners — share options before I confirm”
+- “Get live-oak pruning quotes and flag Oak Wilt season constraints”
+
+**For providers (small operators)**
+
+Add the Totbox MCP endpoint in your chat setup and connect your existing **calendar** (MVP). **ServiceTitan** operators get a deeper path later: qualified bookings into their tenant, webhooks for status, invoice-aware records. Inbound jobs arrive as structured briefs.
+
+Onboarding target: under 10 minutes for the calendar path; ST connect documented separately (~10–15 min design target).
 
 ---
 
 ## Architecture
 
 ```
-Consumer Families
-       |
-       v
+Households
+    |
+    v
 Chat Apps (Grok / Claude / ChatGPT)
-       |
-       |  MCP
-       v
-+-----------------------------+
-|        Totbox Platform      |
-|                             |
-|  - MCP Endpoint Generator   |
-|  - Onboarding & OAuth       |
-|    (Google Calendar, etc.)  |
-|  - Core Orchestration       |
-|    (Rules / Matching /      |
-|     Verification)           |
-|  - Inbound Automation       |
-|    (Voice / Text Agents)    |
-+-----------------------------+
-       |
-       |  Webhooks / OAuth
-       v
-Small Local Providers
-  (Entertainment Centers, Childcare,
-   Lawn Care, HVAC, Tutoring, etc.)
+    |
+    |  MCP
+    v
++----------------------------------+
+|         Totbox Platform          |
+|  - Service briefs & comparison   |
+|  - MCP endpoint generator        |
+|  - OAuth (Calendar; ST Tier 2)   |
+|  - Rules / trust / recurring     |
+|  - Household approval gates      |
+|  - Records / archive hooks       |
++----------------------------------+
+    |
+    |  OAuth / webhooks
+    v
+Small local providers
+  (HVAC, cleaning, tree, …)
 ```
 
 ---
 
-## User Flows
+## User flows
 
 ```
-Family Consumer Flow                  Small Provider Flow
----------------------------------     ---------------------------------
-1. Query via chat app                 1. Add MCP Endpoint + OAuth
-2. Discover services via MCP          2. Receive inbound lead
-3. Compare options                    3. AI assists with qualification
-   (availability, pricing, reviews)      & quoting
-4. Confirm & book                     4. Booking confirmed → syncs to
-                                         their Calendar / FSM
+Household flow                         Provider flow
+---------------------------------      ---------------------------------
+1. Query via chat app                  1. MCP endpoint + OAuth calendar
+2. Parallel discover & compare         2. Receive structured inbound brief
+   (price, terms, reviews, slots)      3. AI helps qualify + suggest slots
+3. Optional household approval         4. Confirm → sync calendar / ST
+4. Book with service brief
+5. Records + next-due reminders
 ```
 
 ---
 
-## Why This Direction
+## Implementation status
 
-- Strong shared pain on both sides (families and small operators).
-- High frequency + urgency = fast validation and conversion.
-- Low-friction design (MCP + existing tools) matches real 2026 user behavior.
-- Clear path to quick wins while building defensibility through standardization.
+| Area | Status |
+|------|--------|
+| Product vision + v3.1 beachhead / ST annex | This branch / docs on `main` after merge |
+| Stages 1–5 (Next.js, store, MCP server, provider registration, Google Calendar availability) | `feat/expand-scope` (open PR) |
+| Stages 6–9 (briefs/compare, trust, household approval, recurring) | Spec’d; not yet built |
+| Stages 10a–10c (ServiceTitan design → prototype → pilot) | Spec’d in ST annex |
+| Stage 11 (dual-sided referrals) | Spec’d; after core loop |
 
 ---
 
-## Contributing / Early Collaboration
+## Why this direction
 
-This is an evolving product. Feedback from families and small operators is extremely valuable.
+- Shared pain on both sides of the same email thread.
+- High frequency + urgency (especially HVAC/cleaning) → fast validation.
+- Low-friction design matches how people already coordinate in 2026.
+- Clear path: prove home-services loop → expand verticals → deepen ServiceTitan / calendar integrations.
 
-- Full product plan: [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md)
+---
+
+## Contributing / early collaboration
+
+Feedback from households and small operators is extremely valuable.
+
+- Product plan: [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md)
+- Anonymized research insights: [`docs/research/home_services_email_insights.md`](docs/research/home_services_email_insights.md)
+- Research privacy rules: [`docs/research/README.md`](docs/research/README.md)
 - Issues and discussions welcome
 
 **License:** Apache-2.0
