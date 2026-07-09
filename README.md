@@ -27,6 +27,7 @@ Everything happens primarily in the chat apps you already use (Grok, Claude, Cha
 | Doc | Purpose |
 |-----|---------|
 | [`docs/product_thesis.md`](docs/product_thesis.md) | **Scheduling not discovery** thesis |
+| [`docs/mcp_workflow_architecture.md`](docs/mcp_workflow_architecture.md) | **Host LLM as EA** + MCP as project manager / job checklist |
 | [`docs/provider_onboarding_matrix.md`](docs/provider_onboarding_matrix.md) | Coordination channel matrix (no registry) |
 | [`docs/local_household_runbook.md`](docs/local_household_runbook.md) | Dev/local MCP + CLI runbook |
 | [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md) | Full plan (being aligned to thesis) |

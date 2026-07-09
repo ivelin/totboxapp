@@ -92,12 +92,15 @@ Providers (phone, email, web form, SMS)
 
 ## What we will build (priority)
 
-1. **Service brief** from natural language (deterministic now; LLM-assisted later if useful).  
-2. **Quote intake** — paste/PDF/email → structured terms for side-by-side compare.  
-3. **Schedule workflow** — propose windows, merge household calendar, draft “does Tuesday 9–11 work?”  
-4. **Book confirmation tracking** — status: outreach → proposed → confirmed → done → invoice noted.  
-5. **Rebook memory** — optional private “last vendor for AC” without being a city registry.  
-6. **Local MCP/CLI** so developers use it on real chores immediately.
+1. **Job + checklist PM** in MCP — durable state, `next_action` for the host LLM (see [`mcp_workflow_architecture.md`](mcp_workflow_architecture.md)).  
+2. **Host-LLM-maximizing tools** — templates + draft specs the host fills from memory; user approval; then send/record.  
+3. **Quote intake** — paste/email → host extracts → Totbox normalizes/compares on the job.  
+4. **Schedule workflow** — propose windows, calendar merge, confirmation tracking.  
+5. **Human-channel outreach** — email/SMS/phone scripts; no provider registry.  
+6. **Rebook memory** — optional private “last vendor,” not a city directory.  
+7. **Local MCP/CLI** first; hosted later.
+
+**Division of labor:** Host LLM = executive assistant (draft, parse, memory). Totbox MCP = project manager (checklist, gates, side effects).
 
 ---
 
