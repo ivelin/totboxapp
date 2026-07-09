@@ -231,21 +231,24 @@ export function listAllBookings(): Booking[] {
 }
 
 // Stage 4 helpers for thin delegation (per strategist)
-export function getProviderDetailsForToken(providerId: string, token?: string) {
+export function getProviderDetailsForToken(providerId: string, _token?: string) {
   reloadProviders();
   const p = getProvider(providerId);
   if (!p) return null;
   // invalid/unknown token retains prior unseeded behavior (return data like no-token)
   // only a matching token "scopes" but since id is explicit, data is visible either way
-  const { token: _t, ...safe } = p as unknown as { [key: string]: unknown; token?: string };
+  const { token: _omitToken, ...safe } = p as unknown as { [key: string]: unknown; token?: string };
+  void _omitToken;
+  void _token;
   return safe;
 }
 
-export function getAvailabilityForToken(providerId: string, date: string, token?: string) {
+export function getAvailabilityForToken(providerId: string, date: string, _token?: string) {
   reloadProviders();
   const p = getProvider(providerId);
   if (!p) return { providerId, date, slots: [] };
   // invalid/unknown token retains prior unseeded behavior (compute slots like no-token)
+  void _token;
   const slots = computeAvailability(providerId, date);
   return { providerId, date, slots };
 }
