@@ -113,7 +113,8 @@ npm run typecheck
 - Landing page: `/`
 - Provider dashboard (register, token, calendar connect): `/dashboard`
 - MCP: `http://localhost:3001/mcp` (pass provider token for scoped tools)
-- Current tools: `search_services`, `get_provider_details`, `get_availability`
+- Tools: `search_services`, `get_provider_details`, `get_availability`, `create_service_brief`, `compare_options`
+- Beachhead seed: fictional HVAC + cleaning (+ tree) demo operators (`npx tsx scripts/seed.ts`)
 
 **Connecting the MCP:** Run `npm run dev:mcp`. Register on `/dashboard` (name, services, location, rules). You get a secret token + MCP URL. Add both to your chat app for scoped results.
 
@@ -124,8 +125,9 @@ npm run typecheck
 | Area | Status |
 |------|--------|
 | Product vision + v3.1 beachhead / ST annex | On `main` |
-| Stages 1–5 (Next.js, store, MCP, registration, Google Calendar availability) | This PR / branch |
-| Stages 6–9 (briefs/compare, trust, household approval, recurring) | Spec’d; next after merge |
+| Stages 1–5 (Next.js, store, MCP, registration, Google Calendar availability) | On `main` |
+| Stage 6 (service briefs, compare, HVAC/cleaning seeds) | This branch |
+| Stages 7–9 (trust, household approval, recurring) | Spec’d; next |
 | Stages 10a–10c (ServiceTitan design → prototype → pilot) | Spec’d in ST annex |
 | Stage 11 (dual-sided referrals) | Spec’d; after core loop |
 

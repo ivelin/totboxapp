@@ -1,41 +1,40 @@
-// Stage 2+ seed script
+// Stage 2+ / Stage 6 seed script
 // Usage: npx tsx scripts/seed.ts
+// Seeds fictional beachhead providers only (public-safe — no real household data).
 
-import { seedProviders, getProviders, computeAvailability } from '../src/lib/store';
-import { Provider } from '../src/lib/types';
+import {
+  seedProviders,
+  getProviders,
+  computeAvailability,
+  beachheadSampleProviders,
+  compareOptions,
+  createServiceBrief,
+  resetStore,
+} from '../src/lib/store';
 
-const sampleProviders: Provider[] = [
-  {
-    id: "prov_001",
-    name: "Austin Kids Play Center",
-    category: "kids_activities",
-    location: "Austin, TX",
-    services: ["Birthday parties", "Open play", "Art classes"],
-    rules: {
-      availability: { days: ["Tue", "Thu", "Sat"], windows: ["09:00-17:00"] },
-    },
-    calendarConnected: false,
-  },
-  {
-    id: "prov_002",
-    name: "Hill Country HVAC Pros",
-    category: "home_maintenance",
-    location: "Austin, TX",
-    services: ["AC Tune-up", "Furnace Check"],
-    rules: {
-      availability: { days: ["Mon", "Wed", "Fri"], windows: ["08:00-16:00"] },
-    },
-    calendarConnected: false,
-  },
-];
-
+resetStore();
+const sampleProviders = beachheadSampleProviders();
 seedProviders(sampleProviders);
 
-console.log("=== Totbox Seed (Stage 2) ===");
-console.log("Providers:", getProviders().map(p => `${p.id} — ${p.name}`));
+console.log('=== Totbox Seed (Stage 6 beachhead) ===');
+console.log(
+  'Providers:',
+  getProviders().map(p => `${p.id} — ${p.name} [${p.category}]`)
+);
 
-const sampleDate = "2026-07-05"; // a Saturday (matches prov_001)
-const slots = computeAvailability("prov_001", sampleDate);
-console.log(`Sample availability for prov_001 on ${sampleDate}:`, slots);
+const sampleDate = '2026-07-06'; // Monday
+const slots = computeAvailability('prov_hvac_001', sampleDate);
+console.log(`Sample availability for prov_hvac_001 on ${sampleDate}:`, slots);
 
-console.log("\nStore seeded. Stage 3 will wire this into MCP tools.");
+const brief = createServiceBrief({
+  naturalLanguage:
+    'Find AC maintenance plans for my area in the next 2 weeks under $300 with good recent reviews',
+});
+const comparison = compareOptions({ briefId: brief.id, location: 'Austin', limit: 5 });
+console.log('\nService brief:', brief.id, brief.category, brief.budgetUsd);
+console.log(
+  'Compare options:',
+  comparison.options.map(o => `${o.name} $${o.priceFromUsd ?? '?'} score=${o.matchScore}`)
+);
+
+console.log('\nStore seeded with HVAC + cleaning (+ tree) demo operators.');

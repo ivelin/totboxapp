@@ -13,34 +13,12 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
 
-import { seedProviders, reloadProviders } from '../src/lib/store.js';
+import { seedProviders, reloadProviders, beachheadSampleProviders } from '../src/lib/store.js';
 import { dispatchMcpTool } from '../src/lib/mcp-tools';
 import { appendMcpTranscript } from '../src/lib/mcp-transcript.js';
 
-// Sample data matching types (typed to avoid literal errors)
-const SAMPLE_PROVIDERS = [
-  {
-    id: 'prov_001',
-    name: 'Austin Kids Play Center',
-    category: 'kids_activities' as const,
-    location: 'Austin, TX',
-    services: ['Birthday parties', 'Open play', 'Art classes'],
-    rules: { availability: { days: ['Tue', 'Thu', 'Sat'], windows: ['09:00-17:00'] } },
-    calendarConnected: false,
-    token: 'tok_prov001_demo',
-  },
-  {
-    id: 'prov_002',
-    name: 'Hill Country HVAC Pros',
-    category: 'home_maintenance' as const,
-    location: 'Austin, TX',
-    services: ['AC Tune-up', 'Furnace Check'],
-    rules: { availability: { days: ['Mon', 'Wed', 'Fri'], windows: ['08:00-16:00'] } },
-    calendarConnected: false,
-    token: 'tok_prov002_demo',
-  },
-];
-seedProviders(SAMPLE_PROVIDERS);
+// Stage 6 beachhead seed: fictional HVAC + cleaning (+ tree) operators only
+seedProviders(beachheadSampleProviders());
 
 const PORT = process.env.MCP_PORT ? parseInt(process.env.MCP_PORT) : 3001;
 
@@ -83,6 +61,46 @@ mcpServer.registerTool(
   },
   async (args) => {
     return dispatchMcpTool('get_availability', args);
+  }
+);
+
+mcpServer.registerTool(
+  'create_service_brief',
+  {
+    description:
+      'Capture a natural-language home-services job as a structured service brief (Stage 6). Infers category/budget/priorities when possible.',
+    inputSchema: {
+      naturalLanguage: z.string().describe('User request in plain language'),
+      category: z.string().optional(),
+      serviceType: z.string().optional(),
+      priorities: z.array(z.string()).optional(),
+      budgetUsd: z.number().optional(),
+      location: z.string().optional(),
+      dateWindow: z.string().optional(),
+    },
+  },
+  async (args) => {
+    return dispatchMcpTool('create_service_brief', args);
+  }
+);
+
+mcpServer.registerTool(
+  'compare_options',
+  {
+    description:
+      'Parallel multi-provider comparison (price, membership, cancel fee, inclusions, trust stub). Pass naturalLanguage and/or briefId (Stage 6).',
+    inputSchema: {
+      naturalLanguage: z.string().optional(),
+      briefId: z.string().optional(),
+      category: z.string().optional(),
+      location: z.string().optional(),
+      budgetUsd: z.number().optional(),
+      query: z.string().optional(),
+      limit: z.number().int().positive().optional().default(5),
+    },
+  },
+  async (args) => {
+    return dispatchMcpTool('compare_options', args);
   }
 );
 

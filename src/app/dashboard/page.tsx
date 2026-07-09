@@ -136,7 +136,7 @@ export default function ProviderDashboard() {
           <div className="grid md:grid-cols-2 gap-4">
             <label className="block">
               <div className="text-sm mb-1">Business / Service Name</div>
-              <input className="w-full rounded border p-2 bg-white dark:bg-black" value={form.name} onChange={e=>setForm({...form, name:e.target.value})} placeholder="Austin Kids Play Center" required />
+              <input className="w-full rounded border p-2 bg-white dark:bg-black" value={form.name} onChange={e=>setForm({...form, name:e.target.value})} placeholder="Demo Hill Country Comfort" required />
             </label>
             <label className="block">
               <div className="text-sm mb-1">Location</div>

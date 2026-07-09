@@ -8,7 +8,10 @@ export const ServiceCategorySchema = z.enum([
   'childcare_afterschool',
   'tutoring',
   'sports_extracurricular',
-  'home_maintenance', // HVAC, plumbing, cleaning
+  'home_maintenance', // HVAC, plumbing, cleaning (legacy umbrella)
+  'hvac',
+  'cleaning',
+  'tree_arborist',
 ]);
 
 export type ServiceCategory = z.infer<typeof ServiceCategorySchema>;
@@ -28,6 +31,21 @@ export const ProviderRuleSchema = z.object({
 
 export type ProviderRule = z.infer<typeof ProviderRuleSchema>;
 
+/** Stage 6: structured commercial terms for compare / quote surfaces */
+export const OfferTermsSchema = z.object({
+  priceFromUsd: z.number().optional(),
+  priceHint: z.string().optional(),
+  membership: z.string().optional(),
+  cancelFeeUsd: z.number().optional(),
+  partsExtra: z.boolean().optional(),
+  inclusions: z.array(z.string()).optional(),
+  exclusions: z.array(z.string()).optional(),
+  commitment: z.string().optional(),
+  trustSummary: z.string().optional(), // stub until Stage 7 aggregation
+});
+
+export type OfferTerms = z.infer<typeof OfferTermsSchema>;
+
 export const ProviderSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -35,6 +53,7 @@ export const ProviderSchema = z.object({
   location: z.string(),
   services: z.array(z.string()),
   rules: ProviderRuleSchema,
+  offer: OfferTermsSchema.optional(),
   // populated later
   calendarConnected: z.boolean().default(false),
   calendarTokens: z.object({
@@ -47,6 +66,36 @@ export const ProviderSchema = z.object({
 
 export type Provider = z.infer<typeof ProviderSchema>;
 
+/** Stage 6: natural-language job captured as structured brief */
+export const ServiceBriefSchema = z.object({
+  id: z.string(),
+  naturalLanguage: z.string(),
+  category: ServiceCategorySchema.optional(),
+  serviceType: z.string().optional(),
+  priorities: z.array(z.string()).optional(),
+  budgetUsd: z.number().optional(),
+  location: z.string().optional(),
+  dateWindow: z.string().optional(),
+  createdAt: z.string(),
+});
+
+export type ServiceBrief = z.infer<typeof ServiceBriefSchema>;
+
+export const CompareOptionSchema = z.object({
+  providerId: z.string(),
+  name: z.string(),
+  category: ServiceCategorySchema,
+  location: z.string(),
+  services: z.array(z.string()),
+  offer: OfferTermsSchema.optional(),
+  priceFromUsd: z.number().optional(),
+  withinBudget: z.boolean().optional(),
+  matchScore: z.number(),
+  matchReasons: z.array(z.string()),
+});
+
+export type CompareOption = z.infer<typeof CompareOptionSchema>;
+
 export const BookingSchema = z.object({
   id: z.string(),
   providerId: z.string(),
@@ -54,6 +103,7 @@ export const BookingSchema = z.object({
   date: z.string(),
   time: z.string(),
   consumerNote: z.string().optional(),
+  briefId: z.string().optional(),
   status: z.enum(['pending', 'confirmed', 'cancelled']).default('pending'),
 });
 

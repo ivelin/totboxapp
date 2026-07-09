@@ -19,6 +19,8 @@ import {
   setCalendarBusyMock,
   searchProviders,
   computeAvailability,
+  beachheadSampleProviders,
+  compareOptions,
 } from '../../src/lib/store';
 import { dispatchMcpTool } from '../../src/lib/mcp-tools';
 import { Provider, ProviderSchema } from '../../src/lib/types';
@@ -50,6 +52,22 @@ interface SearchCase {
   expectedCountMin: number;
   expectedIdsContain?: string[];
   description?: string;
+}
+
+interface CompareCase {
+  description?: string;
+  seedBeachhead?: boolean;
+  args: {
+    naturalLanguage?: string;
+    category?: string;
+    location?: string;
+    budgetUsd?: number;
+    limit?: number;
+  };
+  expectedMinOptions: number;
+  expectedTopWithinBudget?: boolean;
+  expectedIdsContain?: string[];
+  expectedCategories?: string[];
 }
 
 function setupProvider(caseItem: AvailabilityCase) {
@@ -141,21 +159,53 @@ function runSearchEval(cases: SearchCase[]): { passed: number; failed: number; d
   return { passed, failed, details };
 }
 
+function runCompareEval(cases: CompareCase[]): { passed: number; failed: number; details: string[] } {
+  let passed = 0, failed = 0;
+  const details: string[] = [];
+
+  for (const c of cases) {
+    try {
+      resetStore();
+      if (c.seedBeachhead) seedProviders(beachheadSampleProviders());
+      const res = compareOptions(c.args);
+      const okCount = res.options.length >= c.expectedMinOptions;
+      const okIds = !c.expectedIdsContain || c.expectedIdsContain.every(id => res.options.some(o => o.providerId === id));
+      const okBudget = c.expectedTopWithinBudget == null || res.options[0]?.withinBudget === c.expectedTopWithinBudget;
+      const okCats = !c.expectedCategories || res.options.every(o => c.expectedCategories!.includes(o.category));
+      if (okCount && okIds && okBudget && okCats) {
+        passed++;
+        dispatchMcpTool('compare_options', c.args);
+      } else {
+        failed++;
+        details.push(`FAIL compare: ${c.description || JSON.stringify(c.args)} got ${res.options.length}`);
+      }
+    } catch (e: unknown) {
+      failed++;
+      details.push(`ERROR compare: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+  return { passed, failed, details };
+}
+
 function main() {
   console.log('=== Totbox Strong Eval Runner ===');
 
   const availCases: AvailabilityCase[] = loadJson('availability-cases.json');
   const searchCases: SearchCase[] = loadJson('search-cases.json');
+  const compareCases: CompareCase[] = loadJson('compare-cases.json');
 
   const availRes = runAvailabilityEval(availCases);
   const searchRes = runSearchEval(searchCases);
+  const compareRes = runCompareEval(compareCases);
 
-  const totalFailed = availRes.failed + searchRes.failed;
+  const totalFailed = availRes.failed + searchRes.failed + compareRes.failed;
   console.log(`Availability: ${availRes.passed} passed, ${availRes.failed} failed`);
   console.log(`Search: ${searchRes.passed} passed, ${searchRes.failed} failed`);
+  console.log(`Compare: ${compareRes.passed} passed, ${compareRes.failed} failed`);
 
   if (availRes.details.length) console.log('Availability details:', availRes.details);
   if (searchRes.details.length) console.log('Search details:', searchRes.details);
+  if (compareRes.details.length) console.log('Compare details:', compareRes.details);
 
   if (totalFailed > 0) {
     console.error('EVAL FAILED — regressions detected');
