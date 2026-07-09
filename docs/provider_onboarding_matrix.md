@@ -1,88 +1,101 @@
-# Provider onboarding matrix (one page)
+# Coordination channel matrix (one page)
 
-**Strategy (current):** Maximize **service-provider coverage** and **resident usefulness** with **no FSM API layer** (ServiceTitan / Jobber / Housecall Pro, etc.) as a dependency. Use **human interfaces** (phone, email, SMS, web forms) + structured Totbox profiles. Optional Google Calendar later. FSM APIs only when a multi-truck partner explicitly needs dispatch-native booking.
+**Thesis:** Totbox is a **scheduling / coordination workflow** product, not a vendor discovery registry.  
+Discovery is already free via SEO, Maps, Yelp, and AI chat. See [`product_thesis.md`](product_thesis.md).
 
-**Local-first:** Developers run Totbox as MCP/CLI on their own machine for household chores → prove value → optional hosted service later. See [`local_household_runbook.md`](local_household_runbook.md).
+**Strategy:** Maximize **job completion usefulness** with **human interfaces** (phone, email, SMS, web forms). Optional Calendar. **No FSM API dependency** for coverage. FSM only for selective dispatch depth later.
 
----
-
-## Matrix: who → how we onboard → automation level
-
-| Provider type | Typical tools today | Totbox capture channel | Data we store | Book / confirm path | Automation level | When to add FSM API |
-|---------------|---------------------|------------------------|---------------|---------------------|------------------|---------------------|
-| **Micro** (solo, cash/text, no software) | Phone, SMS, cash | Call / text / verbal quote → you enter profile | Name, trade, area, rough price, notes, contact method | You (or agent draft) call/text with structured brief | **Low** — capture + remind | Never required |
-| **Small cleaning / maid** | Email PDF, website form, sometimes Jobber/HCP | Email + web form quote → structured offer fields | Tiers, custom priorities, cancel/recurring notes | Email “book this scope” + calendar slot if any | **Low–med** | Only if *they* insist on Jobber sync |
-| **Small HVAC (1–4 trucks)** | Mix of paper, FieldEdge/HCP/Jobber, light ST | Phone/email quote + plan PDF → offer terms | Membership $, cancel fee, parts extra, windows | Human confirm; optional Calendar busy | **Med** | Prefer human first; API only if volume warrants |
-| **Multi-truck HVAC** | Often ServiceTitan / FieldEdge | Still: brief via email/phone **or** later ST leads push | Same + dispatch preference | Human/email book **until** ST adapter | **Med → high** with ST | **Yes** — after they pilot and ask for it |
-| **Tree / lawn / seasonal** | Phone, Yelp, seasonal flyers | Yelp/phone quote + seasonal rules note | Price range, season flags (e.g. Oak Wilt window) | Call/text confirm | **Low** | Rarely |
-| **Property manager mediated** | AppFolio-style portals, email | Status brief to PM + vendor handoff notes | Site label (generic), vendor, open tickets | Forward structured status | **Low–med** | Portal APIs later if needed |
-| **Dev household “my vendors”** | Whatever you already use | **CLI/MCP register** + paste offer terms yourself | Your private `.data/` on laptop | You book however you always did | **Personal** | N/A |
+**Local-first:** Developers run Totbox as MCP/CLI for household chores. See [`local_household_runbook.md`](local_household_runbook.md).
 
 ---
 
-## Coverage vs depth (why no-FSM-first)
+## What we capture (per job), not “city inventory”
+
+| Input | Source | Totbox stores |
+|-------|--------|----------------|
+| Job intent | Resident natural language | Service brief |
+| Candidate providers | Google / chat / “my usual guy” (external) | Ephemeral party on the job, or optional **private** rebook memory |
+| Quotes / plan PDFs | Email, form, phone notes | Normalized offer terms for compare |
+| Availability | Resident calendar + provider reply | Proposed windows, confirmed slot |
+| Confirmation | Their email/SMS/phone | Job status |
+| Invoice / next due | Attachment or note | Records / recurring |
+
+**We do not** maintain a public competing directory of “all HVAC in Austin.”
+
+---
+
+## Matrix: provider situation → how scheduling works (no registry)
+
+| Provider situation | How resident finds them | Totbox’s job | Confirm channel | Automation | FSM API? |
+|--------------------|-------------------------|--------------|-----------------|------------|----------|
+| **Micro** (solo, cash/text) | Search / referral / AI chat | Brief + call/text script + time proposals | Phone / SMS | Low | Never |
+| **Small cleaning** | SEO / website / prior hire | Brief + priority list + compare quotes pasted in | Email / web form | Low–med | Rare |
+| **Small HVAC** | Search / review sites | Brief + plan/terms normalizer + calendar windows | Email / phone | Med | Only if they demand it |
+| **Multi-truck HVAC (often ST)** | Same external discovery | Same workflow; optional later: push job into ST | Email → later ST | Med → high | **Selective later** |
+| **Tree / seasonal** | Search + season rules | Brief + seasonal guidance + schedule window | Phone / email | Low | Rare |
+| **PM-mediated** | PM relationship | Status brief + vendor handoff tracking | Email / portal | Low–med | Later if needed |
+| **Personal rebook** | “Same cleaner as last time” | Private memory of **your** past vendor (not public SEO) | Whatever worked last time | Med | N/A |
+
+---
+
+## Coverage vs depth (reframed)
 
 ```text
-                    Company COUNT                    Job VOLUME (some metros)
-Human channels      ████████████████████ ~95%+        ██████████████ high
-Top FSM APIs only   ████ ~15–35% digitized             ████████ solid mid/large HVAC
-ST alone            ██ low single digits–teens         ████ multi-truck HVAC slice
+Need                              Solution
+----------------------------------------------------------------
+Find who exists                   Google / Maps / Yelp / AI search  (NOT Totbox)
+Get on their calendar             Human channels + calendar helpers (Totbox core)
+Normalize 3 quotes I already have Totbox compare (user-sourced quotes)
+Multi-truck auto-dispatch         Optional FSM API later (slice of market only)
 ```
 
-- **Count of providers you can list:** human interfaces win.  
-- **Depth of auto-dispatch for big HVAC:** FSM APIs win — but only for that slice.  
-- **Best usefulness for early end users (you):** human capture + deterministic compare beats waiting on partner APIs.
+---
+
+## Resident usefulness (workflow stages)
+
+| Stage | Pain without Totbox | Totbox focus |
+|-------|---------------------|--------------|
+| Discover | Mostly solved | Pass-through / out of scope |
+| Scope & quote | Multi-turn email | Brief + term capture |
+| Household decide | Forwards / delay | Share / approval (later) |
+| Schedule | Phone tag | Propose slots, calendar merge |
+| Confirm | Lost threads | Status on job |
+| After / again | Forgot invoice & due date | Records + rebook |
 
 ---
 
-## Resident usefulness by channel
+## “Onboarding” checklist (per job or first contact — not city sales)
 
-| Channel | Resident sees | Latency | Reliability of “booked” |
-|---------|---------------|---------|-------------------------|
-| Structured profile + compare only | Options + $ terms | Instant | Soft (you still confirm offline) |
-| + draft email/SMS from brief | Copy-paste outreach | Minutes | Soft until reply |
-| + phone script from brief | Call checklist | Same day | High if you call |
-| + Google Calendar | Busy-aware slots | Instant-ish | Medium (demo OAuth today) |
-| + ServiceTitan job create | Native job in their system | Automated | High for ST shops only |
+1. **Find provider externally** (or rebook from private memory).  
+2. **Create service brief** in Totbox (CLI/MCP).  
+3. **Attach or enter quote terms** when they reply (price, cancel, inclusions).  
+4. **Compare** if multiple quotes.  
+5. **Draft** schedule ask / confirmation.  
+6. **Mark confirmed** + optional next-due.  
 
-**MVP target for real household use:** top three rows + optional Calendar. Not ST.
-
----
-
-## Onboarding checklist (any real provider, 10 minutes)
-
-1. **Contact** (phone/email/web form) → get quote or plan flyer.  
-2. **Enter into Totbox** (dashboard register, CLI, or seed file):  
-   - category (`hvac` / `cleaning` / `tree_arborist` / …)  
-   - services, metro location (not private street addresses in public repos)  
-   - offer: priceFrom, membership, cancelFee, inclusions/exclusions  
-   - availability rules (days/windows)  
-3. **Preferred contact method** for book: phone / email / form URL (store in notes/services text for now).  
-4. **Resident path:** `create_service_brief` → `compare_options` → **you** send one structured ask.  
-5. **After service:** note price/outcome in records (manual until Stage 9+).
-
-**Public repo rule:** never commit real customer addresses, personal emails, or private research dumps. Local `.data/` is gitignored.
+No requirement that the provider “signs up for Totbox” to complete a job.
 
 ---
 
-## Decision rules (product)
+## Decision rules
 
 | If… | Then… |
 |-----|--------|
-| You need coverage of cleaners, tree, solo HVAC | Human channel only |
-| A multi-truck HVAC partner books weekly via Totbox and uses ST | Design ST adapter (Stage 10) |
-| A cleaner only accepts web form | Capture form URL + draft prefilled brief |
-| Dev user managing own house | Local MCP/CLI; private provider list; no hosted dependency |
-| Hosted service for non-tech users (later) | Same matrix; add UX + multi-tenant; still default human book |
+| Building a public provider database | **Stop** — wrong product |
+| User pastes 2 quotes from email | Normalize + compare — **core** |
+| User only has a phone number from Google | Brief + call script + log outcome — **core** |
+| Multi-truck partner wants auto job create | Consider ST/Jobber adapter — **later, selective** |
+| Dev wants local household tool | MCP/CLI + private `.data/` — **now** |
 
 ---
 
-## Explicit non-goals (this phase)
+## Explicit non-goals
 
-- Building Jobber + ST + HCP + FieldEdge adapters before local household usefulness.  
-- Requiring providers to change software to appear in Totbox.  
-- Payments, marketplace bidding, or full open directory SEO.
+- Public SEO directory, provider acquisition funnel as inventory  
+- Ranking “best HVAC” as a Yelp substitute  
+- Requiring provider accounts before scheduling help works  
+- FSM APIs as the path to “coverage”
 
 ---
 
-*One-pager for strategy + ops. Implementation detail for local household use: [`local_household_runbook.md`](local_household_runbook.md).*
+*Supersedes earlier “onboard providers into a registry for discovery” framing.*

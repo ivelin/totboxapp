@@ -14,31 +14,35 @@ Everything happens primarily in the chat apps you already use (Grok, Claude, Cha
 
 **Why:** Anonymized multi-year household coordination research shows the highest multi-turn friction here (often 6–12+ emails per decision): parallel vendor comparison, PDF/plan quotes, review research, partner approvals, FSM invoices, and forgotten preventive cadence. That is the chore stack agents should own.
 
-**Integrations (priority order):**
-1. **Human channels** (phone / email / SMS / web forms) for **maximum provider coverage** — default book path.  
-2. **Local MCP + CLI** so developers run Totbox on their own machine for real household chores.  
-3. Optional Google Calendar (availability).  
-4. **FSM APIs** (ServiceTitan, Jobber, …) **later / selective** — depth for multi-truck partners only, not required for coverage.
+**Core thesis:** Providers are already discoverable via SEO, Maps, and AI chat. **Totbox owns the scheduling/coordination workflow** (brief → quotes → household decide → schedule → confirm → records)—**not** a competing vendor registry. See [`docs/product_thesis.md`](docs/product_thesis.md).
 
-**Parallel track:** Kids’ activities, entertainment centers, childcare, tutoring, sports — still core to the long-term brand, not Stage-0.
+**Integrations (priority order):**
+1. **Human channels** (phone / email / SMS / web forms) — universal book/confirm path.  
+2. **Local MCP + CLI** for developers managing real household chores.  
+3. Optional Google Calendar (busy / propose times).  
+4. **FSM APIs** (ServiceTitan, Jobber, …) **later / selective** — dispatch depth only, never “fill a directory.”
+
+**Parallel track:** Kids’ activities / FEC etc. remain long-term brand, not Stage-0.
 
 | Doc | Purpose |
 |-----|---------|
-| [`docs/provider_onboarding_matrix.md`](docs/provider_onboarding_matrix.md) | **One-page** provider matrix + no-FSM-first strategy |
-| [`docs/local_household_runbook.md`](docs/local_household_runbook.md) | **Dev/local** MCP + CLI household runbook |
-| [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md) | Full product plan |
-| [`docs/research/`](docs/research/) | Anonymized research + ST annex (future depth) |
-| [`AGENTS.md`](AGENTS.md) | Public repo: no PII in commits |
+| [`docs/product_thesis.md`](docs/product_thesis.md) | **Scheduling not discovery** thesis |
+| [`docs/provider_onboarding_matrix.md`](docs/provider_onboarding_matrix.md) | Coordination channel matrix (no registry) |
+| [`docs/local_household_runbook.md`](docs/local_household_runbook.md) | Dev/local MCP + CLI runbook |
+| [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md) | Full plan (being aligned to thesis) |
+| [`docs/research/`](docs/research/) | Anonymized research + ST annex |
+| [`AGENTS.md`](AGENTS.md) | Public repo: no PII |
 
 ---
 
 ## Core approach
 
-- **Coverage first:** Onboard any provider via human interfaces; do **not** require ServiceTitan/Jobber.
-- **Local-first:** Clone the repo; run MCP/CLI for your own house; `.data/` stays private on disk.
-- **Minimal friction for residents:** Chat/MCP/CLI → structured brief → compare → **you** confirm offline.
-- **Hosted service later:** Only after local usefulness is proven for developers/power users.
-- **FSM APIs optional:** High-volume HVAC partners only, after the human loop works.
+- **Not a directory:** Do not maintain a city-wide vendor registry; discovery is external.
+- **Workflow first:** Structure the job, normalize quotes you collect, schedule, follow up, rebook.
+- **Local-first:** Clone; MCP/CLI; private `.data/` for *your* rebook memory only.
+- **Book offline by default:** Phone/email/form—covers every provider without FSM signup.
+- **Hosted later:** Same workflow for non-tech users after local proof.
+- **FSM optional:** Only when a partner needs dispatch-native jobs.
 
 ---
 
@@ -46,17 +50,18 @@ Everything happens primarily in the chat apps you already use (Grok, Claude, Cha
 
 **For households**
 
-Ask naturally, for example:
+1. Find candidates however you already do (search / AI / referral).  
+2. Ask Totbox (MCP/CLI) to structure and schedule the chore, for example:
 
-- “Find AC maintenance plans for my area in the next 2 weeks under $300 with good recent reviews”
-- “Book a 3hr priority clean focusing on blinds, windows, under beds, corners — share options before I confirm”
-- “Get live-oak pruning quotes and flag Oak Wilt season constraints”
+- “I need AC maintenance in the next 2 weeks under $300—help me brief and schedule”
+- “Compare these two cleaning quotes and draft a confirmation for the cheaper one”
+- “Remind me when live-oak pruning season opens; rebook last arborist if terms look ok”
 
-**For providers (small operators)**
+**For providers**
 
-Add the Totbox MCP endpoint in your chat setup and connect your existing **calendar** (MVP). **ServiceTitan** operators get a deeper path later: qualified bookings into their tenant, webhooks for status, invoice-aware records. Inbound jobs arrive as structured briefs.
+No signup required for a resident to complete a job. Optional later: accept structured briefs / calendar holds / FSM job create if they want less admin.
 
-Onboarding target: under 10 minutes for the calendar path; ST connect documented separately (~10–15 min design target).
+Onboarding target for *household tool use*: minutes to brief + draft outreach—not “list every vendor in Austin.”
 
 **Connecting the MCP (Stage 4)**  
 Run `npm run dev:mcp`. Go to /dashboard to register (name, services, location, rules). You get a secret token + the MCP URL (http://localhost:3001/mcp). Add to your chat app with the token for scoped results. Tools now support optional `token` arg for scoping to your provider only.
@@ -95,14 +100,13 @@ Small local providers
 ## User flows
 
 ```
-Household flow                         Provider flow
----------------------------------      ---------------------------------
-1. Query via chat app                  1. MCP endpoint + OAuth calendar
-2. Parallel discover & compare         2. Receive structured inbound brief
-   (price, terms, reviews, slots)      3. AI helps qualify + suggest slots
-3. Optional household approval         4. Confirm → sync calendar / ST
-4. Book with service brief
-5. Records + next-due reminders
+Household workflow (Totbox)              Provider channel (external)
+---------------------------------        ---------------------------------
+1. Need a job (chat/CLI)                 Found via Google / AI / referral
+2. Service brief                         |
+3. Collect/compare quotes                Phone / email / web form
+4. Propose times (calendar)              Confirms slot
+5. Track confirm + records + rebook      Invoices on their tools
 ```
 
 ---
@@ -122,26 +126,26 @@ npm install
 npm run seed
 npm run smoke:house-owner
 
-# Your real vendors (data stays in local .data/ — gitignored)
+# Optional private rebook memory (vendors YOU already chose — not a city directory)
 npm run household -- add --name "Preferred AC Co" --category hvac --location "Austin, TX" \
   --price 245 --membership "Bi-annual" --cancel-fee 120 --inclusions "Inspection,Coil clean" \
   --contact "their phone or email (local only)"
-npm run household -- list
 npm run household -- compare --text "AC maintenance under \$300 next 2 weeks"
 npm run household -- draft --text "AC tune-up next week" --provider-id <id from list>
+# Find new vendors via Google/AI search; book on their phone/email/form
 
 # Optional: MCP for Grok / Claude / OpenClaw / etc.
 npm run dev:mcp   # http://localhost:3001/mcp
 ```
 
-**House-owner smoke (demo providers):**
+**Smoke (demo fixtures for learning/CI only — not a product directory):**
 
 ```bash
 npm run smoke:house-owner              # no server
 npm run smoke:house-owner -- --live    # with npm run dev:mcp running
 ```
 
-Sample jobs: AC under $300; priority clean focusing on blinds/windows/under beds. Expect multi-option prices/terms. Book offline via phone/email/form.
+Real use: **discover externally** → Totbox brief / quote compare / draft / schedule help → **confirm on their channel**.
 
 ---
 

@@ -1,9 +1,9 @@
 # Local household runbook (developers / power users)
 
-**Audience:** People who can clone a repo and run Node (OpenClaw, Hermes, Grok Build, Claude Code/Cowork, plain terminal).  
-**Goal:** Use Totbox **on your machine** as an **MCP server and/or CLI** to manage **your** home-service chores—compare options, keep structured provider notes, draft outreach—**without** ServiceTitan/Jobber and **without** a hosted Totbox account.
+**Audience:** People who clone the repo (OpenClaw, Hermes, Grok Build, Claude Code/Cowork, terminal).  
+**Thesis:** Totbox helps **schedule and coordinate** home services—not discover who exists in your city. Discovery is Google / AI search. See [`product_thesis.md`](product_thesis.md).
 
-**Strategy:** [No FSM API first](provider_onboarding_matrix.md) for maximum provider coverage. You capture real vendors via phone/email/web forms into a **local** store.
+**Goal:** Run Totbox **locally** as **MCP and/or CLI** for **your** chores: structure the job, track quotes, draft outreach, compare terms, remember rebooks—**without** a hosted account and **without** FSM APIs.
 
 ---
 
@@ -15,123 +15,106 @@ cd totboxapp
 npm install
 ```
 
-Requires Node 20+ recommended. Data lives in **`.data/`** (gitignored)—safe for private local provider lists.
+Data: **`.data/`** (gitignored). Optional private notes about *your* vendors for rebook—not a public registry.
 
 ---
 
-## 2. Seed demo operators (optional)
+## 2. Mental model (real house use)
 
-Fictional HVAC/cleaning samples to learn the loop:
-
-```bash
-npm run seed
-npm run smoke:house-owner
+```text
+1. You (or your chat app) find candidates via Google / memory
+2. Totbox: create_service_brief  →  clear job package
+3. You send draft outreach (email/SMS) or call using the brief
+4. Quotes come back → enter/compare terms in Totbox
+5. Totbox: propose times / calendar awareness (when wired)
+6. You confirm offline; Totbox tracks status / next due (evolving)
 ```
 
-Expect multi-provider compare with prices/terms. When ready for **real** vendors, skip relying on demo IDs and register your own (below).
+Demo seeds (`npm run seed`) exist only so tools have data in CI/dev. **Production personal use = your jobs + your quote notes**, not “search Totbox’s city directory.”
 
 ---
 
-## 3. Run as MCP (chat agents)
+## 3. MCP (agent hosts)
 
 ```bash
 npm run dev:mcp
 # → http://localhost:3001/mcp
 ```
 
-Point your agent host (Grok / Claude / Cursor / OpenClaw / etc.) at that MCP URL when the host supports custom MCP endpoints.
+| Tool | Real household meaning |
+|------|-------------------------|
+| `create_service_brief` | Package the chore |
+| `compare_options` | Rank **options you care about** (today: local store; target: user-sourced quotes) |
+| `search_services` | Query **your local notes/fixtures**—not Google |
+| `get_provider_details` / `get_availability` | Detail + windows for parties on the job |
 
-**Tools (Stage 6):**
-
-| Tool | Household use |
-|------|----------------|
-| `create_service_brief` | Turn “AC under $300 next 2 weeks” into structured job |
-| `compare_options` | Rank local providers by category/budget/terms |
-| `search_services` | Find providers by text/category/location |
-| `get_provider_details` | Full record (offer, rules) |
-| `get_availability` | Rule windows (+ calendar busy if connected) |
-
-Matchmaking is **deterministic code** (no LLM inside Totbox). The chat model only orchestrates tool calls if you use a chat host.
+Matchmaking code is **deterministic**. Chat models only orchestrate tools if you use a host.
 
 ---
 
-## 4. Run as CLI (no chat required)
+## 4. CLI
 
 ```bash
-# Help
 npm run household -- help
 
-# List providers in local store
-npm run household -- list
+# Optional demo fixtures for learning the UI of the tools
+npm run household -- seed-demo
+npm run smoke:house-owner
 
-# Register a REAL local vendor you already use (private to your machine)
-npm run household -- add \
-  --name "My Preferred AC Co" \
-  --category hvac \
-  --location "Austin, TX" \
-  --services "Tune-up,Membership" \
-  --price 245 \
-  --membership "Bi-annual plan" \
-  --cancel-fee 120 \
-  --inclusions "Inspection,Coil clean" \
-  --contact "phone or email you use (local only)"
+# Private rebook memory (optional): vendors YOU already chose externally
+npm run household -- add --name "Preferred AC Co" --category hvac --location "Austin, TX" \
+  --price 245 --membership "Bi-annual" --contact "phone/email (local only)"
 
-# House-owner style compare
-npm run household -- compare --text "Find AC maintenance under \$300 in Austin next 2 weeks"
-npm run household -- compare --text "Priority clean focusing on blinds, windows, under beds" --category cleaning
-
-# Draft outreach email body from a brief (you send it)
-npm run household -- draft --text "AC tune-up under \$300 next week" --provider-id prov_xxx
+npm run household -- compare --text "AC maintenance under \$300 next 2 weeks"
+npm run household -- draft --text "AC tune-up next week" --provider-id <id>
+# → copy draft to email/SMS; book on their channel
 ```
 
-Replace demo names with **your** vendors. Do **not** push `.data/` or real PII to public git.
+`add` = **your CRM for rebook**, not onboarding the metro’s suppliers into Totbox.
 
 ---
 
-## 5. Real house services as fast as possible (checklist)
+## 5. Fast path for a real job this week
 
-1. **List 3–5 vendors** you already trust or would call (HVAC, cleaner, tree).  
-2. **`npm run household -- add …`** for each with best-known price/terms (from last invoice or quote).  
-3. **`npm run household -- compare --text "…"`** for the job you need this week.  
-4. **`npm run household -- draft …`** → copy into email/SMS/phone notes.  
-5. **Book offline** the way they already accept (phone/form).  
-6. After service: update price/notes with another `add` or edit `.data/providers.json` carefully.
+1. Decide the job in plain language.  
+2. `create_service_brief` / `household -- compare` with that text (or draft first).  
+3. Find 1–3 companies via **Google or chat search** (outside Totbox).  
+4. Contact them with **`household -- draft`** or your own words + brief details.  
+5. When quotes return, store terms (CLI add/update or future quote-intake) and compare.  
+6. Pick one; schedule by phone/email/form; note confirmation.  
 
-Optional UI: `npm run dev` → `/dashboard` to register providers in browser (same local store).
-
-Optional Calendar: dashboard “Connect Google Calendar” is **demo** OAuth today—useful for merge logic testing; production OAuth needs your own client IDs later.
+No provider “signup” required.
 
 ---
 
 ## 6. What is / isn’t automated
 
-| Step | Automated now? |
-|------|----------------|
-| Parse job → brief | Yes (rules/regex) |
-| Compare multi-provider terms | Yes (deterministic score) |
-| Call ServiceTitan / Jobber | **No** (by design this phase) |
-| Send email/SMS for you | Draft text only; you send |
-| Live accurate capacity | Only if you maintain rules/calendar |
+| Step | Now |
+|------|-----|
+| Discover vendors in the city | **External** (search / AI / referral) |
+| Structure job | Yes |
+| Compare directory listings | Demo/local notes only—not the product goal |
+| Compare quotes you collected | Target core (partially via local offer fields) |
+| Send email for you | Draft only |
+| FSM dispatch | No (intentional) |
 | Payments | No |
 
 ---
 
-## 7. Path to hosted service (later)
+## 7. Roadmap implication
 
-If local use proves useful:
+Prefer building **quote intake + job status + calendar + drafts** over **provider acquisition / registry SEO**.
 
-1. Keep **human book** as default for coverage.  
-2. Add multi-tenant hosting + simple consumer UI.  
-3. Add FSM APIs only for partners who need dispatch-native jobs (see matrix).
+Hosted multi-user product later can stay workflow-centric (bring-your-own providers via search), not marketplace inventory.
 
 ---
 
 ## 8. Privacy
 
-- Public repo: no personal addresses, family emails, or private research dumps.  
-- Local `.data/` is yours; gitignored.  
-- See [`AGENTS.md`](../AGENTS.md) and [`research/README.md`](research/README.md).
+- Do not commit real addresses, personal emails, or private research.  
+- `.data/` is local and gitignored.  
+- [`AGENTS.md`](../AGENTS.md), [`research/README.md`](research/README.md).
 
 ---
 
-*Related: [`provider_onboarding_matrix.md`](provider_onboarding_matrix.md) · product spec · `npm run smoke:house-owner`*
+*Related: [`product_thesis.md`](product_thesis.md) · [`provider_onboarding_matrix.md`](provider_onboarding_matrix.md)*
