@@ -155,4 +155,57 @@ describe('Job PM safety-gated workflow', () => {
     updateJobFacts(job.id, { service_address: 'x' }, { email: 'a@example.com' });
     expect(() => ingestProviderMessage({ jobId: job.id, body: 'hi' })).toThrow(/before outreach/i);
   });
+
+  it('confirmAppointment REFUSED with only send_message grant (needs commit_money_or_time)', () => {
+    let job = startJob({ intent: 'AC maintenance under $300' });
+    job = updateJobFacts(
+      job.id,
+      { service_address: '500 Example St (test fixture only)' },
+      { label: 'Neighborhood HVAC', email: 'hvac-demo@example.com' }
+    );
+    job = submitDraftForApproval({
+      jobId: job.id,
+      body: 'Please quote AC maintenance.',
+      channel: 'email',
+    });
+    job = recordUserApproval({
+      jobId: job.id,
+      kind: 'send_message',
+      summary: 'Approve outreach only',
+      granted: true,
+    });
+    job = approveAndSendMessage({ jobId: job.id, dryRun: true });
+    job = ingestProviderMessage({
+      jobId: job.id,
+      body: 'Tuesday 9am for $245',
+    });
+    // Only send_message is on file — scheduling must still refuse
+    expect(job.approvals.some(a => a.kind === 'send_message' && a.granted)).toBe(true);
+    expect(job.approvals.some(a => a.kind === 'commit_money_or_time' && a.granted)).toBe(false);
+    expect(() =>
+      confirmAppointment({ jobId: job.id, scheduledAt: '2026-07-15T09:00:00Z' })
+    ).toThrow(/REFUSED: confirm_appointment requires record_user_approval\(kind=commit_money_or_time/);
+  });
+
+  it('refuses dryRun:false without hostPerformed (never pretend a send)', () => {
+    let job = startJob({ intent: 'AC maintenance under $200' });
+    job = updateJobFacts(
+      job.id,
+      { service_address: '500 Example St (test fixture only)' },
+      { email: 'hvac-demo@example.com' }
+    );
+    job = submitDraftForApproval({ jobId: job.id, body: 'Hi, schedule AC please.' });
+    job = recordUserApproval({
+      jobId: job.id,
+      kind: 'send_message',
+      summary: 'Approve send',
+      granted: true,
+    });
+    expect(() =>
+      approveAndSendMessage({ jobId: job.id, dryRun: false, hostPerformed: false })
+    ).toThrow(/REFUSED: dryRun:false without hostPerformed|Never pretend/i);
+    // dry-run still works
+    job = approveAndSendMessage({ jobId: job.id, dryRun: true });
+    expect(job.messages.some(m => m.direction === 'outbound' && m.dryRun === true)).toBe(true);
+  });
 });

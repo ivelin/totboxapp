@@ -22,7 +22,11 @@ Totbox does **not** replace the host’s brain. The host LLM drafts, remembers, 
 | Commit money / appointment time | `record_user_approval(kind=commit_money_or_time)` |
 | Use host voice/SMS MCP | Host asks user; then `record_outbound` / `hostPerformed` |
 
-`approve_and_send_message` **refuses** without approval. Default `dryRun: true` (no network send).
+`approve_and_send_message` **refuses** without approval. Default `dryRun: true` (honest record only, no network send).
+
+`dryRun: false` without `hostPerformed: true` is **REFUSED** — Totbox has no live send adapter yet and must never pretend a send happened. After host Gmail/SMS/voice sends, call with `hostPerformed: true` (and prior `send_message` approval).
+
+`confirm_appointment` requires **`commit_money_or_time`** approval specifically — a prior `send_message` grant is **not** enough.
 
 ## Validation between steps
 

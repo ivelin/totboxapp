@@ -532,6 +532,11 @@ export function submitDraftForApproval(input: {
 /**
  * Side-effect send path. Default dryRun=true (safety).
  * Requires recorded approval for send_message when policy requires it.
+ *
+ * Real network send via Totbox is NOT implemented in early product.
+ * - dryRun true (default): record only, honest dry-run
+ * - hostPerformed true: host/Gmail/Voximplant already sent; we only record
+ * - dryRun false without hostPerformed: REFUSED (never pretend a send happened)
  */
 export function approveAndSendMessage(input: {
   jobId: string;
@@ -546,23 +551,28 @@ export function approveAndSendMessage(input: {
   const job = getJob(input.jobId);
   if (!job) throw new Error('job not found');
   const dryRun = input.dryRun !== false; // default true
+  const hostPerformed = !!input.hostPerformed;
   const policy = job.safetyPolicy.requireExplicitApprovalForSideEffects;
 
   if (policy && !hasGrant(job, 'send_message')) {
     throw new Error('REFUSED: send_message requires record_user_approval(granted=true) first — safety before convenience');
   }
-  if (policy && job.facts.service_address && !hasGrant(job, 'share_pii') && !hasGrant(job, 'send_message')) {
-    // send_message approval that includes draft with address counts; require explicit share or send grant
-  }
-  // Require share_pii if address is in draft and no send_message grant that covered it — we treat send_message grant as covering the send package after draft review
-  if (!hasGrant(job, 'send_message')) {
-    throw new Error('REFUSED: no send approval on file');
+
+  // Never claim a live Totbox channel send without an adapter or host execution
+  if (!dryRun && !hostPerformed) {
+    throw new Error(
+      'REFUSED: dryRun:false without hostPerformed is not supported — Totbox has no live send adapter yet. ' +
+        'Use dryRun:true (record only) or hostPerformed:true after host Gmail/SMS/voice send. Never pretend a send happened.'
+    );
   }
 
   const body = input.body || job.pendingDraft?.body;
   if (!body) throw new Error('no message body');
   const channel = input.channel || job.pendingDraft?.channel || 'email';
   const to = input.to || job.pendingDraft?.to;
+
+  // Message is dry-run unless host actually performed the send
+  const messageIsDryRun = !hostPerformed;
 
   job.messages.push({
     id: id('msg'),
@@ -571,22 +581,19 @@ export function approveAndSendMessage(input: {
     channel,
     body,
     to,
-    dryRun: dryRun && !input.hostPerformed,
+    dryRun: messageIsDryRun,
     approved: true,
   });
 
   markDone(job, 'send_outreach');
   job.pendingDraft = undefined;
-  job.status = 'outbound_sent';
   audit(
     job,
-    input.hostPerformed ? 'outbound_host' : dryRun ? 'outbound_dry_run' : 'outbound_sent',
-    input.hostPerformed
+    hostPerformed ? 'outbound_host' : 'outbound_dry_run',
+    hostPerformed
       ? 'Host environment performed send; recorded on job'
-      : dryRun
-        ? 'Dry-run outbound recorded (no network send)'
-        : 'Outbound send recorded',
-    { to, channel, hostResult: input.hostResult }
+      : 'Dry-run outbound recorded (no network send — honest record only)',
+    { to, channel, hostResult: input.hostResult, dryRun: messageIsDryRun }
   );
   job.status = 'awaiting_provider_reply';
   return upsert(recomputeNextAction(job));
@@ -661,11 +668,12 @@ export function confirmAppointment(input: {
 }): Job {
   const job = getJob(input.jobId);
   if (!job) throw new Error('job not found');
-  if (job.safetyPolicy.requireExplicitApprovalForSideEffects && !hasGrant(job, 'commit_money_or_time') && !hasGrant(job, 'send_message')) {
-    // require explicit decision approval
-    if (!hasGrant(job, 'commit_money_or_time')) {
-      throw new Error('REFUSED: confirm_appointment requires record_user_approval(kind=commit_money_or_time)');
-    }
+  // Money/time commitment is a separate gate from send_message — never substitute
+  if (job.safetyPolicy.requireExplicitApprovalForSideEffects && !hasGrant(job, 'commit_money_or_time')) {
+    throw new Error(
+      'REFUSED: confirm_appointment requires record_user_approval(kind=commit_money_or_time, granted=true) — ' +
+        'send_message approval is not sufficient for scheduling commitments'
+    );
   }
   if (!isDone(job, 'provider_reply')) {
     throw new Error('cannot confirm appointment before provider reply ingested');
