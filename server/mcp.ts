@@ -14,7 +14,7 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { z } from 'zod';
 
 import { seedProviders, reloadProviders, beachheadSampleProviders } from '../src/lib/store.js';
-import { dispatchMcpTool } from '../src/lib/mcp-tools';
+import { dispatchMcpTool, listJobPmToolDescriptors } from '../src/lib/mcp-tools';
 import { appendMcpTranscript } from '../src/lib/mcp-transcript.js';
 
 // Stage 6 beachhead seed: fictional HVAC + cleaning (+ tree) operators only
@@ -104,6 +104,8 @@ mcpServer.registerTool(
   }
 );
 
+// Job PM tools are exposed via HTTP tools/list + tools/call → dispatchMcpTool (host-LLM-first PM).
+
 // Startup (IIFE to avoid top-level await cjs issues with tsx/esbuild)
 (async () => {
   const transport = new StreamableHTTPServerTransport({
@@ -150,72 +152,77 @@ mcpServer.registerTool(
       }
 
       if (method === 'tools/list') {
+        const legacy = [
+          {
+            name: 'search_services',
+            description: 'Local fixture/search helper — NOT a city vendor directory. Prefer external discovery + start_job.',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                query: { type: 'string' },
+                category: { type: 'string' },
+                location: { type: 'string' },
+                limit: { type: 'number' },
+                token: { type: 'string' },
+              },
+            },
+          },
+          {
+            name: 'get_provider_details',
+            description: 'Return full details for one local fixture provider.',
+            inputSchema: {
+              type: 'object',
+              properties: { providerId: { type: 'string' }, token: { type: 'string' } },
+              required: ['providerId'],
+            },
+          },
+          {
+            name: 'get_availability',
+            description: 'Get availability slots for a provider on a date.',
+            inputSchema: {
+              type: 'object',
+              properties: { providerId: { type: 'string' }, date: { type: 'string' }, token: { type: 'string' } },
+              required: ['providerId', 'date'],
+            },
+          },
+          {
+            name: 'create_service_brief',
+            description: 'Legacy brief helper; prefer start_job for full PM checklist.',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                naturalLanguage: { type: 'string' },
+                category: { type: 'string' },
+                serviceType: { type: 'string' },
+                priorities: { type: 'array', items: { type: 'string' } },
+                budgetUsd: { type: 'number' },
+                location: { type: 'string' },
+                dateWindow: { type: 'string' },
+              },
+              required: ['naturalLanguage'],
+            },
+          },
+          {
+            name: 'compare_options',
+            description: 'Compare local fixture offers; job quotes use ingest_provider_message on a job.',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                naturalLanguage: { type: 'string' },
+                briefId: { type: 'string' },
+                category: { type: 'string' },
+                location: { type: 'string' },
+                budgetUsd: { type: 'number' },
+                query: { type: 'string' },
+                limit: { type: 'number' },
+              },
+            },
+          },
+        ];
         return res.json({
           jsonrpc: '2.0',
           id,
-          result: {
-            tools: [
-              {
-                name: 'search_services',
-                description: 'Search providers by query, category or location. (token optional for scoping)',
-                inputSchema: {
-                  type: 'object',
-                  properties: {
-                    query: { type: 'string' },
-                    category: { type: 'string' },
-                    location: { type: 'string' },
-                    limit: { type: 'number' },
-                    token: { type: 'string' },
-                  },
-                },
-              },
-              {
-                name: 'get_provider_details',
-                description: 'Return full details for one provider.',
-                inputSchema: { type: 'object', properties: { providerId: { type: 'string' }, token: { type: 'string' } }, required: ['providerId'] },
-              },
-              {
-                name: 'get_availability',
-                description: 'Get availability slots for a provider on a date.',
-                inputSchema: { type: 'object', properties: { providerId: { type: 'string' }, date: { type: 'string' }, token: { type: 'string' } }, required: ['providerId', 'date'] },
-              },
-              {
-                name: 'create_service_brief',
-                description:
-                  'Capture a natural-language home-services job as a structured service brief (Stage 6).',
-                inputSchema: {
-                  type: 'object',
-                  properties: {
-                    naturalLanguage: { type: 'string' },
-                    category: { type: 'string' },
-                    serviceType: { type: 'string' },
-                    priorities: { type: 'array', items: { type: 'string' } },
-                    budgetUsd: { type: 'number' },
-                    location: { type: 'string' },
-                    dateWindow: { type: 'string' },
-                  },
-                  required: ['naturalLanguage'],
-                },
-              },
-              {
-                name: 'compare_options',
-                description:
-                  'Parallel multi-provider comparison (price, membership, cancel fee, inclusions, trust stub).',
-                inputSchema: {
-                  type: 'object',
-                  properties: {
-                    naturalLanguage: { type: 'string' },
-                    briefId: { type: 'string' },
-                    category: { type: 'string' },
-                    location: { type: 'string' },
-                    budgetUsd: { type: 'number' },
-                    query: { type: 'string' },
-                    limit: { type: 'number' },
-                  },
-                },
-              },
-            ],
-          },
+          result: { tools: [...listJobPmToolDescriptors(), ...legacy] },
         });
       }
 
@@ -238,16 +245,17 @@ mcpServer.registerTool(
   app.get('/', (_req, res) => {
     res.json({
       service: 'Totbox MCP Server',
-      version: 'stage-6',
+      version: 'job-pm-host-llm-safety',
       mcpEndpoint: `http://localhost:${PORT}/mcp`,
+      principle: 'Safety before convenience. Host LLM first; explicit user approvals for side effects.',
       tools: [
+        ...listJobPmToolDescriptors().map(t => t.name),
         'search_services',
         'get_provider_details',
         'get_availability',
         'create_service_brief',
         'compare_options',
       ],
-      beachhead: 'hvac + cleaning (+ tree) demo operators',
     });
   });
 
