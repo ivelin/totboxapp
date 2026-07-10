@@ -14,23 +14,27 @@ Everything happens primarily in the chat apps you already use (Grok, Claude, Cha
 
 **Why:** Anonymized multi-year household coordination research shows the highest multi-turn friction here (often 6–12+ emails per decision): parallel vendor comparison, PDF/plan quotes, review research, partner approvals, FSM invoices, and forgotten preventive cadence. That is the chore stack agents should own.
 
-**Integrations:** **Tier 1** Google Calendar (stages 1–5). **Tier 2** ServiceTitan (jobs, Leads booking push, invoices, webhooks) — design in-repo, pilot after core brief/compare loop. Non-ST operators keep the Calendar path.
+**Thesis:** Scheduling/coordination workflow — **not** a vendor registry (discovery is Google/AI).  
+**Host LLM first:** Grok / Claude / OpenClaw / Codex draft and use **user’s existing tools** (memory, Gmail, SMS/voice MCP). Totbox is the **job PM** (checklist, gates, audit).  
+**Safety before convenience:** explicit user approval for send/PII/money; dry-run default; validate every step (FSD: must not do harm).
 
-**Parallel track:** Kids’ activities, entertainment centers, childcare, tutoring, sports — still core to the long-term “family life” brand, not the Stage-0 validation path.
-
-Full plan: [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md)  
-Research insights: [`docs/research/home_services_email_insights.md`](docs/research/home_services_email_insights.md)  
-ServiceTitan annex: [`docs/research/servicetitan_integration.md`](docs/research/servicetitan_integration.md)  
-Research privacy (public repo): [`docs/research/README.md`](docs/research/README.md)
+| Doc | Purpose |
+|-----|---------|
+| [`docs/host_llm_safety.md`](docs/host_llm_safety.md) | Safety + host capability fallthrough |
+| [`docs/mcp_workflow_architecture.md`](docs/mcp_workflow_architecture.md) | Job PM / next_action contract |
+| [`docs/product_thesis.md`](docs/product_thesis.md) | Scheduling not discovery |
+| [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md) | Broader product plan |
+| [`AGENTS.md`](AGENTS.md) | Public repo: no PII |
 
 ---
 
 ## Core approach
 
-- **Minimal friction:** Chat + MCP + OAuth. Humans keep only high-value gates (final book/pay, access details, non-standard scope).
-- **Dual-sided value:** Households get one conversational loop. Small operators get structured inbound and less admin (stay in Calendar / ServiceTitan).
-- **Built on real pain:** Collapse discovery → quote/scope → household approval → schedule → records → recurring reminders.
-- **Growth (after the loop works):** Easy resident “tell a neighbor” + provider peer invites — measured referrals, not growth theater first.
+- **Not a directory:** Find vendors externally; Totbox runs the job checklist.
+- **Host LLM = EA; Totbox MCP = PM:** `next_action` work orders; prefer host Gmail/voice/memory.
+- **Safety first:** `record_user_approval` before send; default dry-run; full audit trail.
+- **Human channels** for coverage (phone/email/form); FSM APIs optional later.
+- **Local-first:** `.data/jobs.json` gitignored; `npm run smoke:job`.
 
 ---
 
@@ -99,54 +103,31 @@ Household flow                         Provider flow
 
 ---
 
-## House-owner test path (consumer persona)
-
-Stop here and try the discovery → compare loop as a homeowner. **No chat app required.**
+## Job PM smoke (host-LLM safety path)
 
 ```bash
 npm install
-npm run seed                 # fictional HVAC + cleaning (+ tree) demo operators
-npm run smoke:house-owner    # brief + multi-provider compare (store + MCP dispatch)
+npm run smoke:job    # HVAC + cleaning: start → draft → approval → dry-run send → ingest
+npm run dev:mcp      # start_job, record_user_approval, approve_and_send_message, …
 ```
 
-Optional live MCP (second terminal):
+Host loop: follow each `next_action` (prefer host memory/Gmail/SMS/voice tools) → `record_user_approval` → never send without grant → dry-run or `hostPerformed` send → `ingest_provider_message`.
 
-```bash
-npm run dev:mcp              # listens on http://localhost:3001/mcp
-# then:
-npm run smoke:house-owner -- --live
-```
-
-**Sample jobs the smoke uses (you can rephrase similarly):**
-
-- HVAC: *“Find AC maintenance plans for my area in the next 2 weeks under $300 with good recent reviews”*
-- Cleaning: *“Book a 3hr priority clean focusing on blinds, windows, under beds, corners — share options before I confirm”*
-
-**What you should see:** 2+ demo providers per job, with names plus price/membership/cancel/inclusions-style terms. All operators are fictional (`Demo …`); no real household data.
-
-MCP tools involved: `create_service_brief`, `compare_options` (also `search_services`, `get_provider_details`, `get_availability`).
+Also: `npm run smoke:house-owner` (legacy fixture compare). Docs: [`docs/host_llm_safety.md`](docs/host_llm_safety.md).
 
 ---
 
-## Development (stages 1–6+)
+## Development
 
 ```bash
 npm install
 npm run dev          # Next.js UI on :3000
-npm run dev:mcp      # MCP server on :3001
-npm run build
-npm test
-npm run typecheck
-npm run smoke:house-owner
+npm run dev:mcp      # MCP on :3001
+npm run smoke:job
+npm test && npm run typecheck && npm run build
 ```
 
-- Landing page: `/`
-- Provider dashboard (register, token, calendar connect): `/dashboard`
-- MCP: `http://localhost:3001/mcp` (pass provider token for scoped tools)
-- Tools: `search_services`, `get_provider_details`, `get_availability`, `create_service_brief`, `compare_options`
-- Beachhead seed: fictional HVAC + cleaning (+ tree) demo operators (`npm run seed`)
-
-**Connecting the MCP:** Run `npm run dev:mcp`. Register on `/dashboard` (name, services, location, rules). You get a secret token + MCP URL. Add both to your chat app for scoped results.
+MCP job tools: `start_job`, `update_job_facts`, `submit_draft_for_approval`, `record_user_approval`, `approve_and_send_message`, `ingest_provider_message`, `confirm_appointment`, …
 
 ---
 
@@ -154,10 +135,9 @@ npm run smoke:house-owner
 
 | Area | Status |
 |------|--------|
-| Product vision + v3.1 beachhead / ST annex | On `main` |
-| Stages 1–5 (Next.js, store, MCP, registration, Google Calendar availability) | On `main` |
-| Stage 6 (service briefs, compare, HVAC/cleaning seeds, house-owner smoke) | This branch / PR #3 |
-| Stages 7–9 (trust, household approval, recurring) | Spec’d; next |
+| Stages 1–6 scaffold | On `main` |
+| Job PM + host-LLM safety gates | This branch |
+| Always-on 24/7 daemon / real SMS vendor | Non-goal for now |
 | Stages 10a–10c (ServiceTitan design → prototype → pilot) | Spec’d in ST annex |
 | Stage 11 (dual-sided referrals) | Spec’d; after core loop |
 
