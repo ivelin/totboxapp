@@ -6,6 +6,8 @@
 
 Code maps live instances → this view via `src/lib/workflow-progress.ts` (`progress` on `get_job` / MCP).
 
+**Interchange format:** versioned JSON (`totbox.workflow_def` / `totbox.workflow_progress`) + Mermaid/text projections — see [`format.md`](format.md).
+
 ### Ask your host AI anytime (MCP)
 
 | You say | Tool |
@@ -126,11 +128,12 @@ Illegal transitions stay **REFUSED** (e.g. send without approval; confirm withou
 
 ## Non-goals for the top-level view
 
-- Full BPMN for consumers  
+- Full BPMN for consumers (BPMN is a **semantic dialect** only — see [`format.md`](format.md))  
 - Per-trade different main maps  
 - Showing raw tool names to homeowners  
 - City-wide vendor directory as a step  
+- Mermaid or ASCII as a second source of truth (always derive from JSON)
 
 ---
 
-*Source of truth for the consumer map. Implementation: `src/lib/workflow-progress.ts`.*
+*Source of truth for the consumer story. Implementation: `src/lib/workflow-progress.ts` + format schemas in `src/lib/workflow-format.ts`.*
