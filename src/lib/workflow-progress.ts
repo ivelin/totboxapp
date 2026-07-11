@@ -1,24 +1,37 @@
 /**
  * house_service_v1 — consumer-facing progress map for any house-service job.
  * Stable spine; service kind only affects copy, not step ids.
+ * Interchange: docs/workflows/format.md · schemas in workflow-format.ts
  */
 
 import type { Job, JobStatus } from './job-types';
+import {
+  type ConsumerStepId,
+  type StepVisualState,
+  type BpmnStepType,
+  type WorkflowGate,
+  type WorkflowDefinition,
+  type WorkflowDiagrams,
+  WORKFLOW_PROGRESS_FORMAT,
+  WORKFLOW_FORMAT_VERSION,
+  buildWorkflowDefinition,
+  buildDiagrams,
+} from './workflow-format';
+
+export type { ConsumerStepId, StepVisualState } from './workflow-format';
+export {
+  WORKFLOW_DEF_FORMAT,
+  WORKFLOW_PROGRESS_FORMAT,
+  WORKFLOW_FORMAT_VERSION,
+  toMermaid,
+  toTextDiagram,
+  buildDiagrams,
+  parseWorkflowDefinition,
+  parseWorkflowProgressCore,
+} from './workflow-format';
 
 export const WORKFLOW_ID = 'house_service_v1';
 export const WORKFLOW_VERSION = '1.0.0';
-
-export type ConsumerStepId =
-  | 'describe'
-  | 'details'
-  | 'contact'
-  | 'send'
-  | 'hear_back'
-  | 'choose'
-  | 'booked'
-  | 'done';
-
-export type StepVisualState = 'done' | 'current' | 'upcoming' | 'needs_you' | 'blocked';
 
 export interface WorkflowStepDef {
   id: ConsumerStepId;
@@ -30,6 +43,10 @@ export interface WorkflowStepDef {
   appDoes: string;
   /** Internal checklist item ids that complete this step */
   checklistIds: string[];
+  /** BPMN-aligned activity type (semantic dialect) */
+  bpmnType: BpmnStepType;
+  /** Safety gates that may apply at this step */
+  gates: WorkflowGate[];
 }
 
 /** Top-level consumer map — keep ≤8 steps for any screen */
@@ -40,6 +57,8 @@ export const HOUSE_SERVICE_V1_STEPS: WorkflowStepDef[] = [
     youDo: 'Say what service you need and any budget or timing.',
     appDoes: 'Turns your words into a clear job package.',
     checklistIds: ['brief'],
+    bpmnType: 'userTask',
+    gates: [],
   },
   {
     id: 'details',
@@ -47,6 +66,8 @@ export const HOUSE_SERVICE_V1_STEPS: WorkflowStepDef[] = [
     youDo: 'Confirm address or access if asked (we never invent it).',
     appDoes: 'Uses host memory when allowed; blocks send until required facts exist.',
     checklistIds: ['address'],
+    bpmnType: 'userTask',
+    gates: ['share_pii'],
   },
   {
     id: 'contact',
@@ -54,6 +75,8 @@ export const HOUSE_SERVICE_V1_STEPS: WorkflowStepDef[] = [
     youDo: 'Choose who to contact (search or someone you already know).',
     appDoes: 'Prepares the outreach draft with the right fields for this service type.',
     checklistIds: ['provider_contact', 'draft_outreach'],
+    bpmnType: 'userTask',
+    gates: [],
   },
   {
     id: 'send',
@@ -61,6 +84,8 @@ export const HOUSE_SERVICE_V1_STEPS: WorkflowStepDef[] = [
     youDo: 'Review and approve the message before anything goes out.',
     appDoes: 'Sends via your tools or records a dry-run; never silent auto-send early on.',
     checklistIds: ['send_outreach'],
+    bpmnType: 'userTask',
+    gates: ['send_message'],
   },
   {
     id: 'hear_back',
@@ -68,6 +93,8 @@ export const HOUSE_SERVICE_V1_STEPS: WorkflowStepDef[] = [
     youDo: 'Share the reply if your inbox tools do not auto-import it.',
     appDoes: 'Records quotes and times; prompts the next follow-up if needed.',
     checklistIds: ['provider_reply'],
+    bpmnType: 'serviceTask',
+    gates: [],
   },
   {
     id: 'choose',
@@ -75,6 +102,8 @@ export const HOUSE_SERVICE_V1_STEPS: WorkflowStepDef[] = [
     youDo: 'Approve price and time (money/time needs your OK).',
     appDoes: 'Shows options; will not lock a commitment without approval.',
     checklistIds: ['user_decision'],
+    bpmnType: 'userTask',
+    gates: ['commit_money_or_time'],
   },
   {
     id: 'booked',
@@ -82,6 +111,8 @@ export const HOUSE_SERVICE_V1_STEPS: WorkflowStepDef[] = [
     youDo: 'Be ready on the service day.',
     appDoes: 'Holds the confirmed appointment on the job.',
     checklistIds: ['scheduled'],
+    bpmnType: 'serviceTask',
+    gates: [],
   },
   {
     id: 'done',
@@ -89,8 +120,19 @@ export const HOUSE_SERVICE_V1_STEPS: WorkflowStepDef[] = [
     youDo: 'Pay / note how it went if you want.',
     appDoes: 'Closes the job; can remind you next time (later).',
     checklistIds: ['settle'],
+    bpmnType: 'userTask',
+    gates: [],
   },
 ];
+
+/** Validated `totbox.workflow_def` for the stable house_service_v1 spine. */
+export function getHouseServiceDefinition(): WorkflowDefinition {
+  return buildWorkflowDefinition({
+    workflow_id: WORKFLOW_ID,
+    workflow_version: WORKFLOW_VERSION,
+    steps: HOUSE_SERVICE_V1_STEPS,
+  });
+}
 
 function checklistDone(job: Job, ids: string[]): boolean {
   const relevant = job.checklist.filter(c => ids.includes(c.id));
@@ -206,7 +248,15 @@ export function getWorkflowProgress(job: Job) {
         ? 'This job is finished.'
         : `App: ${current.app_does}`;
 
+  const diagrams: WorkflowDiagrams = buildDiagrams({
+    steps: HOUSE_SERVICE_V1_STEPS.map((s, i) => ({ id: s.id, label: s.label, n: i + 1 })),
+    progressSteps: steps.map(s => ({ id: s.id, state: s.state })),
+  });
+
   return {
+    /** Interchange envelope — docs/workflows/format.md */
+    format: WORKFLOW_PROGRESS_FORMAT,
+    format_version: WORKFLOW_FORMAT_VERSION,
     workflow_id: WORKFLOW_ID,
     workflow_version: WORKFLOW_VERSION,
     service_kind: job.serviceKind,
@@ -218,6 +268,8 @@ export function getWorkflowProgress(job: Job) {
     role_line: roleLine,
     current_step_id: current.id,
     steps,
+    /** Text + Mermaid projections (JSON steps remain source of truth) */
+    diagrams,
     /** Developer drill-down (same payload, separate key for UIs) */
     developer: {
       internal_status: job.status,
@@ -227,6 +279,7 @@ export function getWorkflowProgress(job: Job) {
       next_action: job.nextAction,
       open_checklist: job.checklist.filter(c => c.required && !c.done).map(c => c.id),
       doc: 'docs/workflows/house_service_v1.md',
+      format_doc: 'docs/workflows/format.md',
     },
   };
 }
@@ -288,24 +341,37 @@ export function getServiceProfile(serviceKind?: string) {
  */
 export function getWorkflowTemplate(opts?: { service_kind?: string }) {
   const profile = getServiceProfile(opts?.service_kind);
-  const steps = HOUSE_SERVICE_V1_STEPS.map((s, i) => ({
-    n: i + 1,
+  const definition = getHouseServiceDefinition();
+  const steps = definition.steps.map(s => ({
+    n: s.n,
     id: s.id,
     label: s.label,
-    you_do: s.youDo,
-    app_does: s.appDoes,
+    type: s.type,
+    you_do: s.you_do,
+    app_does: s.app_does,
+    gates: s.gates,
   }));
   const strip = steps.map(s => `○ ${s.label}`).join(' · ');
-  const diagram = '1.Describe → 2.Details → 3.Contact → 4.Send → 5.Hear back → 6.Choose → 7.Booked → 8.Done';
+  const diagrams = buildDiagrams({
+    steps: HOUSE_SERVICE_V1_STEPS.map((s, i) => ({ id: s.id, label: s.label, n: i + 1 })),
+  });
+  /** @deprecated prefer diagrams.text — kept for existing hosts/tests */
+  const diagram = diagrams.text;
 
   return {
     kind: 'workflow_template' as const,
+    format: definition.format,
+    format_version: definition.format_version,
     workflow_id: WORKFLOW_ID,
     workflow_version: WORKFLOW_VERSION,
     service_kind: opts?.service_kind || null,
     service_profile: profile,
+    /** Validated totbox.workflow_def (source of truth for the spine) */
+    definition,
     /** One-line map for any screen */
     diagram,
+    /** Text + Mermaid projections */
+    diagrams,
     strip,
     steps,
     principles: {
@@ -322,9 +388,10 @@ export function getWorkflowTemplate(opts?: { service_kind?: string }) {
       list: 'Call list_jobs — each item includes progress.summary and progress.strip',
     },
     doc: 'docs/workflows/house_service_v1.md',
+    format_doc: 'docs/workflows/format.md',
     /** Host LLM: render strip + current role_line to the user on mobile/desktop */
     host_render_hint:
-      'Show the strip on one line. Below it, show role_line (You: … / App: …). Offer “Where am I?” anytime via get_workflow(job_id).',
+      'Show the strip on one line. Below it, show role_line (You: … / App: …). Prefer progress.diagrams.mermaid or definition when the host can render diagrams. Offer “Where am I?” anytime via get_workflow(job_id).',
   };
 }
 
@@ -419,7 +486,7 @@ export function describeWorkflow(opts?: {
         can_cancel: true,
       },
       host_render_hint:
-        'Show progress.strip and progress.role_line prominently. If next_needs_you, highlight the approval the user must give. Offer developer drill-down only if user asks “under the hood”. Do not display raw street address from tools unless user is approving a draft that intentionally includes it.',
+        'Show progress.strip and progress.role_line prominently. If next_needs_you, highlight the approval the user must give. Optional: progress.diagrams.mermaid for hosts that render Mermaid. Offer developer drill-down only if user asks “under the hood”. Do not display raw street address from tools unless user is approving a draft that intentionally includes it.',
     };
   }
 

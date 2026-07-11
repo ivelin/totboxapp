@@ -7,6 +7,9 @@ describe('consumer workflow sample', () => {
     const sample = getConsumerWorkflowSample();
     expect(sample.template.steps).toHaveLength(8);
     expect(sample.template.diagram).toMatch(/Describe/);
+    expect(sample.template.diagrams?.mermaid).toMatch(/flowchart/);
+    expect(sample.template.definition?.steps).toHaveLength(8);
+    expect(sample.sample_job.progress.diagrams?.mermaid).toMatch(/style send/);
     expect(sample.sample_job.progress.steps).toHaveLength(8);
     expect(sample.sample_job.progress.current_step_id).toBe('send');
     expect(sample.sample_job.progress.steps.find(s => s.id === 'send')?.state).toBe('needs_you');

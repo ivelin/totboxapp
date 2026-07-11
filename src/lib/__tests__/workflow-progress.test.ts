@@ -8,7 +8,16 @@ import {
   approveAndSendMessage,
   jobPublicView,
 } from '../job-pm';
-import { WORKFLOW_ID, HOUSE_SERVICE_V1_STEPS, formatProgressAscii } from '../workflow-progress';
+import {
+  WORKFLOW_ID,
+  HOUSE_SERVICE_V1_STEPS,
+  formatProgressAscii,
+  getHouseServiceDefinition,
+  getWorkflowTemplate,
+  WORKFLOW_PROGRESS_FORMAT,
+  WORKFLOW_DEF_FORMAT,
+  parseWorkflowProgressCore,
+} from '../workflow-progress';
 
 describe('house_service_v1 consumer progress', () => {
   beforeEach(() => {
@@ -91,5 +100,46 @@ describe('house_service_v1 consumer progress', () => {
     expect(view.progress.developer.next_action_type || view.progress.developer.internal_status).toBeTruthy();
     expect(view.checklist).toBeDefined();
     expect(view.next_action).toBeDefined();
+  });
+
+  it('emits totbox.workflow_progress envelope with Mermaid projection', () => {
+    const job = startJob({ intent: 'AC maintenance under $200' });
+    const p = jobPublicView(job).progress;
+    expect(p.format).toBe(WORKFLOW_PROGRESS_FORMAT);
+    expect(p.format_version).toBe('1.0');
+    expect(p.diagrams.text).toMatch(/Describe/);
+    expect(p.diagrams.mermaid).toMatch(/flowchart LR/);
+    expect(p.diagrams.mermaid).toMatch(/describe --> details/);
+    // Core fields validate against interchange schema (developer is free-form)
+    expect(() =>
+      parseWorkflowProgressCore({
+        format: p.format,
+        format_version: p.format_version,
+        workflow_id: p.workflow_id,
+        workflow_version: p.workflow_version,
+        service_kind: p.service_kind,
+        summary: p.summary,
+        strip: p.strip,
+        role_line: p.role_line,
+        current_step_id: p.current_step_id,
+        steps: p.steps,
+        diagrams: p.diagrams,
+        developer: { internal_status: p.developer.internal_status },
+      })
+    ).not.toThrow();
+  });
+
+  it('template includes validated definition and diagrams', () => {
+    const t = getWorkflowTemplate({ service_kind: 'hvac' });
+    expect(t.format).toBe(WORKFLOW_DEF_FORMAT);
+    expect(t.definition.workflow_id).toBe(WORKFLOW_ID);
+    expect(t.definition.steps).toHaveLength(8);
+    expect(t.definition.edges).toHaveLength(7);
+    expect(t.diagrams.mermaid).toMatch(/send --> hear_back/);
+    expect(t.diagram).toBe(t.diagrams.text);
+    expect(getHouseServiceDefinition().steps.map(s => s.id)).toEqual(
+      HOUSE_SERVICE_V1_STEPS.map(s => s.id)
+    );
+    expect(t.steps.find(s => s.id === 'send')?.gates).toContain('send_message');
   });
 });

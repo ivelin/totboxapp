@@ -19,21 +19,27 @@ type SamplePayload = {
   template: {
     workflow_id: string;
     workflow_version: string;
+    format?: string;
+    format_version?: string;
     diagram: string;
+    diagrams?: { text: string; mermaid: string };
     strip: string;
     steps: Step[];
     principles: Record<string, string>;
     service_profile: { label: string; field_hints: string[]; outreach_notes: string };
+    format_doc?: string;
   };
   sample_job: {
     job_id: string;
     intent: string;
     service_kind: string;
     progress: {
+      format?: string;
       strip: string;
       summary: string;
       role_line: string;
       current_step_id: string;
+      diagrams?: { text: string; mermaid: string };
       steps: Array<Step & { state: StepState; you_do: string; app_does: string }>;
     };
     draft_preview: {
@@ -250,6 +256,12 @@ export function WorkflowProgressSample({ sample }: { sample: SamplePayload }) {
           <section className="mb-4 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
             <p className="text-xs text-zinc-500">
               {sample.template.workflow_id} · v{sample.template.workflow_version}
+              {sample.template.format ? (
+                <>
+                  {' '}
+                  · {sample.template.format} {sample.template.format_version}
+                </>
+              ) : null}
             </p>
             <p className="mt-2 font-mono text-xs leading-relaxed text-zinc-700 dark:text-zinc-300 sm:text-sm">
               {sample.template.diagram}
@@ -258,6 +270,16 @@ export function WorkflowProgressSample({ sample }: { sample: SamplePayload }) {
               Same path for <strong>{sample.template.service_profile.label}</strong> and every other house
               service. Only the details under each step change.
             </p>
+            {sample.template.diagrams?.mermaid ? (
+              <details className="mt-3">
+                <summary className="cursor-pointer text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200">
+                  Mermaid projection (for docs / rich hosts)
+                </summary>
+                <pre className="mt-2 overflow-x-auto rounded-xl bg-zinc-100 p-3 font-mono text-[10px] leading-relaxed text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 sm:text-xs">
+                  {sample.template.diagrams.mermaid}
+                </pre>
+              </details>
+            ) : null}
           </section>
           <section className="space-y-2">
             {sample.template.steps.map(step => (

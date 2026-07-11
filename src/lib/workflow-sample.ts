@@ -92,11 +92,16 @@ export function getConsumerWorkflowSample() {
     template: {
       workflow_id: template.workflow_id,
       workflow_version: template.workflow_version,
+      format: template.format,
+      format_version: template.format_version,
       diagram: template.diagram,
+      diagrams: template.diagrams,
+      definition: template.definition,
       strip: template.strip,
       steps: template.steps,
       principles: template.principles,
       service_profile: template.service_profile,
+      format_doc: template.format_doc,
     },
     sample_job: {
       job_id: job.id,

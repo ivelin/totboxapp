@@ -44,6 +44,7 @@ All approvals and audit events are stored on the job (local `.data/jobs.json`). 
 The host LLM must be able to **show the workflow on demand** — general template, by service type, or for a live job — as a clean structured payload (strip + steps + you/app roles). Tools: **`get_workflow`**, **`get_job`**, **`list_jobs`**.
 
 - Consumer: full visibility of process and “where I am”; no dark patterns.  
+- Format: `totbox.workflow_def` / `totbox.workflow_progress` ([`workflows/format.md`](workflows/format.md)); Mermaid is a **projection**, not a second source of truth.  
 - Privacy: instance views redact street address values by default (`has_service_address` only).  
 - Honesty: dry-run is labeled dry-run; never pretend a send.  
 - Developer: `progress.developer` + checklist/audit for drill-down.
