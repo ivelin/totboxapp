@@ -109,12 +109,14 @@ Household flow                         Provider flow
 ```bash
 npm install
 npm run smoke:job    # HVAC + cleaning: start → draft → approval → dry-run send → ingest
-npm run dev:mcp      # start_job, record_user_approval, approve_and_send_message, …
+npm run dev:mcp      # start_job, get_workflow, record_user_approval, …
 ```
+
+**Workflow visibility:** ask the host anytime — `get_workflow` (general or `service_kind`) or `get_workflow({ job_id })` / `get_job` for the live strip. Same 8 steps for every house service; you stay in control of approvals.
 
 Host loop: follow each `next_action` (prefer host memory/Gmail/SMS/voice tools) → `record_user_approval` → never send without grant → dry-run or `hostPerformed` send → `ingest_provider_message`.
 
-Also: `npm run smoke:house-owner` (legacy fixture compare). Docs: [`docs/host_llm_safety.md`](docs/host_llm_safety.md).
+Also: `npm run smoke:house-owner` (legacy fixture compare). Docs: [`docs/host_llm_safety.md`](docs/host_llm_safety.md), [`docs/workflows/house_service_v1.md`](docs/workflows/house_service_v1.md).
 
 ---
 
@@ -128,7 +130,7 @@ npm run smoke:job
 npm test && npm run typecheck && npm run build
 ```
 
-MCP job tools: `start_job`, `update_job_facts`, `submit_draft_for_approval`, `record_user_approval`, `approve_and_send_message`, `ingest_provider_message`, `confirm_appointment`, …
+MCP job tools: `get_workflow`, `start_job`, `get_job`, `list_jobs`, `update_job_facts`, `submit_draft_for_approval`, `record_user_approval`, `approve_and_send_message`, `ingest_provider_message`, `confirm_appointment`, …
 
 ---
 
