@@ -46,4 +46,4 @@ npm run smoke:job    # HVAC + cleaning: start → approve → dry-run → ingest
 npm run dev:mcp      # expose start_job, record_user_approval, …
 ```
 
-See also: [`mcp_workflow_architecture.md`](mcp_workflow_architecture.md), [`product_thesis.md`](product_thesis.md).
+See also: [`mcp_workflow_architecture.md`](mcp_workflow_architecture.md), [`product_thesis.md`](product_thesis.md), consumer progress map [`workflows/house_service_v1.md`](workflows/house_service_v1.md).

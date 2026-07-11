@@ -9,21 +9,22 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      thresholds: {
-        lines: 5,
-        functions: 5,
-        branches: 5,
-        statements: 5,
-      },
-      // basic thresholds per scaffolding plan; focus on core lib paths
-      // full 80% targeted in future iterations per non-goals
+      // Gate on product logic only (not Next pages / scripts)
+      include: ['src/lib/**/*.{ts,tsx}'],
       exclude: [
         'node_modules/**',
-        '.next/**',
-        'scripts/verify-*.ts', // keep as integration drivers for now
         '**/*.d.ts',
+        '**/*.{test,spec}.ts',
         '**/types.ts',
+        '**/job-types.ts', // schema-only
+        '**/mcp-transcript.ts', // I/O helper
       ],
+      thresholds: {
+        lines: 55,
+        functions: 55,
+        branches: 50,
+        statements: 55,
+      },
     },
   },
 });

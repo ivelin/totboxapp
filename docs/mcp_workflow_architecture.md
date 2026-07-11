@@ -10,7 +10,7 @@ Totbox MCP is the **project manager for a home-service job**: durable checklist,
 
 **Host capability fallthrough:** for address, mail, SMS, voice — instruct host to use existing MCPs first; Totbox dry-run/record fallback second.
 
-Related: [`product_thesis.md`](product_thesis.md).
+Related: [`product_thesis.md`](product_thesis.md) · **Consumer map:** [`workflows/house_service_v1.md`](workflows/house_service_v1.md) (`progress` on every job).
 
 ## Implemented tools (job PM)
 

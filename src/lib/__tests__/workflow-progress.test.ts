@@ -6,7 +6,6 @@ import {
   submitDraftForApproval,
   recordUserApproval,
   approveAndSendMessage,
-  ingestProviderMessage,
   jobPublicView,
 } from '../job-pm';
 import { WORKFLOW_ID, HOUSE_SERVICE_V1_STEPS, formatProgressAscii } from '../workflow-progress';
