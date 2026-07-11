@@ -22,6 +22,8 @@ describe('MCP job PM tools (shipped dispatch)', () => {
   it('start_job returns progress map house_service_v1', () => {
     const r = parse(dispatchMcpTool('start_job', { intent: 'AC maintenance under $250' }));
     expect(r.job_id).toMatch(/^job_/);
+    expect(r.workflow_id).toBe('house_service_v1');
+    expect(r.workflow_version).toBeTruthy();
     expect(r.progress.workflow_id).toBe('house_service_v1');
     expect(r.progress.steps).toHaveLength(8);
     expect(r.progress.strip).toMatch(/Describe/);

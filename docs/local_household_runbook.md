@@ -43,8 +43,10 @@ npm run dev:mcp
 
 | Tool | Real household meaning |
 |------|-------------------------|
-| `create_service_brief` | Package the chore |
-| `compare_options` | Rank **options you care about** (today: local store; target: user-sourced quotes) |
+| `get_workflow` | See the process (general, by service type, or this job’s “where am I?” strip) |
+| `start_job` / `get_job` / `list_jobs` | Run and inspect house-service job instances |
+| `create_service_brief` | Package the chore (legacy helper; prefer `start_job`) |
+| `compare_options` | Rank **options you care about** (fixtures; target: user-sourced quotes) |
 | `search_services` | Query **your local notes/fixtures**—not Google |
 | `get_provider_details` / `get_availability` | Detail + windows for parties on the job |
 

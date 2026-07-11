@@ -17,7 +17,7 @@ import {
   ApprovalRecord,
   AuditEvent,
 } from './job-types';
-import { getWorkflowProgress } from './workflow-progress';
+import { getWorkflowProgress, WORKFLOW_ID, WORKFLOW_VERSION } from './workflow-progress';
 
 const DATA_DIR = path.join(process.cwd(), '.data');
 /** Vitest workers must not share one jobs.json (parallel clobber → "job not found"). */
@@ -439,6 +439,8 @@ export function startJob(input: {
     id: id('job'),
     createdAt: t,
     updatedAt: t,
+    workflowId: WORKFLOW_ID,
+    workflowVersion: WORKFLOW_VERSION,
     intent: input.intent,
     serviceKind,
     status: 'intake',
@@ -713,6 +715,8 @@ export function jobPublicView(job: Job) {
     status: job.status,
     service_kind: job.serviceKind,
     intent: job.intent,
+    workflow_id: job.workflowId || WORKFLOW_ID,
+    workflow_version: job.workflowVersion || WORKFLOW_VERSION,
     /** Consumer-facing map (mobile-friendly strip + roles). Same spine for all house services. */
     progress,
     checklist: job.checklist,
