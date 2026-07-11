@@ -17,6 +17,8 @@ Code maps live instances → this view via `src/lib/workflow-progress.ts` (`prog
 
 Host should render **`strip` + `role_line`** (or `progress.strip` / `progress.role_line`) on one mobile screen. Full control: you approve send, address sharing, and money/time.
 
+**Live sample UI (interactive):** open **`/workflow`** in the Next app — same data model as MCP `get_workflow`, mobile-friendly, tap steps to inspect You vs App roles.
+
 ---
 
 ## What you see (consumer — any phone or desktop)
