@@ -106,9 +106,15 @@ function assertTemplate() {
   must(t.kind === 'workflow_template', 'template kind');
   must(t.steps?.length === 8, 'template 8 steps');
   must(t.principles?.transparency, 'transparency principle');
+  must(t.format === 'totbox.workflow_def', 'template format envelope');
+  must(t.definition?.format === 'totbox.workflow_def', 'definition object');
+  must(t.definition?.edges?.length === 7, 'linear edges');
+  must(typeof t.diagrams?.mermaid === 'string' && t.diagrams.mermaid.includes('flowchart'), 'mermaid projection');
+  must(t.diagram === t.diagrams?.text, 'diagram aliases diagrams.text');
   const hvac = parse(dispatchMcpTool('get_workflow', { service_kind: 'hvac' }));
   must(hvac.service_profile?.field_hints?.length > 0, 'hvac profile');
   console.log('get_workflow template OK:', t.diagram);
+  console.log('mermaid lines:', String(t.diagrams.mermaid).split('\n').length);
 }
 
 async function main() {

@@ -93,7 +93,7 @@ Providers (phone, email, web form, SMS)
 ## What we will build (priority)
 
 1. **Job + checklist PM** in MCP — durable state, `next_action` for the host LLM (see [`mcp_workflow_architecture.md`](mcp_workflow_architecture.md)).  
-2. **Full workflow visibility** — stable `house_service_v1` map; `get_workflow` / `get_job` / `list_jobs` so users always see process, position, and roles ([`workflows/house_service_v1.md`](workflows/house_service_v1.md)).  
+2. **Full workflow visibility** — stable `house_service_v1` map; `get_workflow` / `get_job` / `list_jobs` so users always see process, position, and roles ([`workflows/house_service_v1.md`](workflows/house_service_v1.md)). Portable formats: **`totbox.workflow_def` / `totbox.workflow_progress`** + Mermaid/text projections ([`workflows/format.md`](workflows/format.md)).  
 3. **Host-LLM-maximizing tools** — templates + draft specs the host fills from memory; user approval; then send/record.  
 4. **Quote intake** — paste/email → host extracts → Totbox normalizes/compares on the job.  
 5. **Schedule workflow** — propose windows, calendar merge, confirmation tracking.  
