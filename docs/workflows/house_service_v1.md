@@ -17,7 +17,8 @@ Code maps live instances → this view via `src/lib/workflow-progress.ts` (`prog
 | “Where is my AC job?” | `get_workflow({ job_id })` or `get_job` |
 | “List my open jobs” | `list_jobs` (each has `progress_strip`) |
 
-Host should render **`strip` + `role_line`** (or `progress.strip` / `progress.role_line`) on one mobile screen. Full control: you approve send, address sharing, and money/time.
+Host should render **`strip` + `role_line`** (or `progress.strip` / `progress.role_line`) on one mobile screen. Full control: you approve send, address sharing, and money/time.  
+Rich hosts may also paint **`diagrams.mermaid`** or step cards from `definition` / `progress.steps` ([format](format.md)).
 
 **Live sample UI (interactive):** open **`/workflow`** in the Next app — same data model as MCP `get_workflow`, mobile-friendly, tap steps to inspect You vs App roles.
 

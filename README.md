@@ -22,6 +22,7 @@ Everything happens primarily in the chat apps you already use (Grok, Claude, Cha
 |-----|---------|
 | [`docs/host_llm_safety.md`](docs/host_llm_safety.md) | Safety + host capability fallthrough |
 | [`docs/workflows/house_service_v1.md`](docs/workflows/house_service_v1.md) | **Consumer 8-step map** + dev drill-down |
+| [`docs/workflows/format.md`](docs/workflows/format.md) | **Interchange format** (`totbox.workflow_*` + Mermaid) |
 | [`docs/mcp_workflow_architecture.md`](docs/mcp_workflow_architecture.md) | Job PM / next_action contract |
 | [`docs/product_thesis.md`](docs/product_thesis.md) | Scheduling not discovery |
 | [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md) | Broader product plan |
@@ -112,13 +113,13 @@ npm run smoke:job    # HVAC + cleaning: start → draft → approval → dry-run
 npm run dev:mcp      # start_job, get_workflow, record_user_approval, …
 ```
 
-**Workflow visibility:** ask the host anytime — `get_workflow` (general or `service_kind`) or `get_workflow({ job_id })` / `get_job` for the live strip. Same 8 steps for every house service; you stay in control of approvals.
+**Workflow visibility:** ask the host anytime — `get_workflow` (general or `service_kind`) or `get_workflow({ job_id })` / `get_job` for the live strip. Same 8 steps for every house service; you stay in control of approvals. Structured as `totbox.workflow_def` / `totbox.workflow_progress` with optional Mermaid projection (`diagrams.mermaid`) — see [`docs/workflows/format.md`](docs/workflows/format.md).
 
 **Interactive sample (browser):** `npm run dev` → open [**/workflow**](http://localhost:3000/workflow) — mobile-friendly strip, tap a step for You vs App, sample “approve message” card.
 
 Host loop: follow each `next_action` (prefer host memory/Gmail/SMS/voice tools) → `record_user_approval` → never send without grant → dry-run or `hostPerformed` send → `ingest_provider_message`.
 
-Also: `npm run smoke:house-owner` (legacy fixture compare). Docs: [`docs/host_llm_safety.md`](docs/host_llm_safety.md), [`docs/workflows/house_service_v1.md`](docs/workflows/house_service_v1.md).
+Also: `npm run smoke:house-owner` (legacy fixture compare). Docs: [`docs/host_llm_safety.md`](docs/host_llm_safety.md), [`docs/workflows/house_service_v1.md`](docs/workflows/house_service_v1.md), [`docs/workflows/format.md`](docs/workflows/format.md).
 
 ---
 
