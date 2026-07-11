@@ -29,7 +29,10 @@
 
 ## Format: `totbox.workflow_def` (template)
 
-Stable process spine (no live job). Returned by `get_workflow` / `get_workflow({ service_kind })` under `definition` (and summarized as `steps` / `diagram` / `diagrams`).
+Stable process spine (no live job). Returned by `get_workflow` / `get_workflow({ service_kind })` as:
+
+- **`definition`** — full `totbox.workflow_def` object  
+- **`steps` / `diagram` / `diagrams`** — convenience summaries (same spine)
 
 ```json
 {

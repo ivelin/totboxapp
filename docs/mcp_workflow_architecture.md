@@ -14,7 +14,7 @@ Related: [`product_thesis.md`](product_thesis.md) · **Consumer map:** [`workflo
 
 ## Implemented tools (job PM)
 
-**Visibility / transparency:** `get_workflow` (alias `explain_workflow`) — general template, `service_kind` profile, or live `job_id` instance (consumer strip + roles; address redacted on inspect).
+**Visibility / transparency:** `get_workflow` (alias `explain_workflow`) — general template, `service_kind` profile, or live `job_id` instance (consumer strip + roles; address redacted on inspect). Template includes validated **`definition`** (`totbox.workflow_def`) and **`diagrams.mermaid`** projection; instance `progress` uses **`totbox.workflow_progress`** + `diagrams`. See [`workflows/format.md`](workflows/format.md).
 
 **Job control:** `start_job`, `get_job` (includes `progress`), `list_jobs` (strips per job), `update_job_facts`, `suggest_next_action`, `submit_draft_for_approval`, `record_user_approval`, `approve_and_send_message` (default dry-run), `record_outbound`, `ingest_provider_message`, `confirm_appointment`.
 
