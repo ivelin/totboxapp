@@ -21,6 +21,7 @@ Everything happens primarily in the chat apps you already use (Grok, Claude, Cha
 | Doc | Purpose |
 |-----|---------|
 | [`docs/host_llm_safety.md`](docs/host_llm_safety.md) | Safety + host capability fallthrough |
+| [`docs/workflows/house_service_v1.md`](docs/workflows/house_service_v1.md) | **Consumer 8-step map** + dev drill-down |
 | [`docs/mcp_workflow_architecture.md`](docs/mcp_workflow_architecture.md) | Job PM / next_action contract |
 | [`docs/product_thesis.md`](docs/product_thesis.md) | Scheduling not discovery |
 | [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md) | Broader product plan |
