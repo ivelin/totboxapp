@@ -17,17 +17,28 @@ import {
   ApprovalRecord,
   AuditEvent,
 } from './job-types';
+import { getWorkflowProgress } from './workflow-progress';
 
 const DATA_DIR = path.join(process.cwd(), '.data');
-const JOBS_FILE = path.join(DATA_DIR, 'jobs.json');
+/** Vitest workers must not share one jobs.json (parallel clobber → "job not found"). */
+const JOBS_FILE =
+  process.env.TOTBOX_JOBS_FILE ||
+  (process.env.VITEST
+    ? path.join(DATA_DIR, `jobs-test-${process.env.VITEST_WORKER_ID || process.pid}.json`)
+    : path.join(DATA_DIR, 'jobs.json'));
+
+/** When true, never read/write disk (unit tests that call resetJobs stay isolated). */
+const MEMORY_ONLY = process.env.TOTBOX_JOBS_MEMORY === '1' || !!process.env.VITEST;
 
 let jobs: Job[] = [];
 
 function ensureDataDir() {
+  if (MEMORY_ONLY) return;
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
 function loadJobs() {
+  if (MEMORY_ONLY) return;
   ensureDataDir();
   if (!fs.existsSync(JOBS_FILE)) return;
   try {
@@ -39,6 +50,7 @@ function loadJobs() {
 }
 
 function saveJobs() {
+  if (MEMORY_ONLY) return;
   ensureDataDir();
   fs.writeFileSync(JOBS_FILE, JSON.stringify(jobs, null, 2));
 }
@@ -695,11 +707,14 @@ export function suggestNextAction(jobId: string): { job: Job; nextAction: NextAc
 
 /** Public snapshot for MCP/CLI without forcing host to re-read whole file */
 export function jobPublicView(job: Job) {
+  const progress = getWorkflowProgress(job);
   return {
     job_id: job.id,
     status: job.status,
     service_kind: job.serviceKind,
     intent: job.intent,
+    /** Consumer-facing map (mobile-friendly strip + roles). Same spine for all house services. */
+    progress,
     checklist: job.checklist,
     blocks: job.blocks,
     next_action: job.nextAction,

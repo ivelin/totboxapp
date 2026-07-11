@@ -83,6 +83,12 @@ async function runOne(label: string, intent: string, providerEmail: string, repl
   );
   must(r.checklist?.find((c: { id: string; done: boolean }) => c.id === 'provider_reply')?.done, 'reply ingested');
   must(r.audit_tail?.length > 0, 'audit trail');
+  must(r.progress?.workflow_id === 'house_service_v1', 'consumer progress map');
+  must(r.progress?.steps?.length === 8, '8 consumer steps');
+  must(r.progress?.strip, 'mobile strip');
+  must(r.progress?.developer?.doc, 'developer drill-down doc');
+  console.log('progress strip:', r.progress.strip);
+  console.log('progress summary:', r.progress.summary);
   console.log('ingest ok; status', r.status, 'next', r.next_action?.type);
   console.log('OK', label, r.job_id);
 }
