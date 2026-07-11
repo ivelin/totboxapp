@@ -6,6 +6,17 @@
 
 Code maps live instances → this view via `src/lib/workflow-progress.ts` (`progress` on `get_job` / MCP).
 
+### Ask your host AI anytime (MCP)
+
+| You say | Tool |
+|---------|------|
+| “How does Totbox work for house services?” | `get_workflow` |
+| “What is different for HVAC / cleaning?” | `get_workflow({ service_kind: "hvac" })` |
+| “Where is my AC job?” | `get_workflow({ job_id })` or `get_job` |
+| “List my open jobs” | `list_jobs` (each has `progress_strip`) |
+
+Host should render **`strip` + `role_line`** (or `progress.strip` / `progress.role_line`) on one mobile screen. Full control: you approve send, address sharing, and money/time.
+
 ---
 
 ## What you see (consumer — any phone or desktop)

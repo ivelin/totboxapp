@@ -250,3 +250,178 @@ export function formatProgressAscii(job: Job): string {
   }
   return lines.join('\n');
 }
+
+/** Service-kind profile deltas (same spine; different fields/copy hints). */
+export function getServiceProfile(serviceKind?: string) {
+  const kind = (serviceKind || 'general').toLowerCase();
+  const profiles: Record<
+    string,
+    { label: string; field_hints: string[]; outreach_notes: string }
+  > = {
+    hvac: {
+      label: 'HVAC / AC',
+      field_hints: ['maintenance vs repair', 'urgency', 'system notes', 'budget', 'preferred windows'],
+      outreach_notes: 'Ask price, inclusions, cancel/membership terms, available slots.',
+    },
+    cleaning: {
+      label: 'House cleaning',
+      field_hints: ['priority rooms/surfaces', 'duration or package', 'budget', 'preferred windows'],
+      outreach_notes: 'Send priority list; confirm price and access.',
+    },
+    tree_arborist: {
+      label: 'Tree / arborist',
+      field_hints: ['what to prune/remove', 'season constraints (e.g. Oak Wilt)', 'budget'],
+      outreach_notes: 'Confirm season rules and cleanup inclusions.',
+    },
+    general: {
+      label: 'House service (general)',
+      field_hints: ['what you need', 'budget', 'timing'],
+      outreach_notes: 'Confirm scope, price, and schedule.',
+    },
+  };
+  return profiles[kind] || profiles.general;
+}
+
+/**
+ * Stable workflow template (no instance). For host LLM to explain the process
+ * before or during a job — mobile-friendly structured payload.
+ */
+export function getWorkflowTemplate(opts?: { service_kind?: string }) {
+  const profile = getServiceProfile(opts?.service_kind);
+  const steps = HOUSE_SERVICE_V1_STEPS.map((s, i) => ({
+    n: i + 1,
+    id: s.id,
+    label: s.label,
+    you_do: s.youDo,
+    app_does: s.appDoes,
+  }));
+  const strip = steps.map(s => `○ ${s.label}`).join(' · ');
+  const diagram = '1.Describe → 2.Details → 3.Contact → 4.Send → 5.Hear back → 6.Choose → 7.Booked → 8.Done';
+
+  return {
+    kind: 'workflow_template' as const,
+    workflow_id: WORKFLOW_ID,
+    workflow_version: WORKFLOW_VERSION,
+    service_kind: opts?.service_kind || null,
+    service_profile: profile,
+    /** One-line map for any screen */
+    diagram,
+    strip,
+    steps,
+    principles: {
+      consumer_control: 'You approve send, address sharing, and money/time. The app does not go dark on you.',
+      transparency: 'Ask anytime: general workflow, this service type, or this job id.',
+      privacy: 'Address and contacts stay local; never invent PII; no public vendor directory.',
+      safety: 'Safety before convenience — more explicit approvals in early product.',
+      host_first: 'Your host AI uses your memory and tools first; Totbox is the checklist PM.',
+    },
+    how_to_inspect: {
+      general: 'Call get_workflow (no args) or get_workflow({ scope: "template" })',
+      by_service: 'Call get_workflow({ service_kind: "hvac" | "cleaning" | "tree_arborist" })',
+      instance: 'Call get_workflow({ job_id }) or get_job({ job_id }) — see progress strip + roles',
+      list: 'Call list_jobs — each item includes progress.summary and progress.strip',
+    },
+    doc: 'docs/workflows/house_service_v1.md',
+    /** Host LLM: render strip + current role_line to the user on mobile/desktop */
+    host_render_hint:
+      'Show the strip on one line. Below it, show role_line (You: … / App: …). Offer “Where am I?” anytime via get_workflow(job_id).',
+  };
+}
+
+/** Redact street-level address from nested next_action payloads (consumer inspect). */
+function redactDeveloperForInspect(dev: ReturnType<typeof getWorkflowProgress>['developer']) {
+  const na = dev.next_action;
+  if (!na) return { ...dev, next_action: na };
+  const placeholders = na.placeholders
+    ? {
+        ...na.placeholders,
+        service_address:
+          na.placeholders.service_address != null && na.placeholders.service_address !== ''
+            ? '[on_file]'
+            : na.placeholders.service_address,
+      }
+    : na.placeholders;
+  const draftSkeleton =
+    typeof na.draftSkeleton === 'string'
+      ? na.draftSkeleton.replace(/Service address:\s*.*$/gim, 'Service address: [on_file]')
+      : na.draftSkeleton;
+  return {
+    ...dev,
+    next_action: {
+      ...na,
+      placeholders,
+      draftSkeleton,
+    },
+  };
+}
+
+/**
+ * Unified inspect API: template, service-kind template, or job instance progress.
+ * Prefer this for host LLM “show me the workflow” questions.
+ */
+export function describeWorkflow(opts?: {
+  job_id?: string;
+  service_kind?: string;
+  scope?: 'template' | 'instance' | 'auto';
+  /** When resolving instance, pass the job object */
+  job?: Job;
+}):
+  | ReturnType<typeof getWorkflowTemplate>
+  | {
+      kind: 'workflow_instance';
+      workflow_id: string;
+      workflow_version: string;
+      job_id: string;
+      intent: string;
+      service_kind: string;
+      progress: ReturnType<typeof getWorkflowProgress>;
+      privacy: {
+        note: string;
+        has_service_address: boolean;
+        address_value_redacted: true;
+      };
+      control: {
+        you_are_in_control: true;
+        next_needs_you: boolean;
+        can_cancel: true;
+      };
+      host_render_hint: string;
+    } {
+  const scope = opts?.scope || (opts?.job_id || opts?.job ? 'instance' : 'template');
+
+  if (scope === 'instance' || opts?.job) {
+    const job = opts?.job;
+    if (!job) {
+      throw new Error('job required for instance scope');
+    }
+    const progressRaw = getWorkflowProgress(job);
+    const progress = {
+      ...progressRaw,
+      developer: redactDeveloperForInspect(progressRaw.developer),
+    };
+    const needsYou = progress.steps.some(s => s.state === 'needs_you' || s.state === 'blocked');
+    return {
+      kind: 'workflow_instance',
+      workflow_id: WORKFLOW_ID,
+      workflow_version: WORKFLOW_VERSION,
+      job_id: job.id,
+      intent: job.intent,
+      service_kind: job.serviceKind,
+      progress,
+      privacy: {
+        note: 'Full street address is not echoed here — only whether it is on file. Host may use update_job_facts/get_job only after user intent; never paste address into chat unless user is reviewing a send draft.',
+        has_service_address: !!job.facts?.service_address,
+        address_value_redacted: true,
+      },
+      control: {
+        you_are_in_control: true,
+        next_needs_you: needsYou,
+        can_cancel: true,
+      },
+      host_render_hint:
+        'Show progress.strip and progress.role_line prominently. If next_needs_you, highlight the approval the user must give. Offer developer drill-down only if user asks “under the hood”. Do not display raw street address from tools unless user is approving a draft that intentionally includes it.',
+    };
+  }
+
+  return getWorkflowTemplate({ service_kind: opts?.service_kind });
+}

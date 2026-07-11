@@ -139,6 +139,9 @@ export const JobSchema = z.object({
   id: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  /** Pinned stable consumer workflow (e.g. house_service_v1) */
+  workflowId: z.string().default('house_service_v1'),
+  workflowVersion: z.string().default('1.0.0'),
   intent: z.string(),
   serviceKind: ServiceKindSchema,
   status: JobStatusSchema,

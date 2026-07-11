@@ -84,18 +84,37 @@ async function runOne(label: string, intent: string, providerEmail: string, repl
   must(r.checklist?.find((c: { id: string; done: boolean }) => c.id === 'provider_reply')?.done, 'reply ingested');
   must(r.audit_tail?.length > 0, 'audit trail');
   must(r.progress?.workflow_id === 'house_service_v1', 'consumer progress map');
+  must(r.workflow_id === 'house_service_v1', 'job pins workflow_id');
   must(r.progress?.steps?.length === 8, '8 consumer steps');
   must(r.progress?.strip, 'mobile strip');
   must(r.progress?.developer?.doc, 'developer drill-down doc');
   console.log('progress strip:', r.progress.strip);
   console.log('progress summary:', r.progress.summary);
+
+  const wf = parse(dispatchMcpTool('get_workflow', { job_id: r.job_id }));
+  must(wf.kind === 'workflow_instance', 'get_workflow instance');
+  must(wf.progress?.strip, 'get_workflow strip');
+  must(wf.control?.you_are_in_control === true, 'consumer control flag');
+  must(wf.privacy?.address_value_redacted === true, 'address redacted on inspect');
+
   console.log('ingest ok; status', r.status, 'next', r.next_action?.type);
   console.log('OK', label, r.job_id);
 }
 
+function assertTemplate() {
+  const t = parse(dispatchMcpTool('get_workflow', {}));
+  must(t.kind === 'workflow_template', 'template kind');
+  must(t.steps?.length === 8, 'template 8 steps');
+  must(t.principles?.transparency, 'transparency principle');
+  const hvac = parse(dispatchMcpTool('get_workflow', { service_kind: 'hvac' }));
+  must(hvac.service_profile?.field_hints?.length > 0, 'hvac profile');
+  console.log('get_workflow template OK:', t.diagram);
+}
+
 async function main() {
-  console.log('=== Job PM smoke (safety dry-run) ===');
+  console.log('=== Job PM smoke (safety dry-run + workflow visibility) ===');
   resetJobs();
+  assertTemplate();
   await runOne(
     'HVAC',
     'AC maintenance under $300 next 2 weeks',

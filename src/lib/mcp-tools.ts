@@ -21,6 +21,7 @@ import {
   jobPublicView,
 } from './job-pm';
 import type { ServiceKind } from './job-types';
+import { describeWorkflow, getWorkflowTemplate } from './workflow-progress';
 
 type LooseArgs = Record<string, unknown>;
 
@@ -135,7 +136,44 @@ export function dispatchMcpTool(name: string, args: LooseArgs) {
       return ok(jobPublicView(job));
     }
     if (name === 'list_jobs') {
-      return ok(listJobs().map(jobPublicView));
+      return ok({
+        kind: 'job_list',
+        principles: {
+          transparency: 'Each job includes a progress strip — same 8 steps for every house service.',
+          control: 'You can inspect any job with get_workflow({ job_id }) or get_job.',
+        },
+        jobs: listJobs().map(j => {
+          const v = jobPublicView(j);
+          return {
+            job_id: v.job_id,
+            intent: v.intent,
+            service_kind: v.service_kind,
+            status: v.status,
+            progress_summary: v.progress?.summary,
+            progress_strip: v.progress?.strip,
+            role_line: v.progress?.role_line,
+            current_step_id: v.progress?.current_step_id,
+          };
+        }),
+      });
+    }
+    if (name === 'get_workflow' || name === 'explain_workflow') {
+      const jobId = getStr(args.job_id) || getStr(args.jobId);
+      const serviceKind = getStr(args.service_kind) || getStr(args.serviceKind);
+      const scope = getStr(args.scope) as 'template' | 'instance' | 'auto' | undefined;
+      if (jobId) {
+        const job = getJob(jobId);
+        if (!job) return err('job not found');
+        return ok(
+          describeWorkflow({
+            job_id: jobId,
+            job,
+            scope: scope === 'template' ? 'template' : 'instance',
+            service_kind: serviceKind,
+          })
+        );
+      }
+      return ok(getWorkflowTemplate({ service_kind: serviceKind }));
     }
     if (name === 'update_job_facts') {
       const jobId = getStr(args.job_id) || getStr(args.jobId) || '';
@@ -285,12 +323,26 @@ export function listJobPmToolDescriptors() {
     },
     {
       name: 'get_job',
-      description: 'Get job status, checklist, blocks, next_action, approvals audit tail.',
+      description:
+        'Get job status + consumer progress (strip, where you are, you/app roles) + developer drill-down (checklist, next_action, audit). Full transparency for the instance.',
       inputSchema: { type: 'object', properties: { job_id: { type: 'string' } }, required: ['job_id'] },
     },
     {
+      name: 'get_workflow',
+      description:
+        'Inspect the house-service workflow with full transparency. No args = general template (8 steps). service_kind = HVAC/cleaning/tree profile. job_id = this request’s live progress strip. Host should render strip + role_line for mobile/desktop. Alias: explain_workflow.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          job_id: { type: 'string', description: 'Specific job instance' },
+          service_kind: { type: 'string', description: 'hvac | cleaning | tree_arborist' },
+          scope: { type: 'string', description: 'template | instance | auto' },
+        },
+      },
+    },
+    {
       name: 'list_jobs',
-      description: 'List local household jobs.',
+      description: 'List household jobs with progress_strip and progress_summary for each (easy scan).',
       inputSchema: { type: 'object', properties: {} },
     },
     {

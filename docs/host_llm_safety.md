@@ -39,11 +39,20 @@ Totbox does **not** replace the host’s brain. The host LLM drafts, remembers, 
 
 All approvals and audit events are stored on the job (local `.data/jobs.json`). Future versions may offer fewer prompts **only** where history shows safe patterns — never by deleting the audit trail or skipping gates by default in early iterations.
 
+## Transparency & control (visibility)
+
+The host LLM must be able to **show the workflow on demand** — general template, by service type, or for a live job — as a clean structured payload (strip + steps + you/app roles). Tools: **`get_workflow`**, **`get_job`**, **`list_jobs`**.
+
+- Consumer: full visibility of process and “where I am”; no dark patterns.  
+- Privacy: instance views redact street address values by default (`has_service_address` only).  
+- Honesty: dry-run is labeled dry-run; never pretend a send.  
+- Developer: `progress.developer` + checklist/audit for drill-down.
+
 ## Quick exercise
 
 ```bash
 npm run smoke:job    # HVAC + cleaning: start → approve → dry-run → ingest
-npm run dev:mcp      # expose start_job, record_user_approval, …
+npm run dev:mcp      # expose start_job, get_workflow, record_user_approval, …
 ```
 
 See also: [`mcp_workflow_architecture.md`](mcp_workflow_architecture.md), [`product_thesis.md`](product_thesis.md), consumer progress map [`workflows/house_service_v1.md`](workflows/house_service_v1.md).
