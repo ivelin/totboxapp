@@ -10,6 +10,7 @@ export default function TotboxHome() {
           <nav className="flex items-center gap-6 text-sm">
             <a href="#families" className="hover:underline">For Families</a>
             <a href="#providers" className="hover:underline">For Providers</a>
+            <a href="/workflow" className="hover:underline">Your path</a>
             <a href="#quickstart" className="hover:underline">Quick Start</a>
             <a href="/dashboard" className="rounded-full border px-4 py-1.5 text-xs hover:bg-zinc-100 dark:hover:bg-zinc-900">Provider Dashboard</a>
           </nav>
@@ -30,8 +31,8 @@ export default function TotboxHome() {
             Small local operators spend less time on the phone and more time delivering great experiences.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="#quickstart" className="inline-flex h-12 items-center justify-center rounded-full bg-black px-8 text-white dark:bg-white dark:text-black font-medium hover:opacity-90">
-              Try it in your chat app
+            <a href="/workflow" className="inline-flex h-12 items-center justify-center rounded-full bg-black px-8 text-white dark:bg-white dark:text-black font-medium hover:opacity-90">
+              See your house service path
             </a>
             <a href="#providers" className="inline-flex h-12 items-center justify-center rounded-full border border-zinc-300 dark:border-zinc-700 px-8 font-medium hover:bg-zinc-50 dark:hover:bg-zinc-900">
               For small operators
