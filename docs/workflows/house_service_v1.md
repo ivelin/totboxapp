@@ -55,7 +55,7 @@ You: approve this message before we send it.
 | 5 | **Hear back** | Paste a reply if needed | Watches/records quotes and times |
 | 6 | **Choose** | **Approve** price and time | Shows options; won’t lock money/time without you |
 | 7 | **Booked** | Be ready on the day | Holds the confirmed appointment |
-| 8 | **Done** | Pay / note outcome | Optional next-due reminder |
+| 8 | **Done** | Pay / note outcome | Explicit `record_job_completion` (notes + optional next-due) — not silent auto-close after Booked |
 
 **Safety:** early on, the app asks more often. That is intentional (must not do harm).
 

@@ -20,6 +20,10 @@ Everything happens primarily in the chat apps you already use (Grok, Claude, Cha
 
 | Doc | Purpose |
 |-----|---------|
+| [`docs/strategy/bootstrap_pmf_and_agentic_gap.md`](docs/strategy/bootstrap_pmf_and_agentic_gap.md) | **Strategy:** agentic gap vs e‑com, bootstrap phases, what not to build |
+| [`docs/eval/continuous_sim_eval.md`](docs/eval/continuous_sim_eval.md) | **Parallel:** multi-actor sim + continuous eval (sandbox ≈ prod) |
+| [`docs/local_mcp_connect.md`](docs/local_mcp_connect.md) | **Local test:** Grok / Hermes / curl → `localhost:3001/mcp` |
+| [`docs/local_household_runbook.md`](docs/local_household_runbook.md) | Personal house job path (consumer tools) |
 | [`docs/host_llm_safety.md`](docs/host_llm_safety.md) | Safety + host capability fallthrough |
 | [`docs/workflows/house_service_v1.md`](docs/workflows/house_service_v1.md) | **Consumer 8-step map** + dev drill-down |
 | [`docs/workflows/format.md`](docs/workflows/format.md) | **Interchange format** (`totbox.workflow_*` + Mermaid) |
@@ -56,9 +60,8 @@ Add the Totbox MCP endpoint in your chat setup and connect your existing **calen
 
 Onboarding target: under 10 minutes for the calendar path; ST connect documented separately (~10–15 min design target).
 
-**Connecting the MCP (Stage 4)**  
-Run `npm run dev:mcp`. Go to /dashboard to register (name, services, location, rules). You get a secret token + the MCP URL (http://localhost:3001/mcp). Add to your chat app with the token for scoped results. Tools now support optional `token` arg for scoping to your provider only.
-Current tools (Stage 3): search_services, get_provider_details, get_availability.
+**Connecting the MCP (local)**  
+See [`docs/local_mcp_connect.md`](docs/local_mcp_connect.md): `npm run dev:mcp` → `http://localhost:3001/mcp` → Grok (`grok mcp add --transport http …`) or Hermes HTTP. Household job PM needs **no** token. Optional Stage 4 provider token (register at `/dashboard`) only scopes fixture search to one operator.
 
 ---
 
@@ -133,7 +136,7 @@ npm run smoke:job
 npm test && npm run typecheck && npm run build
 ```
 
-MCP job tools: `get_workflow`, `start_job`, `get_job`, `list_jobs`, `update_job_facts`, `submit_draft_for_approval`, `record_user_approval`, `approve_and_send_message`, `ingest_provider_message`, `confirm_appointment`, …
+MCP job tools: `get_workflow`, `start_job`, `get_job`, `list_jobs`, `update_job_facts`, `submit_draft_for_approval`, `record_user_approval`, `approve_and_send_message`, `ingest_provider_message`, `normalize_quote`, `confirm_appointment`, `record_job_completion`, …
 
 ---
 
@@ -142,10 +145,31 @@ MCP job tools: `get_workflow`, `start_job`, `get_job`, `list_jobs`, `update_job_
 | Area | Status |
 |------|--------|
 | Stages 1–6 scaffold | On `main` |
-| Job PM + host-LLM safety gates | This branch |
+| Job PM + host-LLM safety gates | On `main` |
+| Phase 1 full household path (paste quote → book → next-due) | **Now** — see Bootstrap roadmap |
 | Always-on 24/7 daemon / real SMS vendor | Non-goal for now |
-| Stages 10a–10c (ServiceTitan design → prototype → pilot) | Spec’d in ST annex |
+| Operator paid pilots (Phase 2) | Deferred until shadow PMF |
+| Stages 10a–10c (ServiceTitan design → prototype → pilot) | Spec’d; **after** revenue/LOI |
+| Multi-level “Shopify-like” provider MCP suite | **Not** bootstrap; long-horizon option |
 | Stage 11 (dual-sided referrals) | Spec’d; after core loop |
+
+---
+
+## Bootstrap roadmap (north star)
+
+Survive and learn before platform depth. Every stage either **completes more household jobs** or **converts proof into revenue**.
+
+| Phase | Focus | Exit |
+|-------|--------|------|
+| **0** | Foundation on `main` (job PM, safety, `house_service_v1`, Calendar OAuth scaffold, ST design annex) | Done — stop yak-shaving formats |
+| **1 — now** | Shadow PMF: real HVAC/cleaning jobs via MCP; quote-from-paste; confirm appointment; explicit completion + next-due | ≥5 jobs with touchpoint drop; runbook works for your house |
+| **2** | First $: structured inbound for local operators (or household sub if faster) | 1–3 paid pilots / LOIs |
+| **3** | Stickiness: harden quote/calendar/rebook from pilot feedback | Retention + case study |
+| **4** | Adjacent only with cash/LOI: ST private pilot, “Agentic Ready” packaging, second vertical | Demand-funded adapters |
+
+**Explicit non-goals until Phase 2+ exit:** city provider directory, multi-FSM integration matrix, viral referral GTM, kids/FEC GTM, claiming a full field-services agent commerce platform.
+
+**Personal house path:** [`docs/local_household_runbook.md`](docs/local_household_runbook.md) · host connect: [`docs/local_mcp_connect.md`](docs/local_mcp_connect.md) · rationale: [`docs/strategy/bootstrap_pmf_and_agentic_gap.md`](docs/strategy/bootstrap_pmf_and_agentic_gap.md) · smoke: `npm run smoke:job`.
 
 ---
 
@@ -154,7 +178,7 @@ MCP job tools: `get_workflow`, `start_job`, `get_job`, `list_jobs`, `update_job_
 - Shared pain on both sides of the same email thread.
 - High frequency + urgency (especially HVAC/cleaning) → fast validation.
 - Low-friction design matches how people already coordinate in 2026.
-- Clear path: prove home-services loop → expand verticals → deepen ServiceTitan / calendar integrations.
+- Clear path: **prove household job loop (Phase 1)** → paid operator wedge (Phase 2) → deepen Calendar/ST only when funded.
 
 ---
 
@@ -168,7 +192,11 @@ Feedback from households and small operators is extremely valuable.
 - Agent hard rule (public repo, no PII): [`AGENTS.md`](AGENTS.md)
 - Issues and discussions welcome
 
-**License:** Apache-2.0
+## License
+
+**Apache License 2.0** — see [`LICENSE`](LICENSE).
+
+You may use, modify, and distribute this software under the terms of the Apache License, Version 2.0.
 
 ---
 

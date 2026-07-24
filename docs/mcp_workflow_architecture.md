@@ -271,15 +271,17 @@ Same tools; multi-tenant jobs; optional managed send/receive; still host LLM for
 
 ## Implementation phases (aligned with no-registry, no-FSM-first)
 
-| Phase | Deliverable |
-|-------|-------------|
-| **W0** | Job model + checklist + `start_job` / `get_job` / `suggest_next_action` (persist `.data/jobs`) |
-| **W1** | Templates + `prepare_outbound_draft` + `submit_draft_for_approval` (no real send) |
-| **W2** | `record_outbound` / `ingest_provider_message` + host-LLM extraction schema |
-| **W3** | `approve_and_send_message` dry-run + optional real send adapter (user config) |
-| **W4** | Calendar propose slots + `confirm_appointment` |
-| **W5** | Multi-quote compare on job; user decision gate |
-| **W6** | Optional sampling; optional inbound email webhook; optional ST for partners |
+Bootstrap north star: **Phase 1 household complete loop first**; ST/provider multi-level MCP only after revenue (see README).
+
+| Phase | Deliverable | Bootstrap map |
+|-------|-------------|---------------|
+| **W0** | Job model + checklist + `start_job` / `get_job` / `suggest_next_action` (persist `.data/jobs`) | Done |
+| **W1** | Templates + draft + `submit_draft_for_approval` (no real send) | Done |
+| **W2** | `record_outbound` / `ingest_provider_message` + quote hints / `normalize_quote` | Done (Phase 1) |
+| **W3** | `approve_and_send_message` dry-run + hostPerformed path | Done (live Totbox adapter later) |
+| **W4** | `confirm_appointment` + explicit `record_job_completion` / next-due | Done (local record; live Calendar write later) |
+| **W5** | Multi-quote compare on job; user decision gate | Partial / Phase 3 |
+| **W6** | Optional inbound webhook; optional ST for partners | Phase 4 (funded) |
 
 ---
 

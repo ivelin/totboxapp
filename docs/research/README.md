@@ -24,3 +24,19 @@ These notes capture **product insights** for Totbox. They are intended for a **p
 **Local raw research** (Gmail exports, full research logs with PII) must stay **outside** the repo or under a gitignored path such as `docs/research/private/`.
 
 If you are unsure whether something is identifying, **omit it**.
+
+---
+
+## Public research & strategy index
+
+| Doc | What it is |
+|-----|------------|
+| [`home_services_email_insights.md`](home_services_email_insights.md) | Anonymized coordination friction patterns (home services) |
+| [`servicetitan_integration.md`](servicetitan_integration.md) | ST design annex (Tier 2; not bootstrap) |
+| [`../strategy/bootstrap_pmf_and_agentic_gap.md`](../strategy/bootstrap_pmf_and_agentic_gap.md) | **Why** services lag e‑com agent MCP; bootstrap phases; what not to build |
+| [`../eval/continuous_sim_eval.md`](../eval/continuous_sim_eval.md) | Multi-actor sandbox + continuous eval design |
+| [`../eval/scenario_format.md`](../eval/scenario_format.md) | Scenario YAML sketch |
+| [`../eval/trace_schema.md`](../eval/trace_schema.md) | Decision trace envelope |
+| [`../compliance/recording_consent.md`](../compliance/recording_consent.md) | Call/message capture principles (not legal advice) |
+| [`../local_mcp_connect.md`](../local_mcp_connect.md) | Local host connect (Grok / Hermes / curl) |
+| [`../local_household_runbook.md`](../local_household_runbook.md) | Consumer Phase 1 job path |
