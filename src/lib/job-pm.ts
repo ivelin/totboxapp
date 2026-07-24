@@ -396,24 +396,37 @@ export function recomputeNextAction(job: Job): Job {
     return job;
   }
 
-  if (isDone(job, 'scheduled') && !isDone(job, 'settle')) {
-    const settle = job.checklist.find(c => c.id === 'settle');
-    if (settle && !settle.required) {
-      markDone(job, 'settle');
-    }
+  // Booked: stay on scheduled until explicit completion/next-due (no silent auto-skip of settle)
+  if (isDone(job, 'scheduled') && job.checklist.some(c => c.id === 'settle') && !isDone(job, 'settle')) {
+    job.status = 'scheduled';
+    job.nextAction = {
+      type: 'mark_done',
+      instructionsForHostLlm:
+        'Appointment is on the job (Booked). When the homeowner is ready to close — after the visit, or to record outcome early — call record_job_completion. ' +
+        'Optional: next_due (ISO date for rebook/preventive), notes (invoice meta only; no secrets). ' +
+        'Do not invent prices or access codes. Until then status stays scheduled with progress on Booked.',
+      preferredHostTools: ['ask_user', 'calendar'],
+      totboxFallback: {
+        mode: 'record_only',
+        description: 'Record completion and next-due on the local job only.',
+      },
+      requiresUserApproval: false,
+    };
+    return job;
   }
 
   // All required done?
   const requiredLeft = job.checklist.filter(c => c.required && !c.done);
-  if (requiredLeft.length === 0) {
+  if (requiredLeft.length === 0 && (!job.checklist.some(c => c.id === 'settle') || isDone(job, 'settle'))) {
     job.status = 'done';
     job.nextAction = {
       type: 'done',
-      instructionsForHostLlm: 'Job complete. Summarize for user. Suggest optional next-due reminder.',
+      instructionsForHostLlm:
+        'Job complete. Summarize for user.' +
+        (job.nextDueAt ? ` Next due on file: ${job.nextDueAt}.` : ' Suggest setting next-due via record_job_completion if not set.'),
       preferredHostTools: [],
       requiresUserApproval: false,
     };
-    audit(job, 'job_done', 'All required checklist items complete');
     return job;
   }
 
@@ -656,24 +669,145 @@ export function ingestProviderMessage(input: {
     approved: false,
   });
 
-  // Lightweight deterministic extract hints (host LLM does full NLU)
-  const price = input.body.match(/\$\s*(\d+)/);
-  if (price) {
+  // Lightweight deterministic extract (host LLM may refine via normalize_quote)
+  const extracted = extractQuoteHints(input.body);
+  if (extracted.priceFromUsd != null || extracted.proposedWindow || input.body.trim()) {
     job.quotes.push({
       id: id('quote'),
       providerLabel: job.providerContact?.label,
-      priceFromUsd: Number(price[1]),
+      priceFromUsd: extracted.priceFromUsd,
+      proposedWindow: extracted.proposedWindow,
       raw: input.body,
-      notes: 'auto-extracted price token; host should validate',
+      notes: extracted.priceFromUsd != null
+        ? 'auto-extracted from paste; host/user should validate before commit_money_or_time'
+        : 'paste recorded; no $ price token found — host may call normalize_quote',
     });
   }
 
   markDone(job, 'provider_reply');
   audit(job, 'inbound_ingested', 'Provider message recorded', {
-    hasPriceHint: !!price,
+    hasPriceHint: extracted.priceFromUsd != null,
+    hasWindowHint: !!extracted.proposedWindow,
   });
   job.status = 'negotiating';
   return upsert(recomputeNextAction(job));
+}
+
+/** Deterministic quote hints from pasted provider text (not full NLU). */
+export function extractQuoteHints(body: string): {
+  priceFromUsd?: number;
+  proposedWindow?: string;
+} {
+  const price = body.match(/\$\s*(\d+(?:\.\d{1,2})?)/);
+  // e.g. "Tuesday 9am", "Friday 10:00", "next Tue at 2pm"
+  const windowMatch =
+    body.match(
+      /\b((?:mon|tues|wednes|thurs|fri|satur|sun)(?:day)?|tomorrow|today)\b[^.$]{0,40}?\b(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i
+    ) ||
+    body.match(/\b((?:mon|tues|wednes|thurs|fri|satur|sun)(?:day)?)\b(?:\s+(?:morning|afternoon|evening))?/i) ||
+    body.match(/\b(\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)\b[^.$]{0,20}?\b(\d{1,2}(?::\d{2})?\s*(?:am|pm))/i);
+  let proposedWindow: string | undefined;
+  if (windowMatch) {
+    proposedWindow = windowMatch[0].replace(/\s+/g, ' ').trim().slice(0, 80);
+  }
+  return {
+    priceFromUsd: price ? Number(price[1]) : undefined,
+    proposedWindow,
+  };
+}
+
+/**
+ * Host or user supplies / corrects structured quote fields after paste.
+ * Does not require directory — pure job-scoped offer record.
+ */
+export function normalizeJobQuote(input: {
+  jobId: string;
+  priceFromUsd?: number;
+  proposedWindow?: string;
+  providerLabel?: string;
+  notes?: string;
+  raw?: string;
+  quoteId?: string;
+}): Job {
+  const job = getJob(input.jobId);
+  if (!job) throw new Error('job not found');
+  if (!isDone(job, 'provider_reply') && job.quotes.length === 0) {
+    // Allow normalize after ingest only; if no reply yet but user pastes structured quote, still require reply step
+    if (!isDone(job, 'send_outreach')) {
+      throw new Error('cannot normalize quote before outreach send is complete');
+    }
+  }
+
+  if (input.quoteId) {
+    const existing = job.quotes.find(q => q.id === input.quoteId);
+    if (!existing) throw new Error('quote not found');
+    if (input.priceFromUsd != null) existing.priceFromUsd = input.priceFromUsd;
+    if (input.proposedWindow != null) existing.proposedWindow = input.proposedWindow;
+    if (input.providerLabel != null) existing.providerLabel = input.providerLabel;
+    if (input.notes != null) existing.notes = input.notes;
+    if (input.raw != null) existing.raw = input.raw;
+    audit(job, 'quote_normalized', `Updated quote ${input.quoteId}`, {
+      priceFromUsd: existing.priceFromUsd,
+      proposedWindow: existing.proposedWindow,
+    });
+  } else {
+    job.quotes.push({
+      id: id('quote'),
+      providerLabel: input.providerLabel || job.providerContact?.label,
+      priceFromUsd: input.priceFromUsd,
+      proposedWindow: input.proposedWindow,
+      notes: input.notes || 'host/user normalized offer',
+      raw: input.raw,
+    });
+    if (!isDone(job, 'provider_reply')) markDone(job, 'provider_reply');
+    audit(job, 'quote_normalized', 'Added normalized quote on job', {
+      priceFromUsd: input.priceFromUsd,
+      proposedWindow: input.proposedWindow,
+    });
+  }
+
+  return upsert(recomputeNextAction(job));
+}
+
+/**
+ * Explicit close-out: completion notes + optional next-due. Advances Booked → Done.
+ * No silent auto-complete of settle — host/user must call this.
+ */
+export function recordJobCompletion(input: {
+  jobId: string;
+  notes?: string;
+  nextDueAt?: string;
+  /** When true, close even if not yet scheduled (escape hatch; rare) */
+  force?: boolean;
+}): Job {
+  const job = getJob(input.jobId);
+  if (!job) throw new Error('job not found');
+  if (!input.force && !isDone(job, 'scheduled') && !job.scheduledAt) {
+    throw new Error(
+      'cannot record completion before appointment is confirmed — call confirm_appointment first (or force:true to close without booking)'
+    );
+  }
+  if (input.notes) job.completionNotes = input.notes;
+  if (input.nextDueAt) job.nextDueAt = input.nextDueAt;
+  markDone(job, 'user_decision');
+  markDone(job, 'scheduled');
+  markDone(job, 'settle');
+  job.status = 'done';
+  audit(job, 'job_completed', 'Job closed with explicit completion record', {
+    nextDueAt: job.nextDueAt,
+    hasNotes: !!job.completionNotes,
+  });
+  job.nextAction = {
+    type: 'done',
+    instructionsForHostLlm:
+      'Job complete. Summarize for user.' +
+      (job.nextDueAt ? ` Next due: ${job.nextDueAt}.` : '') +
+      (job.completionNotes ? ` Notes on file.` : ''),
+    preferredHostTools: [],
+    requiresUserApproval: false,
+  };
+  job.blocks = [];
+  return upsert(job);
 }
 
 export function confirmAppointment(input: {
@@ -739,6 +873,8 @@ export function jobPublicView(job: Job) {
     messages_count: job.messages.length,
     quotes: job.quotes,
     scheduled_at: job.scheduledAt,
+    next_due: job.nextDueAt ?? null,
+    completion_notes: job.completionNotes ?? null,
     safety: {
       principle: 'Safety before convenience. Explicit approvals for side effects in early product iterations.',
       require_explicit_approval_for_side_effects: job.safetyPolicy.requireExplicitApprovalForSideEffects,

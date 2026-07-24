@@ -193,7 +193,8 @@ export function getWorkflowProgress(job: Job) {
       (job.nextAction.type === 'await_user_approval' ||
         job.nextAction.type === 'user_decision' ||
         job.nextAction.type === 'draft_for_user_approval' ||
-        job.nextAction.type === 'collect_field_via_host'));
+        job.nextAction.type === 'collect_field_via_host' ||
+        job.nextAction.type === 'confirm_appointment'));
 
   const steps = HOUSE_SERVICE_V1_STEPS.map((def, i) => {
     let state: StepVisualState = 'upcoming';
