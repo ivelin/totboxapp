@@ -201,7 +201,7 @@ Public git: synthetic fixtures only ([AGENTS.md](../../AGENTS.md)).
 |----------|------|
 | `src/lib/job-pm.ts`, `mcp-tools.ts` | App plane under test |
 | `npm run smoke:job` | T0 |
-| `scripts/eval/run-eval.ts` | Seed for T1 expansion or gradual replace |
+| `evals/run-eval.ts` | Seed for T1 expansion or gradual replace |
 | Safety + `house_service_v1` strip | Gold properties |
 
 ---

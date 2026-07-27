@@ -17,8 +17,8 @@ import {
   beachheadSampleProviders,
   createServiceBrief,
   compareOptions,
-} from '../src/lib/store';
-import { dispatchMcpTool } from '../src/lib/mcp-tools';
+} from '../../src/lib/store';
+import { dispatchMcpTool } from '../../src/lib/mcp-tools';
 
 const HVAC_JOB =
   'Find AC maintenance plans for my area in the next 2 weeks under $300 with good recent reviews';

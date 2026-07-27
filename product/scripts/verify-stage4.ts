@@ -44,7 +44,7 @@ console.log("i=" + ${i} + " token?" + !!r.token + " scoped?" + (getProvidersForT
 
   let testLog = '=== 4. mcp + test x2 ===\n';
   for (let i = 1; i <= 2; i++) {
-    const out = await exec('npx tsx scripts/test-mcp.ts');
+    const out = await exec('npx tsx product/scripts/test-mcp.ts');
     testLog += `run${i}:\n` + out + '\n';
   }
   fs.writeFileSync(path.join(SCRATCH, 'mcp-scoped-test.log'), testLog);
@@ -61,7 +61,7 @@ console.log("i=" + ${i} + " token?" + !!r.token + " scoped?" + (getProvidersForT
   logTo('verif-all.log', '=== 5. README ===\n' + readme);
 
   // Step 6: evidence (committed files)
-  const committed = await exec('git show HEAD:server/mcp.ts | grep -E "dispatchMcpTool|getProviderDetailsForToken|getAvailabilityForToken" | head -3 ; git show HEAD:src/app/dashboard/page.tsx | grep -E "Register|token|MCP Endpoint Generator" | head -2 ; git show HEAD:src/lib/store.ts | grep -E "registerProvider|getProvidersForToken" | head -3');
+  const committed = await exec('git show HEAD:product/server/mcp.ts 2>/dev/null | grep -E "dispatchMcpTool|getProviderDetailsForToken|getAvailabilityForToken" | head -3 ; git show HEAD:server/mcp.ts 2>/dev/null | grep -E "dispatchMcpTool|getProviderDetailsForToken|getAvailabilityForToken" | head -3 ; git show HEAD:src/app/dashboard/page.tsx | grep -E "Register|token|MCP Endpoint Generator" | head -2 ; git show HEAD:src/lib/store.ts | grep -E "registerProvider|getProvidersForToken" | head -3');
   logTo('verif-all.log', '=== 6. committed evidence ===\n' + committed);
 
   logTo('verif-all.log', '=== VERIF COMPLETE ===');

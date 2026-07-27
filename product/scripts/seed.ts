@@ -1,5 +1,5 @@
 // Stage 2+ / Stage 6 seed script
-// Usage: npx tsx scripts/seed.ts
+// Usage: npm run seed  (or npx tsx product/scripts/seed.ts)
 // Seeds fictional beachhead providers only (public-safe — no real household data).
 
 import {
@@ -10,7 +10,7 @@ import {
   compareOptions,
   createServiceBrief,
   resetStore,
-} from '../src/lib/store';
+} from '../../src/lib/store';
 
 resetStore();
 const sampleProviders = beachheadSampleProviders();

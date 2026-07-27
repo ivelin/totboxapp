@@ -1,9 +1,9 @@
 /**
  * Verification exercise for scaffolding plan (real shipped code paths).
- * Run with: npx tsx scripts/verify-scaffolding.ts
+ * Run with: npx tsx product/scripts/verify-scaffolding.ts
  */
-import { resetStore, registerProvider, connectCalendar, setCalendarBusyMock, getAvailabilityForToken } from '../src/lib/store.js';
-import { dispatchMcpTool } from '../src/lib/mcp-tools.js';
+import { resetStore, registerProvider, connectCalendar, setCalendarBusyMock, getAvailabilityForToken } from '../../src/lib/store.js';
+import { dispatchMcpTool } from '../../src/lib/mcp-tools.js';
 
 resetStore();
 

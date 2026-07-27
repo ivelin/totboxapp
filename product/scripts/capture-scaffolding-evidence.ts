@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 /**
  * Orchestrator for capturing Verification plan evidence cleanly.
- * Usage: SCRATCH=/tmp/grok-goal-cd514e5af4b7/implementer npx tsx scripts/capture-scaffolding-evidence.ts
+ * Usage: SCRATCH=/tmp/... npx tsx product/scripts/capture-scaffolding-evidence.ts
  * Overwrites logs, hard asserts observables, exits 0 only if all good.
  */
 import { execSync } from 'child_process';
@@ -16,9 +16,10 @@ const ALLOWLIST = [
   'package-lock.json',
   'vitest.config.ts',
   '.github/workflows/ci.yml',
-  'scripts/eval/',
-  'scripts/verify-scaffolding.ts',
-  'scripts/capture-scaffolding-evidence.ts',
+  'evals/',
+  'product/scripts/',
+  'product/server/',
+  'company/',
   'src/lib/',
 ];
 
@@ -149,7 +150,7 @@ function main() {
   // STEP 4: build + tsx verify twice (full build for complete log)
   for (let i = 1; i <= 2; i++) {
     runAndCapture('npm run build 2>&1', verLog, `build-run${i}`);
-    runAndCapture('npx tsx scripts/verify-scaffolding.ts 2>&1', verLog, `verify-run${i}`);
+    runAndCapture('npx tsx product/scripts/verify-scaffolding.ts 2>&1', verLog, `verify-run${i}`);
   }
   assertBuildSuccess(verLog);
   assertVerifySuccess(verLog);

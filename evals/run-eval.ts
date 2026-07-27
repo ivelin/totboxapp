@@ -2,10 +2,10 @@
 /**
  * Strong evaluation / regression harness for Totbox core behaviors.
  * 
- * Golden fixtures live in scripts/eval/fixtures/
+ * Golden fixtures live in evals/fixtures/
  * Extend with new cases for every feature addition or behavior change.
- * 
- * Run: npm run test:eval   (or npx tsx scripts/eval/run-eval.ts)
+ *
+ * Run: npm run test:eval   (or npx tsx evals/run-eval.ts)
  * 
  * Exit code: 0 = all evals pass, 1 = regression detected.
  */
@@ -21,9 +21,9 @@ import {
   computeAvailability,
   beachheadSampleProviders,
   compareOptions,
-} from '../../src/lib/store';
-import { dispatchMcpTool } from '../../src/lib/mcp-tools';
-import { Provider, ProviderSchema } from '../../src/lib/types';
+} from '../src/lib/store';
+import { dispatchMcpTool } from '../src/lib/mcp-tools';
+import { Provider, ProviderSchema } from '../src/lib/types';
 
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 

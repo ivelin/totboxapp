@@ -39,11 +39,14 @@ Product phase language (“Phase 0/1/2…”) is **Totbox’s** bootstrap roadma
 | Public-safe memory | [`AGENTS.md`](../../AGENTS.md) — no PII in git |
 | Reward / risk ICP ranking | Informal in strategy docs; formal scorecards still open |
 | Multi-agent roles + channels | Instance section below; host LLM + MCP tools today |
-| Eval harness / synthetic continuity | Level ~1 smoke; design for Level 2+ in `docs/eval/` |
+| Eval harness / synthetic continuity | Level ~1: `evals/` + smoke; design for Level 2+ in `docs/eval/` |
 | Evaluation-Driven Development | Partial: tests after/with build; numeric business gates not locked |
 | AGENTS.md thin enforcement | Root [`AGENTS.md`](../../AGENTS.md) is **public-repo PII rules**, not yet the company-OS paste block |
 | Metrics: TTR, channel distribution | Not yet scored formally |
 | Template change policy | Instance updates free; template needs founder approval ([`README`](README.md#template-change-policy-standing-rule)) |
+| Living state machine | `npm run company-os` + `company/state/company-state.json` + `src/lib/company-os/` |
+| Instance index | [`instance/README.md`](instance/README.md) |
+| Grok loop workflow | `.grok/workflows/company-operating-loop.rhai` |
 
 ---
 
@@ -111,7 +114,7 @@ research local providers → contact them → collect useful quotes or availabil
 | Slice artifact (OS checklist) | Totbox |
 |-------------------------------|--------|
 | Success criteria | Engineering: smoke green; Business: fewer touchpoints on real jobs (numeric thresholds still open) |
-| Harness reference | `npm run smoke:job`; multi-actor sim design in `docs/eval/` |
+| Harness reference | `npm run smoke:job` (`product/scripts/`); multi-actor sim design in `docs/eval/` |
 | Expected artifacts | Job state, progress strip, dry-run/approval records, quote fields |
 | Human gates | Send; money/time; PII — see host safety |
 | Next increment | **Scheduling & coordination** — same EDD discipline once thin coordination value is proven |

@@ -131,11 +131,24 @@ Also: `npm run smoke:house-owner` (legacy fixture compare). Docs: [`docs/host_ll
 
 ```bash
 npm install
-npm run dev          # Next.js UI on :3000
-npm run dev:mcp      # MCP on :3001
-npm run smoke:job
+npm run dev          # Next.js UI on :3000 (src/, public/)
+npm run dev:mcp      # MCP on :3001 (product/server/)
+npm run smoke:job    # product/scripts/job-smoke.ts
+npm run company-os -- status
 npm test && npm run typecheck && npm run build
 ```
+
+### Repo layout (company-as-code)
+
+| Dir | Role |
+|-----|------|
+| `company/` | Living OS state + CLI |
+| `research/` | ICP / research notes |
+| `product/` | MCP server + product scripts (Next app stays `src/` + `public/`) |
+| `evals/` | Eval harness + fixtures |
+| `traces/` | Decision traces |
+| `growth/` · `support/` · `infrastructure/` | Stubs (later) |
+| `docs/company-os/` | Portable OS template + Totbox instance index |
 
 MCP job tools: `get_workflow`, `start_job`, `get_job`, `list_jobs`, `update_job_facts`, `submit_draft_for_approval`, `record_user_approval`, `approve_and_send_message`, `ingest_provider_message`, `normalize_quote`, `confirm_appointment`, `record_job_completion`, …
 
@@ -201,6 +214,9 @@ This repo also hosts a **standalone** bootstrap OS for solo founders (FI / SCORE
 - Blueprint: [`docs/company-os/operating-system.md`](docs/company-os/operating-system.md)
 - Live runtime (state + 7-stage loop): [`docs/company-os/live-runtime.md`](docs/company-os/live-runtime.md)
 - How Totbox applies it (example + gap analysis): [`docs/company-os/applied-here.md`](docs/company-os/applied-here.md)
+- Living instance index: [`docs/company-os/instance/`](docs/company-os/instance/)
+- Instance CLI: `npm run company-os -- status`
+- Grok workflow: `.grok/workflows/company-operating-loop.rhai`
 
 Point an AI at the repo and ask it to apply the OS to *their* startup — not to copy Totbox’s market.
 

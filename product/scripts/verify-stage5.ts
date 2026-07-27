@@ -34,7 +34,7 @@ async function run() {
   // Step 3-ish: direct store x2 (test-stage5.ts does register+conn+merge asserts)
   let availLog = '=== 3. direct store availability x2 ===\n';
   for (let i = 1; i <= 2; i++) {
-    const out = await exec('npx tsx scripts/test-stage5.ts');
+    const out = await exec('npx tsx product/scripts/test-stage5.ts');
     availLog += `run${i}:\n` + out + '\n';
   }
   writeLog('stage5-availability.log', availLog);
@@ -63,7 +63,7 @@ async function run() {
 
   let mcpLog = '=== 4. mcp get_availability x2 (real fetch) ===\n';
   for (let i = 1; i <= 2; i++) {
-    const out = await exec(`npx tsx scripts/test-stage5-mcp.ts ${i}`);
+    const out = await exec(`npx tsx product/scripts/test-stage5-mcp.ts ${i}`);
     mcpLog += `run${i}:\n` + out + '\n';
   }
   fs.appendFileSync(path.join(SCRATCH, 'stage5-mcp.log'), mcpLog);
@@ -87,7 +87,7 @@ async function run() {
   logTo('verif-all-stage5.log', '=== build ===\n' + build);
 
   // evidence artifacts
-  const artifacts = await exec('ls scripts/test-stage5.ts scripts/test-stage5-mcp.ts scripts/verify-stage5.ts src/app/api/calendar/connect/start/route.ts src/app/api/calendar/connect/callback/route.ts src/lib/store.ts | cat');
+  const artifacts = await exec('ls product/scripts/test-stage5.ts product/scripts/test-stage5-mcp.ts product/scripts/verify-stage5.ts src/app/api/calendar/connect/start/route.ts src/app/api/calendar/connect/callback/route.ts src/lib/store.ts | cat');
   logTo('verif-all-stage5.log', '=== artifacts ===\n' + artifacts);
 
   logTo('verif-all-stage5.log', '=== VERIF COMPLETE ===');

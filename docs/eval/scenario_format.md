@@ -10,11 +10,11 @@ Scenarios are **synthetic** fixtures. No real households, phones, or street addr
 ## File layout (proposed)
 
 ```text
-scripts/eval/scenarios/
+evals/scenarios/
   hvac_pm_budget_v1.yaml
   cleaning_partner_gate_v1.yaml
   …
-scripts/eval/personas/
+evals/personas/
   household_busy_parent_v1.json
   provider_hvac_email_first_v1.json
 ```
