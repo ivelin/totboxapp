@@ -31,6 +31,7 @@ Everything happens primarily in the chat apps you already use (Grok, Claude, Cha
 | [`docs/product_thesis.md`](docs/product_thesis.md) | Scheduling not discovery |
 | [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md) | Broader product plan |
 | [`AGENTS.md`](AGENTS.md) | Public repo: no PII |
+| [`docs/company-os/`](docs/company-os/) | **Mentorship (isolated):** Company Operating System for solo founders — portable blueprint; Totbox is one application |
 
 ---
 
@@ -191,6 +192,17 @@ Feedback from households and small operators is extremely valuable.
 - Research privacy rules: [`docs/research/README.md`](docs/research/README.md)
 - Agent hard rule (public repo, no PII): [`AGENTS.md`](AGENTS.md)
 - Issues and discussions welcome
+
+### Mentorship: Company Operating System (portable)
+
+This repo also hosts a **standalone** bootstrap OS for solo founders (FI / SCORE / mentees). It is **not** Totbox product policy.
+
+- Start: [`docs/company-os/README.md`](docs/company-os/README.md)
+- Blueprint: [`docs/company-os/operating-system.md`](docs/company-os/operating-system.md)
+- Live runtime (state + 7-stage loop): [`docs/company-os/live-runtime.md`](docs/company-os/live-runtime.md)
+- How Totbox applies it (example + gap analysis): [`docs/company-os/applied-here.md`](docs/company-os/applied-here.md)
+
+Point an AI at the repo and ask it to apply the OS to *their* startup — not to copy Totbox’s market.
 
 ## License
 
