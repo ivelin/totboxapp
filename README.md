@@ -2,7 +2,7 @@
 
 **Disappear the logistics of family life.**
 
-Totbox helps small local operators reduce back-office admin and booking hassle so they can focus on in-person experiences. At the same time, it helps busy families cut the chore of researching, comparing, coordinating, and booking services.
+Totbox.app helps busy families cut the chore of researching, comparing, coordinating, and booking services. It also helps small local services operators reduce back-office admin and booking hassle so they can focus on delivering great in-person experiences. 
 
 Everything happens primarily in the chat apps you already use (Grok, Claude, ChatGPT, etc.) via simple **MCP** endpoints + OAuth — not another consumer app to install.
 
