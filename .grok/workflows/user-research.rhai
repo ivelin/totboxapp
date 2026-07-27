@@ -111,7 +111,8 @@ let synthetic_schema = #{
     "required": [
         "icp_id", "persona_sketch", "dialogue_summaries",
         "pain_realism", "status_quo", "would_try", "would_pay_or_act",
-        "trust_barriers", "say_no_reasons", "synthetic_verdict", "evidence_notes"
+        "trust_barriers", "say_no_reasons", "synthetic_verdict",
+        "verdict_key_factors", "evidence_notes"
     ],
     "properties": #{
         "icp_id": #{ "type": "string" },
@@ -124,6 +125,7 @@ let synthetic_schema = #{
         "trust_barriers": #{ "type": "string" },
         "say_no_reasons": #{ "type": "string" },
         "synthetic_verdict": #{ "type": "string" },
+        "verdict_key_factors": #{ "type": "string" },
         "evidence_notes": #{ "type": "string" },
     },
 };
@@ -532,7 +534,10 @@ while !finished {
         sy_p += "3) Answer OS questions: pain_realism, status_quo, would_try, would_pay_or_act,\n";
         sy_p += "   trust_barriers, say_no_reasons.\n";
         sy_p += "4) synthetic_verdict: strong_fit | weak_fit | poor_fit | unclear\n";
-        sy_p += "5) evidence_notes: what would real-world testing need to confirm/kill.\n";
+        sy_p += "5) verdict_key_factors: ONE short phrase (roughly 12-25 words) naming the main drivers\n";
+        sy_p += "   that produced this verdict (e.g. scores, channel fit, falsifiers, reach, risk).\n";
+        sy_p += "   Must explain the verdict at a glance for a table column — not a full paragraph.\n";
+        sy_p += "6) evidence_notes: what would real-world testing need to confirm/kill.\n";
         sy_p += "Set icp_id to " + id2 + ".\n";
         sy_p += "HARD: no PII; no real emails/phones/addresses; label everything synthetic.\n";
 
@@ -565,6 +570,7 @@ while !finished {
                 trust_barriers: "unknown",
                 say_no_reasons: "agent failure",
                 synthetic_verdict: "unclear",
+                verdict_key_factors: "Synthetic agent failed — treat as unverified",
                 evidence_notes: "FAIL_CLOSED_NO_SYNTHETIC",
             });
         }
@@ -646,7 +652,12 @@ while !finished {
     rep_p += "1) research/icps/ROUND_" + this_label + "_report.md — full markdown report with:\n";
     rep_p += "   - Executive summary\n";
     rep_p += "   - Method (Company OS synthetic filter; not real-world proof)\n";
-    rep_p += "   - Table of 5 ICPs with scorecard highlights and synthetic_verdict\n";
+    rep_p += "   - REQUIRED ranked verdict table (all 5 ICPs) with columns exactly:\n";
+    rep_p += "     Rank | ICP | Synthetic verdict | Key factors | promote_lean\n";
+    rep_p += "     where Key factors is a brief (one short phrase) summary of the drivers that\n";
+    rep_p += "     produced the verdict — prefer each ICP's verdict_key_factors from the pack;\n";
+    rep_p += "     if missing, synthesize from scorecard + synthetic notes (still one short phrase).\n";
+    rep_p += "   - Full scorecard table (numeric scores) — may be separate from the verdict table\n";
     rep_p += "   - Ranked top 3 with why\n";
     rep_p += "   - Primary recommendation + kill criteria\n";
     rep_p += "   - Skeptic section (overclaims, conditions)\n";
