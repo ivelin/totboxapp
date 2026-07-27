@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "companyId": "totboxapp",
+  "journeyPhase": 6,
+  "loopStage": 4,
+  "gateStatus": "open",
+  "scores": {
+    "completion": 0.86,
+    "traceCompleteness": 0.7,
+    "notes": "Engineering smoke/tests strong; layout aligned to company-as-code; Phase 1 business exit (real house jobs) still open"
+  },
+  "founderApprovals": [],
+  "openQuestions": [
+    "What numeric Phase 1 business thresholds lock before more build scope?",
+    "When will the next real household job produce a redacted stage-6 feedback note?"
+  ],
+  "lastAction": "layout_realigned_to_template",
+  "createdAt": "2026-07-27T00:00:00.000Z",
+  "updatedAt": "2026-07-27T17:35:00.000Z"
+}

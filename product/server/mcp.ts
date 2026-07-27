@@ -13,9 +13,9 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
 
-import { seedProviders, reloadProviders, beachheadSampleProviders } from '../src/lib/store.js';
-import { dispatchMcpTool, listJobPmToolDescriptors } from '../src/lib/mcp-tools';
-import { appendMcpTranscript } from '../src/lib/mcp-transcript.js';
+import { seedProviders, reloadProviders, beachheadSampleProviders } from '../../src/lib/store.js';
+import { dispatchMcpTool, listJobPmToolDescriptors } from '../../src/lib/mcp-tools';
+import { appendMcpTranscript } from '../../src/lib/mcp-transcript.js';
 
 // Stage 6 beachhead seed: fictional HVAC + cleaning (+ tree) operators only
 seedProviders(beachheadSampleProviders());

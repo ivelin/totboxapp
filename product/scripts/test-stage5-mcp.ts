@@ -8,7 +8,7 @@
  * - prints full responses for capture
  * Called by orchestrator for x2 distinct runs.
  */
-import { registerProvider, connectCalendar, setCalendarBusyMock } from '../src/lib/store.js';
+import { registerProvider, connectCalendar, setCalendarBusyMock } from '../../src/lib/store.js';
 
 const date = '2026-07-07';
 

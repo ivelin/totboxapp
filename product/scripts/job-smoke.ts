@@ -5,8 +5,8 @@
  * Safety: refuses send without approval (unit tests); this path records approvals.
  */
 
-import { resetJobs } from '../src/lib/job-pm';
-import { dispatchMcpTool } from '../src/lib/mcp-tools';
+import { resetJobs } from '../../src/lib/job-pm';
+import { dispatchMcpTool } from '../../src/lib/mcp-tools';
 
 function parse(res: { content: Array<{ text: string }> }) {
   return JSON.parse(res.content[0].text);
@@ -178,7 +178,7 @@ async function main() {
     '2026-08-18'
   );
 
-  const { listJobPmToolDescriptors } = await import('../src/lib/mcp-tools');
+  const { listJobPmToolDescriptors } = await import('../../src/lib/mcp-tools');
   const names = listJobPmToolDescriptors().map(t => t.name);
   for (const n of [
     'start_job',

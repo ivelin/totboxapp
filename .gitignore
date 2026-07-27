@@ -50,3 +50,8 @@ next-env.d.ts
 # app local data + verification scratch
 .data/
 .verif-scratch/
+
+# company-os living runtime traces (seed README stays tracked)
+traces/decisions/*.json
+traces/decisions/*.jsonl
+!traces/decisions/README.md

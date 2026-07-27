@@ -5,7 +5,7 @@
  * - fetch tools/list + tools/call for BOTH search_services and get_availability using reg.token
  * - assert scoped returns only the registered provider's data (non-empty)
  */
-import { registerProvider, getProvidersForToken } from '../src/lib/store.js';
+import { registerProvider, getProvidersForToken } from '../../src/lib/store.js';
 
 async function main() {
   console.log('=== Stage 4 ===');

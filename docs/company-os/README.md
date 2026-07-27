@@ -10,6 +10,10 @@ It is a **living mentorship blueprint**: best practices and lessons for solo fou
 | [`live-runtime.md`](live-runtime.md) | **Live OS shape** — state + 7-stage loop, eval harness, synthetic continuity; optional LangGraph/CrewAI |
 | [`ai-instructions.md`](ai-instructions.md) | Thin enforcement layer — copy-paste for your main AI tool (`AGENTS.md` / rules / system prompt) |
 | [`applied-here.md`](applied-here.md) | **Instance only** — Totbox hypothesis, architecture, gap analysis (not the template) |
+| [`instance/`](instance/) | **Living Totbox instance index** — state pointer, scores, orchestration, thesis snapshot |
+| CLI | `npm run company-os -- status` — durable state machine entry (`company/scripts/`) |
+| Workflow | `.grok/workflows/company-operating-loop.rhai` — Grok Build loop (status/continue/start) |
+| Repo layout | Template categories at root: `company/`, `research/`, `product/`, `evals/`, `traces/`, `growth/`, `support/`, `infrastructure/`, `docs/` |
 
 ---
 

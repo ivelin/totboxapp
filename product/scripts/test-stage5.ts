@@ -6,7 +6,7 @@
  * - also exercises via MCP POST if MCP running (for verif-4)
  * Captures to stdout for redirect to {SCRATCH}/stage5-*.log
  */
-import { registerProvider, setCalendarBusyMock, getAvailabilityForToken, connectCalendar, mergeWithBusy } from '../src/lib/store.js';
+import { registerProvider, setCalendarBusyMock, getAvailabilityForToken, connectCalendar, mergeWithBusy } from '../../src/lib/store.js';
 
 // SCRATCH only used if the caller wants to redirect; no default writes to grok-goal paths.
 const SCRATCH = process.env.SCRATCH || '';

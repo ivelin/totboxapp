@@ -19,17 +19,13 @@ import {
   beachheadSampleProviders,
   seedProviders,
   upsertProvider,
-} from '../src/lib/store';
-import type { ServiceCategory } from '../src/lib/types';
+} from '../../src/lib/store';
+import type { ServiceCategory } from '../../src/lib/types';
 
 function argValue(argv: string[], name: string): string | undefined {
   const i = argv.indexOf(name);
   if (i < 0 || i + 1 >= argv.length) return undefined;
   return argv[i + 1];
-}
-
-function hasFlag(argv: string[], name: string): boolean {
-  return argv.includes(name);
 }
 
 function printHelp() {
