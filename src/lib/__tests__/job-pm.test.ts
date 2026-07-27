@@ -8,9 +8,13 @@ import {
   approveAndSendMessage,
   ingestProviderMessage,
   confirmAppointment,
+  recordJobCompletion,
+  normalizeJobQuote,
+  extractQuoteHints,
   getJob,
   suggestNextAction,
 } from '../job-pm';
+import { dispatchMcpTool } from '../mcp-tools';
 
 describe('Job PM safety-gated workflow', () => {
   beforeEach(() => {
@@ -107,12 +111,131 @@ describe('Job PM safety-gated workflow', () => {
     job = confirmAppointment({ jobId: job.id, scheduledAt: '2026-07-15T09:00:00Z' });
     expect(job.scheduledAt).toBe('2026-07-15T09:00:00Z');
     expect(job.checklist.find(c => c.id === 'scheduled')?.done).toBe(true);
+    expect(job.status).toBe('scheduled');
+    expect(job.nextAction?.type).toBe('mark_done');
+    // Settle is NOT auto-skipped — stays Booked until explicit completion
+    expect(job.checklist.find(c => c.id === 'settle')?.done).toBe(false);
+
+    job = recordJobCompletion({
+      jobId: job.id,
+      notes: 'Visit completed; filter changed',
+      nextDueAt: '2027-01-15',
+    });
+    expect(job.status).toBe('done');
+    expect(job.nextDueAt).toBe('2027-01-15');
+    expect(job.completionNotes).toMatch(/filter/i);
+    expect(job.checklist.find(c => c.id === 'settle')?.done).toBe(true);
 
     const snap = suggestNextAction(job.id);
     expect(snap.job.audit.length).toBeGreaterThan(3);
-    // After schedule, remaining optional settle may complete to done
-    const final = getJob(job.id)!;
-    expect(['scheduled', 'done', 'negotiating', 'awaiting_user_decision', 'settling']).toContain(final.status);
+    expect(getJob(job.id)!.status).toBe('done');
+  });
+
+  it('extractQuoteHints pulls price and weekday window from paste', () => {
+    const h = extractQuoteHints('We can do Tuesday 9am for $245 including inspection.');
+    expect(h.priceFromUsd).toBe(245);
+    expect(h.proposedWindow?.toLowerCase()).toMatch(/tuesday/);
+  });
+
+  it('normalize_quote corrects price on job after ingest', () => {
+    let job = startJob({ intent: 'AC maintenance under $300' });
+    job = updateJobFacts(
+      job.id,
+      { service_address: '500 Example St (test fixture only)' },
+      { label: 'Neighborhood HVAC', email: 'hvac-demo@example.com' }
+    );
+    job = submitDraftForApproval({ jobId: job.id, body: 'Please quote.' });
+    job = recordUserApproval({
+      jobId: job.id,
+      kind: 'send_message',
+      summary: 'ok',
+      granted: true,
+    });
+    job = approveAndSendMessage({ jobId: job.id, dryRun: true });
+    job = ingestProviderMessage({
+      jobId: job.id,
+      body: 'We can come by next week, call for price.',
+    });
+    expect(job.quotes.some(q => q.priceFromUsd == null)).toBe(true);
+    job = normalizeJobQuote({
+      jobId: job.id,
+      quoteId: job.quotes[0].id,
+      priceFromUsd: 260,
+      proposedWindow: 'next week morning',
+    });
+    expect(job.quotes[0].priceFromUsd).toBe(260);
+    expect(job.quotes[0].proposedWindow).toMatch(/next week/);
+  });
+
+  it('MCP dispatch full HVAC consumer path with public view fields', () => {
+    resetJobs();
+    const parse = (res: { content: Array<{ text: string }> }) => JSON.parse(res.content[0].text);
+    let r = parse(
+      dispatchMcpTool('start_job', {
+        intent: 'AC maintenance under $300 next 2 weeks',
+        provider_email: 'hvac-demo@example.com',
+        provider_label: 'Fixture HVAC',
+      })
+    );
+    r = parse(
+      dispatchMcpTool('update_job_facts', {
+        job_id: r.job_id,
+        service_address: '500 Example St (fixture only — not a real home)',
+      })
+    );
+    r = parse(
+      dispatchMcpTool('submit_draft_for_approval', {
+        job_id: r.job_id,
+        body: 'Please quote AC maintenance under $300.',
+        channel: 'email',
+        to: 'hvac-demo@example.com',
+      })
+    );
+    r = parse(
+      dispatchMcpTool('record_user_approval', {
+        job_id: r.job_id,
+        kind: 'send_message',
+        summary: 'Approve dry-run outreach',
+        granted: true,
+      })
+    );
+    r = parse(dispatchMcpTool('approve_and_send_message', { job_id: r.job_id, dryRun: true }));
+    r = parse(
+      dispatchMcpTool('ingest_provider_message', {
+        job_id: r.job_id,
+        body: 'Tuesday 9am for $245 including inspection.',
+        from: 'hvac-demo@example.com',
+      })
+    );
+    expect(r.quotes.length).toBeGreaterThan(0);
+    expect(r.quotes[0].priceFromUsd).toBe(245);
+    expect(r.progress.strip).toBeTruthy();
+    r = parse(
+      dispatchMcpTool('record_user_approval', {
+        job_id: r.job_id,
+        kind: 'commit_money_or_time',
+        summary: 'Accept $245 Tuesday',
+        granted: true,
+      })
+    );
+    r = parse(
+      dispatchMcpTool('confirm_appointment', {
+        job_id: r.job_id,
+        scheduled_at: '2026-07-15T09:00:00Z',
+      })
+    );
+    expect(r.scheduled_at).toBe('2026-07-15T09:00:00Z');
+    expect(r.status).toBe('scheduled');
+    r = parse(
+      dispatchMcpTool('record_job_completion', {
+        job_id: r.job_id,
+        notes: 'Done',
+        next_due: '2027-01-15',
+      })
+    );
+    expect(r.status).toBe('done');
+    expect(r.next_due).toBe('2027-01-15');
+    expect(r.progress.steps.find((s: { id: string }) => s.id === 'done').state).toBe('done');
   });
 
   it('cleaning path: full dry-run loop with host-first instructions', () => {

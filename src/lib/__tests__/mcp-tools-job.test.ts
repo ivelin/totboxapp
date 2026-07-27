@@ -17,6 +17,9 @@ describe('MCP job PM tools (shipped dispatch)', () => {
     expect(names).toContain('record_user_approval');
     expect(names).toContain('approve_and_send_message');
     expect(names).toContain('ingest_provider_message');
+    expect(names).toContain('normalize_quote');
+    expect(names).toContain('confirm_appointment');
+    expect(names).toContain('record_job_completion');
   });
 
   it('start_job returns progress map house_service_v1', () => {

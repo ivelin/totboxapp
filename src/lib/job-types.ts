@@ -130,6 +130,8 @@ export const JobQuoteSchema = z.object({
   id: z.string(),
   providerLabel: z.string().optional(),
   priceFromUsd: z.number().optional(),
+  /** Free-text proposed window/time from provider reply */
+  proposedWindow: z.string().optional(),
   notes: z.string().optional(),
   raw: z.string().optional(),
 });
@@ -170,6 +172,10 @@ export const JobSchema = z.object({
   messages: z.array(JobMessageSchema).default([]),
   quotes: z.array(JobQuoteSchema).default([]),
   scheduledAt: z.string().optional(),
+  /** ISO date (or date-only) for next preventive / rebook reminder */
+  nextDueAt: z.string().optional(),
+  /** Post-service / close-out notes (no PII required) */
+  completionNotes: z.string().optional(),
   safetyPolicy: z
     .object({
       /** Early product: always explicit approvals for side effects */

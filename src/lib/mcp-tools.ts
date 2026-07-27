@@ -17,6 +17,8 @@ import {
   recordOutbound,
   ingestProviderMessage,
   confirmAppointment,
+  normalizeJobQuote,
+  recordJobCompletion,
   suggestNextAction,
   jobPublicView,
 } from './job-pm';
@@ -292,6 +294,37 @@ export function dispatchMcpTool(name: string, args: LooseArgs) {
       if (!scheduledAt) return err('scheduled_at required');
       return ok(jobPublicView(confirmAppointment({ jobId, scheduledAt })));
     }
+    if (name === 'normalize_quote') {
+      const jobId = getStr(args.job_id) || getStr(args.jobId) || '';
+      if (!jobId) return err('job_id required');
+      return ok(
+        jobPublicView(
+          normalizeJobQuote({
+            jobId,
+            priceFromUsd: getNum(args.price_from_usd) ?? getNum(args.priceFromUsd) ?? getNum(args.price),
+            proposedWindow: getStr(args.proposed_window) || getStr(args.proposedWindow) || getStr(args.window),
+            providerLabel: getStr(args.provider_label) || getStr(args.providerLabel),
+            notes: getStr(args.notes),
+            raw: getStr(args.raw) || getStr(args.body),
+            quoteId: getStr(args.quote_id) || getStr(args.quoteId),
+          })
+        )
+      );
+    }
+    if (name === 'record_job_completion') {
+      const jobId = getStr(args.job_id) || getStr(args.jobId) || '';
+      if (!jobId) return err('job_id required');
+      return ok(
+        jobPublicView(
+          recordJobCompletion({
+            jobId,
+            notes: getStr(args.notes),
+            nextDueAt: getStr(args.next_due) || getStr(args.nextDueAt) || getStr(args.next_due_at),
+            force: getBool(args.force, false),
+          })
+        )
+      );
+    }
 
     return err('unknown tool ' + name);
   } catch (e: unknown) {
@@ -448,11 +481,44 @@ export function listJobPmToolDescriptors() {
     },
     {
       name: 'confirm_appointment',
-      description: 'Confirm schedule after commit_money_or_time approval.',
+      description: 'Confirm schedule after commit_money_or_time approval. Advances to Booked (scheduled); Done requires record_job_completion.',
       inputSchema: {
         type: 'object',
         properties: { job_id: { type: 'string' }, scheduled_at: { type: 'string' } },
         required: ['job_id', 'scheduled_at'],
+      },
+    },
+    {
+      name: 'normalize_quote',
+      description:
+        'Add or correct structured quote fields on a job after paste (price, proposed window). Job-scoped only — not a vendor directory. Prefer after ingest_provider_message when auto-extract is incomplete.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          job_id: { type: 'string' },
+          quote_id: { type: 'string' },
+          price_from_usd: { type: 'number' },
+          proposed_window: { type: 'string' },
+          provider_label: { type: 'string' },
+          notes: { type: 'string' },
+          raw: { type: 'string' },
+        },
+        required: ['job_id'],
+      },
+    },
+    {
+      name: 'record_job_completion',
+      description:
+        'Explicit close-out after booking: optional notes + next_due (rebook/preventive). Marks Done on the consumer strip. Not silent — call when the homeowner is ready to settle.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          job_id: { type: 'string' },
+          notes: { type: 'string' },
+          next_due: { type: 'string', description: 'ISO date for next service / reminder' },
+          force: { type: 'boolean', description: 'Close without prior confirm_appointment (rare)' },
+        },
+        required: ['job_id'],
       },
     },
   ];

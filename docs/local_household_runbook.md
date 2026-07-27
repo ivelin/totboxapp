@@ -1,9 +1,9 @@
-# Local household runbook (developers / power users)
+# Local household runbook — Phase 1 consumer path
 
-**Audience:** People who clone the repo (OpenClaw, Hermes, Grok Build, Claude Code/Cowork, terminal).  
-**Thesis:** Totbox helps **schedule and coordinate** home services—not discover who exists in your city. Discovery is Google / AI search. See [`product_thesis.md`](product_thesis.md).
+**Audience:** You, running Totbox against **your own house** (or a developer clone).  
+**Thesis:** Totbox is a **job project manager** for home services — not a city vendor directory. Find companies via Google / AI search / memory; Totbox tracks the chore with safety gates.
 
-**Goal:** Run Totbox **locally** as **MCP and/or CLI** for **your** chores: structure the job, track quotes, draft outreach, compare terms, remember rebooks—**without** a hosted account and **without** FSM APIs.
+**Bootstrap focus (now):** Prove one house-service job end-to-end (HVAC or cleaning) with fewer touchpoints. Operator revenue and ServiceTitan-class provider MCP are **later**, after paid proof. See README **Bootstrap roadmap**.
 
 ---
 
@@ -15,108 +15,237 @@ cd totboxapp
 npm install
 ```
 
-Data: **`.data/`** (gitignored). Optional private notes about *your* vendors for rebook—not a public registry.
+Data lives in **`.data/`** (gitignored). **Never commit** real addresses, vendor emails, or access codes.
 
 ---
 
-## 2. Mental model (real house use)
+## 2. Mental model (8 consumer steps)
 
 ```text
-1. You (or your chat app) find candidates via Google / memory
-2. Totbox: create_service_brief  →  clear job package
-3. You send draft outreach (email/SMS) or call using the brief
-4. Quotes come back → enter/compare terms in Totbox
-5. Totbox: propose times / calendar awareness (when wired)
-6. You confirm offline; Totbox tracks status / next due (evolving)
+1.Describe → 2.Details → 3.Contact → 4.Send
+     → 5.Hear back → 6.Choose → 7.Booked → 8.Done
 ```
 
-Demo seeds (`npm run seed`) exist only so tools have data in CI/dev. **Production personal use = your jobs + your quote notes**, not “search Totbox’s city directory.”
+| Step | You | Totbox + your chat AI |
+|------|-----|------------------------|
+| Describe | “AC tune-up under $300” | `start_job` |
+| Details | Confirm address (from memory / you) | `update_job_facts` — never invent PII |
+| Contact | Who to email/call (you choose) | Draft skeleton for host to fill |
+| Send | **Approve** the message | Dry-run record (or host Gmail after approval) |
+| Hear back | Paste vendor reply | `ingest_provider_message` → quote fields |
+| Choose | **Approve** price/time | `record_user_approval(commit_money_or_time)` |
+| Booked | Show up | `confirm_appointment` |
+| Done | Optional note + next due | `record_job_completion` |
+
+Ask anytime: **“Where am I?”** → `get_workflow({ job_id })` or `get_job` → read `progress.strip` + `role_line`.
 
 ---
 
-## 3. MCP (agent hosts)
+## 3. Start MCP (chat hosts)
 
 ```bash
 npm run dev:mcp
 # → http://localhost:3001/mcp
 ```
 
-| Tool | Real household meaning |
-|------|-------------------------|
-| `get_workflow` | See the process (general, by service type, or this job’s “where am I?” strip) |
-| `start_job` / `get_job` / `list_jobs` | Run and inspect house-service job instances |
-| `create_service_brief` | Package the chore (legacy helper; prefer `start_job`) |
-| `compare_options` | Rank **options you care about** (fixtures; target: user-sourced quotes) |
-| `search_services` | Query **your local notes/fixtures**—not Google |
-| `get_provider_details` / `get_availability` | Detail + windows for parties on the job |
+Wire **Grok / Hermes / curl** using [`local_mcp_connect.md`](local_mcp_connect.md) (HTTP endpoint; household path needs no token). Tools include `start_job`, `get_workflow`, …
 
-Matchmaking code is **deterministic**. Chat models only orchestrate tools if you use a host.
-
----
-
-## 4. CLI
+**Or drive the same tools without a chat UI** (good for personal dry-run / debugging):
 
 ```bash
-npm run household -- help
-
-# Optional demo fixtures for learning the UI of the tools
-npm run household -- seed-demo
-npm run smoke:house-owner
-
-# Private rebook memory (optional): vendors YOU already chose externally
-npm run household -- add --name "Preferred AC Co" --category hvac --location "Austin, TX" \
-  --price 245 --membership "Bi-annual" --contact "phone/email (local only)"
-
-npm run household -- compare --text "AC maintenance under \$300 next 2 weeks"
-npm run household -- draft --text "AC tune-up next week" --provider-id <id>
-# → copy draft to email/SMS; book on their channel
+npm run smoke:job   # full HVAC + cleaning fixture path through Done + next-due
 ```
 
-`add` = **your CRM for rebook**, not onboarding the metro’s suppliers into Totbox.
+---
+
+## 4. Fast path for **my house** this week (copy-paste sequence)
+
+Use **placeholders** below. Replace with your real values only in your local chat or `.data/` — never in a git commit.
+
+### 4.1 Start the job
+
+Tool: `start_job`
+
+```json
+{
+  "intent": "AC maintenance under $300 in the next 2 weeks",
+  "provider_label": "YOUR_USUAL_HVAC_OR_SEARCH_RESULT",
+  "provider_email": "vendor@example.com"
+}
+```
+
+Save `job_id` from the response. You should see `next_action.type` ≈ `collect_field_via_host` (address) and a progress strip starting at **Details**.
+
+### 4.2 Address (Details)
+
+Tool: `update_job_facts`
+
+```json
+{
+  "job_id": "JOB_ID",
+  "service_address": "YOUR_STREET (local only — do not commit)"
+}
+```
+
+Expect `next_action.type` = `draft_for_user_approval` and a draft skeleton.
+
+### 4.3 Draft + approve send (Contact → Send)
+
+1. Host fills the draft (or you write it).  
+2. `submit_draft_for_approval` with `{ "job_id", "body", "channel": "email", "to": "..." }`  
+3. **You approve:** `record_user_approval`  
+   `{ "job_id", "kind": "send_message", "summary": "OK to send this outreach", "granted": true }`  
+4. `approve_and_send_message` with `{ "job_id", "dryRun": true }`  
+   - Dry-run is the default safety path (records the message; no silent network send).  
+   - If your host already sent via Gmail: same tool with `hostPerformed: true` after approval.
+
+Expect: strip advances toward **Hear back**; `next_action` = `await_provider_reply`.
+
+### 4.4 Paste real vendor reply (Hear back)
+
+When email/SMS arrives, paste the body:
+
+Tool: `ingest_provider_message`
+
+```json
+{
+  "job_id": "JOB_ID",
+  "body": "PASTE the vendor email/SMS text here",
+  "from": "vendor@example.com"
+}
+```
+
+**Success check:** `quotes` array has at least one entry; if the text has `$245` style prices, `priceFromUsd` is set. Optional window hints (e.g. “Tuesday 9am”) appear as `proposedWindow`.
+
+If price/window missing, refine without a directory:
+
+Tool: `normalize_quote`
+
+```json
+{
+  "job_id": "JOB_ID",
+  "price_from_usd": 245,
+  "proposed_window": "Tuesday morning"
+}
+```
+
+### 4.5 Choose price/time (Choose)
+
+```json
+{
+  "job_id": "JOB_ID",
+  "kind": "commit_money_or_time",
+  "summary": "I accept $245 on the proposed window",
+  "granted": true
+}
+```
+
+Then:
+
+```json
+{
+  "job_id": "JOB_ID",
+  "scheduled_at": "2026-07-15T09:00:00Z"
+}
+```
+
+(`confirm_appointment`)
+
+**Success check:** `status` = `scheduled`, `scheduled_at` set, progress on **Booked**, `next_action.type` = `mark_done`.  
+**Safety:** `confirm_appointment` **REFUSES** if you only approved `send_message` — money/time is a separate gate.
+
+### 4.6 Close out (Done)
+
+After the visit (or when you want the job closed):
+
+Tool: `record_job_completion`
+
+```json
+{
+  "job_id": "JOB_ID",
+  "notes": "Service done; filters replaced (no secrets)",
+  "next_due": "2027-01-15"
+}
+```
+
+**Success check:** `status` = `done`, `next_due` on the public view, progress strip shows **Done** as ✓.
+
+### 4.7 “Where am I?” anytime
+
+| Tool | Args | Look at |
+|------|------|---------|
+| `get_workflow` | `{}` | Full 8-step process |
+| `get_workflow` | `{ "job_id" }` | Live strip + role line |
+| `get_job` | `{ "job_id" }` | Same + quotes, approvals, checklist |
+| `list_jobs` | `{}` | All open jobs with strips |
+
+Browser sample (same spine, interactive): `npm run dev` → open **/workflow**.
 
 ---
 
-## 5. Fast path for a real job this week
+## 5. Cleaning variant
 
-1. Decide the job in plain language.  
-2. `create_service_brief` / `household -- compare` with that text (or draft first).  
-3. Find 1–3 companies via **Google or chat search** (outside Totbox).  
-4. Contact them with **`household -- draft`** or your own words + brief details.  
-5. When quotes return, store terms (CLI add/update or future quote-intake) and compare.  
-6. Pick one; schedule by phone/email/form; note confirmation.  
+Same tools. Example intent:
 
-No provider “signup” required.
+```text
+3hr priority clean focusing on blinds, windows, under beds, corners
+```
+
+`start_job` extracts priorities into facts when phrased that way. Paste quote replies the same way (`$180`, day/time).
 
 ---
 
-## 6. What is / isn’t automated
+## 6. What success looks like (personal verification)
+
+| Check | Pass |
+|-------|------|
+| Job created from plain language | `job_id` + checklist |
+| Address never invented | You supplied it |
+| Send blocked without approval | Without `record_user_approval`, send errors with REFUSED |
+| Dry-run send recorded | `messages` / audit show dry-run |
+| Vendor paste → quotes | `quotes[].priceFromUsd` or `normalize_quote` |
+| Book needs money/time approval | Separate grant from send |
+| Booked then Done | `scheduled` → `record_job_completion` → `done` + optional `next_due` |
+| Progress strip | `get_job` / `get_workflow` shows where you are |
+
+**Automated stand-in for the fixture path:** `npm run smoke:job` (HVAC + cleaning through Done). Your house = same sequence with real vendor paste offline.
+
+---
+
+## 7. What is / isn’t automated (Phase 1)
 
 | Step | Now |
 |------|-----|
-| Discover vendors in the city | **External** (search / AI / referral) |
-| Structure job | Yes |
-| Compare directory listings | Demo/local notes only—not the product goal |
-| Compare quotes you collected | Target core (partially via local offer fields) |
-| Send email for you | Draft only |
-| FSM dispatch | No (intentional) |
-| Payments | No |
+| Discover vendors | **External** (search / AI / referral) |
+| Job checklist + next_action | Yes |
+| Draft + dry-run send | Yes (after approval) |
+| Live Gmail/SMS send | Host tools only (`hostPerformed`) — no Totbox live adapter yet |
+| Quote from paste | Yes (+ `normalize_quote`) |
+| Confirm appointment | Yes (local record; not live Calendar write in job loop yet) |
+| Next-due on close | Yes |
+| City directory / ST multi-tenant | No (deferred) |
 
 ---
 
-## 7. Roadmap implication
+## 8. CLI helpers (optional)
 
-Prefer building **quote intake + job status + calendar + drafts** over **provider acquisition / registry SEO**.
+```bash
+npm run household -- help
+npm run seed                 # demo fixtures for compare tools only — not your house
+npm run smoke:house-owner    # legacy brief/compare smoke
+npm run smoke:job            # Phase 1 full job PM path (use this)
+```
 
-Hosted multi-user product later can stay workflow-centric (bring-your-own providers via search), not marketplace inventory.
+Private rebook notes (`household -- add`) are **your** CRM, not metro inventory.
 
 ---
 
-## 8. Privacy
+## 9. Privacy
 
-- Do not commit real addresses, personal emails, or private research.  
+- Do not commit real addresses, personal emails, phone numbers, or raw vendor threads.  
 - `.data/` is local and gitignored.  
-- [`AGENTS.md`](../AGENTS.md), [`research/README.md`](research/README.md).
+- See [`AGENTS.md`](../AGENTS.md) and [`research/README.md`](research/README.md).
 
 ---
 
-*Related: [`product_thesis.md`](product_thesis.md) · [`provider_onboarding_matrix.md`](provider_onboarding_matrix.md)*
+*Related: [`product_thesis.md`](product_thesis.md) · [`host_llm_safety.md`](host_llm_safety.md) · [`workflows/house_service_v1.md`](workflows/house_service_v1.md) · README Bootstrap roadmap*

@@ -239,22 +239,34 @@ Providers (HVAC, cleaning, tree, …)
 
 ---
 
+## Current bootstrap north star (supersedes “build everything” reading of older stages)
+
+**Mission under bootstrapping:** Prove households complete high-friction home-service jobs with fewer touchpoints via host LLM + Totbox job PM (human channels + optional Calendar). **No city directory.** Monetize only after shadow proof; ServiceTitan / multi-level provider MCP only with revenue or LOI.
+
+| Bootstrap phase | Focus | Exit |
+|-----------------|--------|------|
+| **Phase 0** | Scaffold + job PM + safety + workflow visibility | On `main` |
+| **Phase 1 (now)** | Full household loop: brief → approve send → paste quote → money/time gate → book → explicit next-due/done | Real jobs + `npm run smoke:job` + runbook for personal house |
+| **Phase 2** | Minimum revenue: structured inbound for local operators (Calendar/email) | Paid pilots |
+| **Phase 3** | Stickiness from pilot feedback | Retention + case study |
+| **Phase 4** | ST private pilot, Agentic Ready packaging, extra verticals — **funded** | Demand-driven |
+
+Historical stage numbers below remain research/annex context; **do not** treat Stages 10–11 as pre-PMF work.
+
 ## Roadmap (aligned to research + current code)
 
 | Window | Focus |
 |--------|--------|
-| **Done / in PR** | Stages 1–5 on `feat/expand-scope`: Next.js scaffold, models/store, MCP server, provider registration, Calendar OAuth + availability merge, verify/capture scaffolding |
-| **Now (plan + docs)** | v3.1 beachhead + ServiceTitan annex + persona/viral plan language |
-| **Stage 6** | Service brief + quote/compare objects; seed HVAC + cleaning providers; consumer compare UX in chat tools |
-| **Stage 7** | Trust summary stub + membership/cancel/parts fields on offers |
-| **Stage 8** | Household share / approval gate |
-| **Stage 9** | Recurring plans, next-due reminders, seasonal `get_guidance` (Oak Wilt / preventive cadence) |
-| **Stage 10a** | ServiceTitan design freeze + sandbox access checklist + per-tenant connection model |
-| **Stage 10b** | Prototype ST connector: Leads/jobs create-read + webhook stub; MCP wrappers behind flag |
-| **Stage 10c** | Pilot 1–2 ST operators; invoice pull for post-service records |
-| **Stage 11** | Dual-sided referral prompts + attribution metrics |
-| **Parallel** | Keep FEC/kids path designed but not blocking home-services validation |
-| **Later** | Lawn hybrid channels; multi-property + PM workflows; public multi-tenant ST app if needed |
+| **Done** | Stages 1–6: Next.js, store, MCP, provider registration (local), Calendar OAuth scaffold, service briefs/compare seeds, job PM + `house_service_v1` |
+| **Phase 1 (now)** | Quote-from-paste, confirm appointment, `record_job_completion` / next-due, consumer runbook for personal house verification |
+| **Phase 2** | Operator structured-inbound offer (not directory); paid design partners |
+| **Stage 7** | Trust summary stub + membership/cancel/parts fields on offers (when compare needs it) |
+| **Stage 8** | Household share / approval gate (when dual-decision households appear) |
+| **Stage 9** | Recurring plans, next-due reminders productization, seasonal `get_guidance` |
+| **Stage 10a–c** | ServiceTitan design → prototype → pilot — **after** Phase 2 revenue/LOI |
+| **Stage 11** | Dual-sided referral prompts + attribution — after core loop |
+| **Deferred** | Multi-FSM matrix; “Shopify-like” multi-level provider MCP suite; kids/FEC GTM |
+| **Later** | Lawn hybrid channels; multi-property + PM workflows |
 
 ---
 

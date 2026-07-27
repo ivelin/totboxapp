@@ -90,13 +90,25 @@ Providers (phone, email, web form, SMS)
 - Ranking/trust graph as a Yelp substitute  
 - Requiring providers to create Totbox accounts before a resident can schedule a job
 
+## Bootstrap priority (Phase 1 first)
+
+Do **not** bootstrap as a multi-level field-services agent platform (Shopify analogue). Sequence:
+
+1. **Phase 1 — household job complete** (now): intent → facts → draft → approve send → paste quote → money/time approval → confirm → explicit completion/next-due; progress strip always visible.  
+2. **Phase 2 — first revenue** after shadow proof: structured inbound for operators (or household sub).  
+3. **Phase 4 — adapters** (ST, etc.) only with cash/LOI.  
+
+Personal path: [`local_household_runbook.md`](local_household_runbook.md).  
+Rationale (agentic gap vs e‑com, venture shapes, decision rules): [`strategy/bootstrap_pmf_and_agentic_gap.md`](strategy/bootstrap_pmf_and_agentic_gap.md).  
+Roadmap table: README + [`totbox_product_spec.md`](totbox_product_spec.md).
+
 ## What we will build (priority)
 
 1. **Job + checklist PM** in MCP — durable state, `next_action` for the host LLM (see [`mcp_workflow_architecture.md`](mcp_workflow_architecture.md)).  
 2. **Full workflow visibility** — stable `house_service_v1` map; `get_workflow` / `get_job` / `list_jobs` so users always see process, position, and roles ([`workflows/house_service_v1.md`](workflows/house_service_v1.md)). Portable formats: **`totbox.workflow_def` / `totbox.workflow_progress`** + Mermaid/text projections ([`workflows/format.md`](workflows/format.md)).  
 3. **Host-LLM-maximizing tools** — templates + draft specs the host fills from memory; user approval; then send/record.  
-4. **Quote intake** — paste/email → host extracts → Totbox normalizes/compares on the job.  
-5. **Schedule workflow** — propose windows, calendar merge, confirmation tracking.  
+4. **Quote intake** — paste/email → auto hints + `normalize_quote` on the job (not a directory).  
+5. **Schedule + close** — `confirm_appointment` after money/time gate; `record_job_completion` + next-due (explicit Done).  
 6. **Human-channel outreach** — email/SMS/phone scripts; no provider registry.  
 7. **Rebook memory** — optional private “last vendor,” not a city directory.  
 8. **Local MCP/CLI** first; hosted later.
