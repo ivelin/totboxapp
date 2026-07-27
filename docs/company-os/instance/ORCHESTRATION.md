@@ -43,9 +43,9 @@ Implements Company OS synthetic research + reward/risk ranking (filter, not PMF 
 1. Load thesis / OS blueprint / prior ICPs / founder notes  
 2. Propose **exactly 5** ICP candidates (seed slate fallback if agent incomplete)  
 3. Parallel reward/risk scorecards  
-4. Parallel synthetic dialogues (3 scenarios per ICP)  
+4. Parallel synthetic dialogues (3 scenarios per ICP) + `verdict_key_factors`  
 5. Adversarial skeptic (fail-closed on `ready_for_real_world_ai`)  
-6. Write `research/icps/ROUND_*_report.md` + `FOUNDER_FEEDBACK.md`  
+6. Write `research/icps/ROUND_*_report.md` (verdict table includes **Key factors** column) + `FOUNDER_FEEDBACK.md`  
 7. **`await_user`** — founder sets `decision: iterate | agree_ready | kill`  
 8. Iterate rounds until `agree_ready` (writes `READY_FOR_REAL_WORLD.md`) or `kill`  
 
