@@ -6,6 +6,17 @@ Totbox.app helps busy families cut the chore of researching, comparing, coordina
 
 Everything happens primarily in the chat apps you already use (Grok, Claude, ChatGPT, etc.) via simple **MCP** endpoints + OAuth — not another consumer app to install.
 
+### Company OS instance
+
+This repository is **both** a product codebase **and** a living **instance** of the portable [Company Operating System](docs/company-os/) for solo founders (bootstrap mentorship blueprint).
+
+| Layer | What it is | Start here |
+|-------|------------|------------|
+| **Template** (portable method) | Principles, journey phases, synthetic research, EDD, founder gates | [`docs/company-os/operating-system.md`](docs/company-os/operating-system.md) · [`live-runtime.md`](docs/company-os/live-runtime.md) |
+| **Instance** (Totbox application) | Durable state, scores, ICPs, workflows, product gap map — steal the discipline, not the beachhead | [`docs/company-os/instance/`](docs/company-os/instance/) · [`applied-here.md`](docs/company-os/applied-here.md) · `npm run company-os -- status` |
+
+Mentees and agents: use the template for *how to decide*; treat Totbox product thesis and ICP as **one worked example**, not defaults to copy.
+
 ---
 
 ## Current beachhead (v3.1)
@@ -31,7 +42,7 @@ Everything happens primarily in the chat apps you already use (Grok, Claude, Cha
 | [`docs/product_thesis.md`](docs/product_thesis.md) | Scheduling not discovery |
 | [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md) | Broader product plan |
 | [`AGENTS.md`](AGENTS.md) | Public repo: no PII |
-| [`docs/company-os/`](docs/company-os/) | **Mentorship (isolated):** Company Operating System for solo founders — portable blueprint; Totbox is one application |
+| [`docs/company-os/`](docs/company-os/) | **Company OS:** portable template + **this repo as living instance** (see callout above) |
 
 ---
 

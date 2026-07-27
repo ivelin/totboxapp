@@ -47,6 +47,7 @@ Product phase language (“Phase 0/1/2…”) is **Totbox’s** bootstrap roadma
 | Living state machine | `npm run company-os` + `company/state/company-state.json` + `src/lib/company-os/` |
 | Instance index | [`instance/README.md`](instance/README.md) |
 | Grok loop workflow | `.grok/workflows/company-operating-loop.rhai` |
+| Synthetic ICP research | `.grok/workflows/user-research.rhai` → `research/icps/` (founder-gated rounds until `READY_FOR_REAL_WORLD.md`) |
 
 ---
 
