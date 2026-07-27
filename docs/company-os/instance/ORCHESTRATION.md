@@ -26,12 +26,29 @@ Template allows LangGraph/CrewAI as optional implementors. Upgrade when multi-ac
 
 ## Grok workflow mapping
 
-`.grok/workflows/company-operating-loop.rhai`:
+### Outer loop — `.grok/workflows/company-operating-loop.rhai`
 
 | `args.action` | Behavior |
 |---------------|----------|
-| `status` | Agent reads instance state + prints where we are |
-| `continue` | Agent runs CLI continue / stage work; `await_user` if journey gate |
+| `status` | Agent reads instance state + prints where we are; flags research stages |
+| `continue` | If loop stage 1–2 or journey 1–3 and no `research/icps/READY_FOR_REAL_WORLD.md`, **blocks** with handoff to `user-research` (override: `skip_research_handoff=true`) |
+| `user-research` | Explicit handoff card → run sibling `user-research` workflow |
 | `start` | Start or restart live loop at stage 1 |
+| `advance-journey` | Founder-gated journey advance only |
 
-Founder gates use `await_user` — not silent journey advance.
+### User research — `.grok/workflows/user-research.rhai`
+
+Implements Company OS synthetic research + reward/risk ranking (filter, not PMF proof):
+
+1. Load thesis / OS blueprint / prior ICPs / founder notes  
+2. Propose **exactly 5** ICP candidates (seed slate fallback if agent incomplete)  
+3. Parallel reward/risk scorecards  
+4. Parallel synthetic dialogues (3 scenarios per ICP)  
+5. Adversarial skeptic (fail-closed on `ready_for_real_world_ai`)  
+6. Write `research/icps/ROUND_*_report.md` + `FOUNDER_FEEDBACK.md`  
+7. **`await_user`** — founder sets `decision: iterate | agree_ready | kill`  
+8. Iterate rounds until `agree_ready` (writes `READY_FOR_REAL_WORLD.md`) or `kill`  
+
+Workflows cannot nest: outer loop **hands off**; founder runs `user-research` then resumes continue.
+
+Founder gates use `await_user` — not silent journey advance or silent ICP promotion.

@@ -16,7 +16,7 @@
 | Evals | [`evals/`](../../../evals/) |
 | Gap map (legacy) | [`../applied-here.md`](../applied-here.md) |
 | Portable template | [`../operating-system.md`](../operating-system.md) · [`../live-runtime.md`](../live-runtime.md) |
-| Grok workflow | [`.grok/workflows/company-operating-loop.rhai`](../../../.grok/workflows/company-operating-loop.rhai) |
+| Grok workflows | [`.grok/workflows/company-operating-loop.rhai`](../../../.grok/workflows/company-operating-loop.rhai) (outer) · [`.grok/workflows/user-research.rhai`](../../../.grok/workflows/user-research.rhai) (ICP synthetic rounds) |
 
 ## Where are we? (commands)
 
@@ -28,6 +28,17 @@ npm run company-os -- advance-journey          # REFUSES without --approve
 npm run company-os -- advance-journey --approve
 npm run company-os -- start
 ```
+
+### User research (synthetic ICP filter)
+
+```text
+/workflow user-research   args: { "mode": "round", "round_label": "1" }
+/workflow user-research   args: { "mode": "status" }
+# company-operating-loop action=user-research  → handoff card
+# continue on loop 1–2 / journey 1–3 blocks until research/icps/READY_FOR_REAL_WORLD.md
+```
+
+Founder loop: read `research/icps/ROUND_*_report.md` → edit `FOUNDER_FEEDBACK.md` (`iterate` | `agree_ready` | `kill`) → resume workflow.
 
 ## Layout vs template categories
 

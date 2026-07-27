@@ -1,33 +1,37 @@
 let meta = #{
     name: "company-operating-loop",
-    description: "Inspect or advance the Totbox company OS living instance (status / continue / start); founder gates for journey phase",
+    description: "Inspect or advance the Totbox company OS living instance (status / continue / start); hands off to user-research on research/validation stages; founder gates for journey phase",
     when_to_use: "When working the company operating system loop: where are we, continue a stage, or start a new live loop cycle",
     phases: [
         #{ title: "Inspect", detail: "Read instance state and open questions" },
+        #{ title: "Research handoff", detail: "When loop/journey is in research-validation, require user-research workflow" },
         #{ title: "Act", detail: "status report, continue loop, or start loop" },
         #{ title: "Gate", detail: "Founder approval if journey advance is requested" },
     ],
 };
 
-// args.action: "status" | "continue" | "start" | "advance-journey" (default status)
+// args.action: "status" | "continue" | "start" | "advance-journey" | "user-research" (default status)
 // args.approve_journey: true only when founder already approved journey advance
 // args.note: optional string
 // args.signal: optional product signal for run-stage
+// args.skip_research_handoff: true only to bypass research gate (founder override)
 
 let action = "status";
 let approve_journey = false;
 let note = "";
 let signal = "";
+let skip_research_handoff = false;
 
 if args != () {
     if args.action != () { action = args.action; }
     if args.approve_journey == true { approve_journey = true; }
     if args.note != () { note = args.note; }
     if args.signal != () { signal = args.signal; }
+    if args.skip_research_handoff == true { skip_research_handoff = true; }
 }
 
-if action != "status" && action != "continue" && action != "start" && action != "advance-journey" {
-    pause("verification", "args.action must be status | continue | start | advance-journey");
+if action != "status" && action != "continue" && action != "start" && action != "advance-journey" && action != "user-research" {
+    pause("verification", "args.action must be status | continue | start | advance-journey | user-research");
 }
 
 phase("Inspect");
@@ -79,6 +83,36 @@ if insp.output.recommended_next != () { rec_s = insp.output.recommended_next; }
 
 log("Inspected company OS: journey=" + jph.to_string() + " loop=" + lst.to_string() + " gate=" + gate_s);
 
+// Research / product-idea validation stages (Company OS live loop 1-2, or early journey)
+// Workflows cannot nest; hand off to sibling workflow `user-research`.
+let needs_user_research = false;
+if lst == 1 || lst == 2 { needs_user_research = true; }
+if jph >= 1 && jph <= 3 { needs_user_research = true; }
+
+phase("Research handoff");
+
+if action == "user-research" {
+    let ur_msg = "";
+    ur_msg += "Launch the sibling workflow **user-research** (project: .grok/workflows/user-research.rhai).\n\n";
+    ur_msg += "Suggested args: { \"mode\": \"round\", \"round_label\": \"1\" }\n";
+    ur_msg += "Optional: founder_notes, max_rounds (1-5).\n\n";
+    ur_msg += "That workflow: proposes 5 ICPs → reward/risk scorecards → synthetic dialogues →\n";
+    ur_msg += "adversarial challenge → report under research/icps/ → founder FOUNDER_FEEDBACK.md gate →\n";
+    ur_msg += "iterate until decision agree_ready (writes READY_FOR_REAL_WORLD.md) or kill.\n\n";
+    ur_msg += "After agree_ready, re-run company-operating-loop with action=continue.\n";
+    ur_msg += "Current cursor: journey=" + jph.to_string() + " loop=" + lst.to_string() + ".\n";
+    let urp = write_scratch_file("company-os-user-research-handoff.md", ur_msg);
+    await_user("user", ur_msg);
+    complete(#{
+        action: "user-research",
+        path: urp,
+        journey_phase: jph,
+        loop_stage: lst,
+        message: "Handoff: run workflow user-research, then resume company loop.",
+        handoff_workflow: "user-research",
+    });
+}
+
 phase("Act");
 
 if action == "status" {
@@ -89,7 +123,12 @@ if action == "status" {
     report += "- loop_stage: " + lst.to_string() + "\n";
     report += "- gate: " + gate_s + "\n";
     report += "- recommended_next: " + rec_s + "\n";
+    report += "- research_stage_flag: " + needs_user_research.to_string() + "\n";
     report += "\nCLI: npm run company-os -- status\n";
+    if needs_user_research {
+        report += "\n**Research/validation stage:** run workflow `user-research` (or company-operating-loop action=user-research).\n";
+        report += "Artifacts: research/icps/ROUND_*_report.md, FOUNDER_FEEDBACK.md, READY_FOR_REAL_WORLD.md\n";
+    }
     let p = write_scratch_file("company-os-status.md", report);
     complete(#{
         action: "status",
@@ -98,6 +137,7 @@ if action == "status" {
         loop_stage: lst,
         gate: gate_s,
         summary: sum_s,
+        needs_user_research: needs_user_research,
     });
 }
 
@@ -157,6 +197,77 @@ if action == "start" {
 }
 
 if action == "continue" {
+    // When in research/validation stages, require user-research unless ready marker or skip
+    if needs_user_research && !skip_research_handoff {
+        let ready_check_schema = #{
+            "type": "object",
+            "required": ["ready_marker", "summary"],
+            "properties": #{
+                "ready_marker": #{ "type": "boolean" },
+                "summary": #{ "type": "string" },
+                "latest_report": #{ "type": "string" },
+            },
+        };
+        let rc_p = "";
+        rc_p += "Check whether Totbox synthetic user research is complete enough to advance past research stages.\n";
+        rc_p += "Read with tools (do not invent):\n";
+        rc_p += "- research/icps/READY_FOR_REAL_WORLD.md (ready_marker=true only if file exists and founder agreed)\n";
+        rc_p += "- research/icps/FOUNDER_FEEDBACK.md and latest ROUND_*_report.md if present\n";
+        rc_p += "Return ready_marker, summary, latest_report path or empty string.\n";
+        let rchk = agent(rc_p, #{
+            label: "cos-research-ready-check",
+            capability_mode: "read-only",
+            output_schema: ready_check_schema,
+        });
+        let is_ready = false;
+        let rsum = "research readiness unknown";
+        if rchk != () && rchk.success && rchk.output != () {
+            if rchk.output.ready_marker == true { is_ready = true; }
+            if rchk.output.summary != () { rsum = rchk.output.summary; }
+        }
+        if !is_ready {
+            let hand = "";
+            hand += "Company OS continue blocked: loop/journey is in RESEARCH or VALIDATION territory\n";
+            hand += "(loop_stage " + lst.to_string() + ", journey_phase " + jph.to_string() + ").\n\n";
+            hand += "Readiness check: " + rsum + "\n\n";
+            hand += "Run sibling workflow **user-research** until founder decision agree_ready\n";
+            hand += "(creates research/icps/READY_FOR_REAL_WORLD.md).\n\n";
+            hand += "How:\n";
+            hand += "1) /workflow user-research with args {\"mode\":\"round\",\"round_label\":\"1\"}\n";
+            hand += "   or company-operating-loop action=user-research for the handoff card\n";
+            hand += "2) Review research/icps/ROUND_*_report.md; edit FOUNDER_FEEDBACK.md; resume until agree_ready\n";
+            hand += "3) Re-run company-operating-loop continue\n\n";
+            hand += "Override only if intentional: args.skip_research_handoff=true\n";
+            write_scratch_file("company-os-research-blocked.md", hand);
+            await_user("user", hand);
+            // After resume, re-check once; if still not ready, complete with blocked (do not silently advance)
+            let rchk2 = agent(rc_p, #{
+                label: "cos-research-ready-recheck",
+                capability_mode: "read-only",
+                output_schema: ready_check_schema,
+            });
+            let is_ready2 = false;
+            let rsum2 = rsum;
+            if rchk2 != () && rchk2.success && rchk2.output != () {
+                if rchk2.output.ready_marker == true { is_ready2 = true; }
+                if rchk2.output.summary != () { rsum2 = rchk2.output.summary; }
+            }
+            if !is_ready2 {
+                complete(#{
+                    action: "continue",
+                    ok: false,
+                    message: "Blocked pending user-research agree_ready: " + rsum2,
+                    journey_phase: jph,
+                    loop_stage: lst,
+                    gate: gate_s,
+                    handoff_workflow: "user-research",
+                    needs_user_research: true,
+                });
+            }
+            log("Research ready marker present after handoff; proceeding with continue");
+        }
+    }
+
     let cont_prompt = "";
     cont_prompt += "Continue the Totbox company OS live loop by ONE stage.\n";
     cont_prompt += "1) Optionally run stage work: npm run company-os -- run-stage\n";
@@ -165,6 +276,7 @@ if action == "continue" {
     }
     cont_prompt += "2) Then: npm run company-os -- continue\n";
     cont_prompt += "3) Re-read company/state/company-state.json\n";
+    cont_prompt += "If research/icps/READY_FOR_REAL_WORLD.md exists, mention it in message.\n";
     cont_prompt += "Report ok, message, journey_phase, loop_stage, gate, cli_ran.\n";
     cont_prompt += "Do NOT run advance-journey. Do NOT increase journey_phase.\n";
     cont_prompt += "If gate is waiting_for_founder, set ok=false and explain founder is needed.\n";
@@ -197,6 +309,7 @@ if action == "continue" {
         journey_phase: cj,
         loop_stage: cl,
         gate: cg,
+        needs_user_research: needs_user_research,
     });
 }
 

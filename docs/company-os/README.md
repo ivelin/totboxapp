@@ -12,7 +12,8 @@ It is a **living mentorship blueprint**: best practices and lessons for solo fou
 | [`applied-here.md`](applied-here.md) | **Instance only** — Totbox hypothesis, architecture, gap analysis (not the template) |
 | [`instance/`](instance/) | **Living Totbox instance index** — state pointer, scores, orchestration, thesis snapshot |
 | CLI | `npm run company-os -- status` — durable state machine entry (`company/scripts/`) |
-| Workflow | `.grok/workflows/company-operating-loop.rhai` — Grok Build loop (status/continue/start) |
+| Workflow | `.grok/workflows/company-operating-loop.rhai` — outer loop (status/continue/start/user-research handoff) |
+| User research | `.grok/workflows/user-research.rhai` — multi-round synthetic ICP filter + founder gates → `research/icps/` |
 | Repo layout | Template categories at root: `company/`, `research/`, `product/`, `evals/`, `traces/`, `growth/`, `support/`, `infrastructure/`, `docs/` |
 
 ---
