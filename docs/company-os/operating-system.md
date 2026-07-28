@@ -1,8 +1,8 @@
 # Company Operating System  
 ## For Solo Founders in Bootstrapping Mode
 
-**Version:** 2.3  
-**Last Updated:** 2026-07-27  
+**Version:** 2.5  
+**Last Updated:** 2026-07-28  
 **Status:** Living guideline (blueprint — not any one company’s live runtime)  
 **Audience:** Independent solo founders; mentors (e.g. Founder Institute, SCORE); AI helpers instructed to follow this system  
 **Isolation:** Portable across startups. Totbox-specific application lives in [`applied-here.md`](applied-here.md) only.  
@@ -40,7 +40,7 @@ Some principles may be useful inside larger companies. Those environments have a
 | **Mentee** | Adopt the OS in *your* repo; replace every product example with *your* thesis and tests. |
 | **AI (any host)** | Follow the blueprint + [`ai-instructions.md`](ai-instructions.md). Treat other folders in a host repo as that company’s product, not as universal law. |
 
-**Golden rule for extraction:** Copy *process and control*. Do not copy another founder’s market, ICP, feature list, or “current hypothesis” as yours.
+**Golden rule for extraction:** Copy *process and control*. Do not copy another founder’s market, customer group, feature list, or “current hypothesis” as yours.
 
 ---
 
@@ -109,7 +109,7 @@ The early phases are not a formality. They exist to stop you from building the w
 You must:
 
 1. Form a clear thesis (what problem, for whom, why now, why you).
-2. Generate several possible customer groups (ICPs) — not one favorite.
+2. Generate several possible customer groups — not one favorite.
 3. Test those groups with synthetic research (AI simulations of realistic people).
 4. Rank them honestly by pain, willingness to act or pay, and how well you can reach them.
 5. Do real-world conversations and small tests with actual people.
@@ -127,15 +127,15 @@ Any “current focus” in a real company is only a **hypothesis that has surviv
 
 | # | Simple phase (primary) | Formal alias | Exit signal (simple) |
 |---|------------------------|--------------|----------------------|
-| 1 | Form thesis and list possible customer groups | Ideation & Opportunity Framing | Written thesis + ≥3 ICP candidates |
-| 2 | Define what success looks like for each group | Vision, Mission & ICP Definition | Clear metrics / “done means…” per group |
-| 3 | Synthetic research and first validation | Customer Discovery & Problem Validation *(synthetic leg)* | Ranked groups with written evidence notes |
-| 4 | Real-world research and validation | Customer Discovery *(real leg)* + start of Solution & Monetization Validation | Conversations/tests; weak groups demoted; reward/risk notes |
-| 5 | Design the simplest system that can test the winner | Architecture & Agentic System Design | One tiny slice + pass/fail rules + human gates |
+| 1 | Form thesis and list possible customer groups | Ideation & Opportunity Framing | Written thesis + at least 3 customer-group candidates |
+| 2 | Define what success looks like for each group | Vision, Mission & Customer Definition | Clear metrics / “done means…” per group |
+| 3 | Synthetic research and first validation | Customer Discovery & Problem Validation *(synthetic leg)* | Ranked groups with written evidence notes; promote still **hold** |
+| 4 | Real-world research and validation | Customer Discovery *(real leg)* + start of Solution & Monetization Validation | Real interest tests and/or conversations; weak groups demoted; see [next pack](#after-synthetic-ranking-the-next-pack) |
+| 5 | Design the simplest system that can test the winner | Architecture & Agentic System Design | One tiny slice + pass/fail rules + human gates; light synthetic product sandbox often runs here in parallel with phase 4 |
 | 6 | Build a tiny slice and test it hard | Build (Evaluation-Driven Development) | Slice runs end-to-end (fixture/sim OK); gate scores |
 | 7 | Try it with real or realistic users | Test, Synthetic Evaluation & Early Launch | Observed behavior, not only compliments |
 | 8 | Learn from what happens and improve | Traction, Feedback & Continuous Learning | Decision traces + score movement |
-| 9 | Grow only after it clearly works | Scale & Expansion (post clear PMF) | Proof of value or payment; then expand |
+| 9 | Grow only after it clearly works | Scale & Expansion (after clear product–market fit) | Proof of value or payment; then expand |
 
 **Monetization stress** (will they pay / which path?) lives mainly in journey phases **4–5** and in ongoing reward/risk scorecards — not as a separate tenth phase.
 
@@ -159,6 +159,34 @@ How these phases sit on top of the continuous compute loop (and persistent state
 
 ## How to Do Honest Research & Validation
 
+Research has three jobs that must not be mixed up:
+
+1. **Filter** cheaply with synthetic work (AI-modeled customers).  
+2. **Ground** market claims in outside facts when you can.  
+3. **Prove** with real people and real behavior before heavy building.
+
+### Label every claim (what kind of evidence is this?)
+
+Every important finding should carry **one** label. Use plain words so you never confuse a simulation with a sale.
+
+| Label | Meaning | May be used as… |
+|-------|---------|-----------------|
+| **Outside facts** | Grounded in public or third-party sources (rules, filings, published data, on-the-record quotes) | Context for “why now” and market pressure |
+| **Company signals** | Reaction to something true about *your* company (founder background, real pilots, real product behavior) | Trust and credibility tests only if the signal is real |
+| **Assumed capability** | Valid **only if** a feature, security control, or process you do not fully have yet is treated as real | A build priority hypothesis — **not** proof you already have it |
+| **Needs real-world proof** | Cannot be settled by AI-modeled people alone (demand, price they will pay, security approval, purchase) | Interview and pilot design only |
+
+**Front-matter for any synthetic pack** (copy at the top of the file):
+
+```text
+What this is: AI-modeled customer responses used as a filter.
+What this is not: proof of demand, willingness to pay, or a real purchase.
+Outside facts are labeled separately. Everything else is a hypothesis to confirm or break with real people.
+```
+
+Older shorthand `synthetic` | `real` | `mixed` on traces is still fine for run type.  
+For **claims inside a report**, prefer the four labels above so “assumed capability” cannot hide as “real.”
+
 ### Synthetic research (fast first filter)
 
 Use AI to create realistic customer profiles and run conversations or scenarios with them.
@@ -174,30 +202,240 @@ Ask:
 Do this for **several** customer groups, not just the one you like.  
 Synthetic research is fast and cheap. It is also imperfect. Treat it as a useful **filter**, not final proof.
 
+### Staged trust reveal (how synthetic trust actually moves)
+
+If you score trust, adoption interest, or purchase interest with synthetic people, do **not** show them everything at once. Reveal in stages and score after each stage:
+
+| Stage | What you show | Why |
+|-------|----------------|-----|
+| **1. Baseline** | Problem and offer only — no founder story, no traction claims, no product magic you do not have | Measures whether the idea is clear and relevant on its own |
+| **2. Founder story** | Who you are and why you understand this problem (truthful only) | Isolates whether *you* earn attention |
+| **3. Company signals** | Only real traction or proof you already have | Isolates whether the *company* earns a serious next step |
+| **4. Assumed capability** | Features or controls you might build, clearly labeled as “if we had this” | Isolates what to build next — not what already exists |
+
+**Reading rule:** Score **movement** between stages matters more than any single absolute score.  
+A high final score that only appears after assumed capability means “build and re-test,” not “customers already want this.”  
+Simulated prices and “I would buy” lines stay labeled **needs real-world proof**.
+
+### Outside market facts (supports vs does not establish)
+
+When you write or review market claims (deadlines, growth rates, competitor moves):
+
+| Write explicitly | Purpose |
+|------------------|---------|
+| **What the evidence supports** | Claims that survive contact with sources (with links or citations) |
+| **What the evidence does not establish** | Gaps, disagreements between sources, or leaps from “market is big” to “they will buy from me” |
+
+Do not quote one vendor forecast as a hard fact when several sources disagree. Prefer a **range** and a **directional** claim you can defend.  
+A strong market story is still not primary-focus promotion without customer evidence.
+
 ### Real-world research (required before heavy building)
 
 - Talk to real people in the groups that looked strongest.
 - Watch what they actually do, not only what they say.
-- Run small tests (price conversations, manual “concierge” delivery, simple landing pages, waitlists with friction, etc.).
+- Run small tests (price conversations, manual “concierge” delivery, interest pages with waitlists, etc.).
 - Look for clear signals that the problem is real and that people will take action.
+- Carry forward open questions from synthetic work; design tests that can **break** your favorite story.
+
+After you have a ranked synthetic research report, use the **next pack** below instead of jumping straight to a big build.
 
 ### Ranking rule
 
 Only promote a customer group to **primary focus** if both synthetic and real-world evidence support it **and** the reward/risk scorecard looks manageable for a solo founder at the current stage (see next section).  
-If evidence is weak, keep looking or kill the idea. Do not protect an idea just because you have already spent time on it.
+If evidence is weak, keep looking or kill the idea. Do not protect an idea just because you have already spent time on it.  
+Multi-group research is not multi-group go-to-market: **rank, demote, and hold** until promotion criteria are met.
 
 ---
 
-## Reward / Risk Thinking & ICP Ranking
+## After Synthetic Ranking: The Next Pack
+
+When user research has produced **ranked customer groups** (still with promote = **hold**), do **not** jump to a large product or a multi-cohort sales push.  
+Run a **next pack** with two tracks. They answer different questions and may run **in parallel** or one after the other.
+
+| Track | Question it answers | Evidence label |
+|-------|---------------------|----------------|
+| **A. Light synthetic product sandbox** | Is the product **capable enough yet** on a thin path under messy, multi-person conditions? | Synthetic product feasibility — **not** demand |
+| **B. Real interest tests** | Will real people take a small step (waitlist, reply, book a call)? | Early real signal — **not** proof they will pay or stay |
+
+Both are **filters**. Neither alone unlocks primary-focus promotion or “ship and scale.”
+
+```text
+Ranked synthetic groups (promote = hold)
+        │
+        ├──────────────────────────────┐
+        ▼                              ▼
+A. Light synthetic product         B. Real interest tests
+   sandbox (feasibility)              (waitlist / outreach / …)
+        │                              │
+        └──────────────┬───────────────┘
+                       ▼
+              Founder gate (iterate / hold / deepen build)
+                       │
+                       ▼
+              Tiny real slice + keep sandbox as eval harness
+```
+
+### Track A — Light synthetic product sandbox (feasibility)
+
+A **completely simulated, isolated** run of a baseline product path. No real customers. No real outbound messages by default. No production side effects.
+
+**Purpose:** answer *“Is the product capable enough yet?”* under realistic mess — not “Do people want this?” (that is Track B and later real proof).
+
+This is **product feasibility evaluation**. You stress the thin slice the way the real world will: many steps, many people, imperfect information. A pretty demo that only works on a happy path is not a pass.
+
+**What “feasible” means here**
+
+The product (often including an AI assistant) must hold a **useful thread of work** to a defined end state **without** the founder silently fixing everything off-stage.
+
+Typical stresses to encode as scenarios (pick what your product actually faces):
+
+| Stress | What you are testing |
+|--------|----------------------|
+| **Long-running work** | Context survives hours or days, not one chat turn |
+| **Multiple channels** | Email, SMS, chat, forms, or voice notes — same job, switched midstream |
+| **Multiple people** | User, co-decider, provider/operator, and handoffs between their staff |
+| **Different language styles** | Formal vs terse vs slang; incomplete sentences; mixed languages if relevant |
+| **Handoffs and triage** | “I’ll pass you to scheduling” / new employee who lacks prior context |
+| **Miscommunication** | Ambiguous replies, talking past each other, conflicting instructions |
+| **Lost or wrong notes** | Missing thread, outdated address, wrong date, invented detail |
+| **Recovery** | Product notices the gap, asks, escalates, or re-states truthfully |
+
+*Domain example (not a required market):* an assistant helping a household manager coordinate a service job while the provider side triages and hands the thread between employees. The sandbox asks whether the assistant can stay coherent across channels and people — or whether it is **not ready yet**.
+
+**Who you simulate**
+
+1. **Each customer group still on the board** from the research report (same group ids as research — synthetic continuity).  
+2. For every group, a **small cast of synthetic people** drawn from the **roles on the real product path** — not your whole company org chart forever.  
+   Examples of path roles (rename for your domain): end user, second decision-maker, provider or operator, front-line employee, supervisor who takes a handoff, reviewer who can say no.  
+3. Prefer a **sample** of each role type (one typical + one difficult), not dozens of near-duplicates.  
+4. Sample **behavior styles** as well as job titles (careful, rushed, hostile, vague).
+
+**Depth rule (stay light)**
+
+| Group rank | Sandbox depth |
+|------------|----------------|
+| Top 1–2 test priority | Full baseline path + hard multi-person / multi-channel cases |
+| Other groups still “hold” | Short baseline only: does the path apply? |
+| Explicitly demoted / kill | Skip or one-line note why out of scope |
+
+**What to run (per group you include)**
+
+Define **one thin end-to-end baseline** (same shape as the first tiny slice):
+
+```text
+Trigger → core steps (may span time and channels) → clear next human action or terminal state
+```
+
+Then run at least:
+
+1. Happy path  
+2. Messy or incomplete input  
+3. Stuck / needs human help  
+4. One adversarial or “status quo is fine” case  
+5. **Capability stress** (when the product is multi-party or multi-channel): handoff, context switch, or wrong/lost information  
+
+Write **pass/fail** before you run — including what counts as “held the thread” vs “lost the plot.”  
+Record decision traces. Re-use scenario ids later in the real evaluation harness ([`live-runtime.md`](live-runtime.md)).
+
+**Sandbox rules**
+
+1. **Isolated** — fake data only; dry-run by default; nothing that can email, charge, or change a real account.  
+2. **End-to-end for the thin path** — not a full platform.  
+3. **Same personas / group ids** as research when possible.  
+4. **Assumed capability stays labeled** — if the sim pretends a feature exists, mark those results **assumed capability**.  
+5. **Fail closed on capability** — if success needs constant founder interpretation, secret re-prompts, or ignoring bad handoffs, the product is **not capable enough yet**.  
+6. **Honest scoreboard** — separate “path is clear” from “AI/product held up under mess.” A clear path with a weak assistant is still a fail for ship-readiness of that assistant.
+
+**Outputs (minimum)**
+
+```text
+Sandbox id / date:
+Customer groups covered:
+Path roles simulated (and styles):
+Channels and time span exercised:
+Scenario ids + pass/fail:
+Capability verdict: capable enough for thin path / not yet / unknown:
+Where humans must approve:
+Where context was lost, invented, or handed off badly:
+What to change in product or slice before real build:
+Evidence label: synthetic product feasibility (not demand)
+```
+
+### Track B — Real interest tests (waitlist and friends)
+
+Small **real-world** steps that measure whether people will act at all — not whether they will pay forever.
+
+**Purpose:** interest and channel signal under the **needs real-world proof** label for demand and price.
+
+**Typical tools (pick what fits; mix is fine)**
+
+| Means | Examples |
+|-------|----------|
+| **Page + waitlist** | Simple landing page; email or SMS list; friction (who they are, what problem) |
+| **Organic** | Communities, content, personal network, referrals |
+| **Social** | Posts with a clear next step |
+| **In person** | Events, local boards, warm intros |
+| **Paid** | Small, capped ad tests only after the offer text is clear |
+| **Direct** | Outreach that asks for a reply, call, or pilot brief |
+
+**Rules**
+
+1. **One primary message per test group** — do not run five unrelated brand stories at once.  
+2. **Measure behavior**, not compliments: signup, reply, booked call, submitted brief.  
+3. **Write decision thresholds before you spend** (example: “if fewer than X qualified signups in Y days on Z spend, iterate message or demote channel”).  
+4. **Cap paid spend** until a thin offer has passed at least one honest real conversation or sandbox feasibility check.  
+5. **Waitlist ≠ willingness to pay.** Treat it as early interest. Price and payment stay open questions.  
+6. **Lawful capture only** — consent, no spam, public-safe notes in public repos.
+
+**Outputs (minimum)**
+
+```text
+Test id / date:
+Customer group targeted:
+Channel(s) used:
+Offer / page link (if any):
+What people did (counts + examples, redacted):
+Cost (time and money):
+Pass / iterate / stop vs your pre-written thresholds:
+Evidence label: real interest signal (not product-market fit)
+```
+
+### How to sequence A and B
+
+| Pattern | When it fits |
+|---------|----------------|
+| **Parallel** (default for many solo founders) | Sandbox nights / AI time; interest tests when humans are reachable |
+| **Sandbox first** | Path is unclear or multi-step; you would be embarrassed to show a broken story |
+| **Interest first** | Message and channel are the open questions; the first offer is mostly concierge |
+
+Do **not** wait for a perfect multi-actor simulated world before talking to anyone.  
+Do **not** scale ads while the thin path fails every sandbox run.
+
+### Founder gate before heavy build
+
+After the next pack has produced artifacts, decide explicitly:
+
+| Decision | Meaning |
+|----------|---------|
+| **Iterate** | Fix slice, message, or ranking; re-run A and/or B |
+| **Hold** | Interesting but weak signal; no big build or big spend |
+| **Deepen build** | Thin real slice + keep sandbox scenarios as the evaluation harness |
+| **Kill** | Kill criteria hit for the hypothesis or the top group |
+
+Primary-focus **promotion** still requires the full promotion rule (synthetic + real + manageable risk) — a green sandbox and a fat waitlist are helpful, not sufficient.
+
+---
+
+## Reward / Risk Thinking & Customer Group Ranking
 
 Not every customer group is equally attractive for a bootstrapped solo founder.  
-When ranking ICPs, write down **both** sides. A simple scorecard beats a vague feeling that “this group seems good.”
+When ranking groups (sometimes called ideal customer profiles), write down **both** sides. A simple scorecard beats a vague feeling that “this group seems good.”
 
 ### Reward side
 
 - How painful and frequent is the problem?
 - How clearly will people pay or take action?
-- How large is the **reachable** market for a solo founder (not the fantasy TAM slide)?
+- How large is the **reachable** market for a solo founder (not a fantasy total-market slide)?
 - How well does the solution fit the channels you can actually operate today?
 
 ### Risk side
@@ -218,16 +456,30 @@ Only promote a group to primary focus when:
 
 Improving scores on a **weak** hypothesis is less valuable than finding a stronger hypothesis.
 
-Suggested one-row scorecard (copy per ICP):
+### Scorecard (copy per customer group)
+
+Use this for ranking and promotion. Messaging fields are optional; they do **not** replace reward/risk or kill criteria.
 
 ```text
-ICP:
+Customer group:
 Reward notes (pain, pay, reach, channel fit):
 Risk notes (reach cost, hand-holding, messiness, legal, time-to-signal):
-Synthetic evidence (date, summary):
+Synthetic evidence (date, summary, evidence labels used):
 Real evidence (date, summary):
-Rank (1 = best) / Promote? (yes/no/hold):
-Kill criteria for this ICP:
+Rank (1 = best test priority) / Promote? (yes / no / hold):
+Kill criteria for this group:
+
+Optional — what to say (for interview and outreach tests only):
+  Main pain (in their words):
+  Language that seems to work:
+  Main objection:
+  Proof they would need:
+  Clear next step to offer:
+  Price or offer range to test (hypothesis only — needs real-world proof):
+
+Optional — next pack (after ranking):
+  Sandbox baseline path pass/fail (date):
+  Real interest test result (date, channel, behavior counts):
 ```
 
 ---
@@ -282,6 +534,35 @@ Consider adding someone when **all** of the following hold:
 
 Document the decision either way.
 
+### Virtual office (how company work is divided)
+
+You do not need a big team. You **do** need honest labels for who or what does each job today.  
+This is about **company functions** (research, sales, product, finance), not product agents inside the app.
+
+For each important function, keep a short card:
+
+```text
+Function name:
+Job (one sentence):
+Who does it today:
+  - Founder owns it
+  - AI helps (drafts or research only — human still decides)
+  - Open (not staffed yet — hire or fill later)
+What goes in:
+What comes out:
+What we do this week:
+Who must approve before anything goes external:
+```
+
+Rules:
+
+1. **No fake staffing.** Do not label a box “Marketing Bot” or “Research Agent” as if a person exists. If AI helps, say so and name the human who approves.  
+2. **One human gate per external claim.** Market numbers, customer promises, and public posts need a named person (usually you).  
+3. **Hire on a trigger, not a date.** Write what must be true before a hire makes sense (for example: “paid customers exceed white-glove founder time”), not only “hire in Q3.”  
+4. **Outputs beat org charts.** Each function should hand something concrete to the next (brief, scorecard, pilot, decision trace).
+
+A one-page virtual office plus the control plane answers “Where are we?” better than a title-heavy chart of empty roles.
+
 ---
 
 ## Decision Traces & Learning Loop
@@ -301,7 +582,7 @@ These **decision traces** are the memory of the company. They serve three purpos
 
 When real users interact with the product, their decisions, approvals, rejections, and outcomes should feed back into:
 
-- Customer profiles (ICPs / personas)  
+- Customer profiles (groups / personas)  
 - Success criteria and thresholds  
 - Ranking of hypotheses  
 - Improvement of the agents / product behavior itself  
@@ -316,7 +597,7 @@ Date:
 Journey phase / loop stage:
 Decision:
 Options considered:
-Evidence used (synthetic | real | mixed):
+Evidence used (run type: synthetic | real | mixed; claim labels if needed):
 Choice:
 Expected outcome:
 Actual outcome (fill later):
@@ -358,7 +639,7 @@ your-startup/
     company-os/           # Blueprint + live-runtime (or link)
     thesis.md             # Current thesis (hypothesis, not gospel)
     open-questions.md
-  research/               # ICPs, personas, validation notes
+  research/               # customer groups, personas, validation notes
   product/ or app/        # What you ship
   evals/ or tests/        # Automated + synthetic scenario tests
   traces/ or docs/decisions/
@@ -383,6 +664,13 @@ These are **company-design** principles, not a mandate to build any particular p
 
 ### Multi-agent thinking (keep simple)
 
+Two different maps — do not mix them:
+
+| Map | What it describes | Where |
+|-----|-------------------|--------|
+| **Virtual office** | Company functions and who runs them today | Control plane (above) |
+| **Product roles** | Specialized jobs *inside* what customers use | This section |
+
 Inside the product it is often useful to think in **specialized roles** rather than one giant agent. Example role *types* (rename for your domain):
 
 | Role type | Job |
@@ -394,7 +682,7 @@ Inside the product it is often useful to think in **specialized roles** rather t
 | Escalator | Knows when to ask the human for help |
 
 These can be separate agents or clear responsibilities inside a larger system.  
-What matters: each role has **clear success criteria** and leaves **decision traces**.
+What matters: each role has **clear success criteria**, leaves **decision traces**, and escalates high-stakes steps to a human.
 
 ### Channel principle
 
@@ -451,15 +739,18 @@ I stay in final control of strategy, journey phase changes, and important decisi
 Hard rules you must follow:
 1. Never advance a journey phase without my explicit approval.
 2. Never treat an early idea or customer group as proven until both synthetic and real-world evidence support it.
-3. Always be able to tell me clearly where we are (journey phase + live loop stage), what evidence we have, and what the next gate is.
-4. When an important decision needs human judgment, say so directly.
-5. Prefer small, honest tests and evaluation-driven increments (Spec → Harness → Implement → Gate) over big unmeasured builds.
-6. Record the reason for important actions (decision traces); close stage 7 (memory update) after meaningful runs.
-7. Answer me in plain language I can understand.
-8. Surface recommended human interjections when judgment is high-leverage (including autonomy levels and monetization path).
-9. Keep reward/risk thinking visible when ranking customer groups or monetization paths.
-10. Do not import another company's product thesis or market as mine unless I explicitly adopt it.
-11. Treat LangGraph/CrewAI/etc. as optional implementors of the live loop — principles first, framework second.
+3. Label claims honestly: outside facts, company signals, assumed capability, or needs real-world proof.
+   Never treat simulated prices or "I would buy" as demand.
+4. Always be able to tell me clearly where we are (journey phase + live loop stage), what evidence we have, and what the next gate is.
+5. When an important decision needs human judgment, say so directly.
+6. Prefer small, honest tests and evaluation-driven increments (Spec → Harness → Implement → Gate) over big unmeasured builds.
+7. After ranked synthetic research, prefer the next pack: light synthetic product sandbox and/or real interest tests before a heavy build.
+8. Record the reason for important actions (decision traces); close stage 7 (memory update) after meaningful runs.
+9. Answer me in plain language I can understand. Avoid cryptic abbreviations.
+10. Surface recommended human interjections when judgment is high-leverage (including autonomy levels and monetization path).
+11. Keep reward/risk thinking visible when ranking customer groups or monetization paths.
+12. Do not import another company's product thesis or market as mine unless I explicitly adopt it.
+13. Treat agent frameworks as optional implementors of the live loop — principles first, framework second.
 
 If you are unsure, ask me. Do not guess on strategy or protect weak ideas.
 ```
@@ -471,7 +762,7 @@ If you are unsure, ask me. Do not guess on strategy or protect weak ideas.
 **Do not fill this section with someone else’s business.**  
 In *your* company runtime, keep a short hypothesis file (e.g. `docs/thesis.md`) with:
 
-1. **Who** you help (primary ICP candidate)  
+1. **Who** you help (primary customer-group candidate)  
 2. **What pain** you address  
 3. **How** you help (one sentence)  
 4. **Why now / why you**  
@@ -482,7 +773,7 @@ For how one real project currently states its hypothesis under this OS, see [`ap
 
 ### First tiny slice (template)
 
-For the primary ICP, define **one** slice that can fail fast. Before building, write:
+For the primary customer group, define **one** slice that can fail fast. Before building, write:
 
 | Artifact | Content |
 |----------|---------|
@@ -495,7 +786,7 @@ For the primary ICP, define **one** slice that can fail fast. Before building, w
 
 Every run should leave decision traces.
 
-If the slice works **and** the customer hypothesis still holds, define the **next small increment** with the **same checklist** (do not drop EDD discipline).
+If the slice works **and** the customer hypothesis still holds, define the **next small increment** with the **same checklist** (do not drop evaluation-driven discipline).
 
 ---
 
@@ -534,9 +825,9 @@ Adjust names to your domain; keep them honest. Track them over time. Prefer **st
 
 | Score | What it asks |
 |-------|----------------|
-| **Reward vs risk** | Overall attractiveness of the current primary ICP (scorecard) |
+| **Reward vs risk** | Overall attractiveness of the current primary customer group (scorecard) |
 | **Early-revenue attractiveness** | Rank derived from reward vs risk for prioritization |
-| **Willingness to pay (early)** | Signals for price / fee / subscription (as applicable) |
+| **Willingness to pay (early)** | Signals for price / fee / subscription (as applicable; real-world proof when claimed) |
 
 Use scores to decide **Advance / Iterate / Hold / Kill** — not to decorate a pitch deck.  
 Thin-slice gates should set numeric thresholds on at least Completion, Extraction, Escalation, and Trace Completeness under normal (and selected stress) conditions.  
@@ -548,17 +839,21 @@ Thin-slice gates should set numeric thresholds on at least Completion, Extractio
 
 1. Confirm the primary focus and contrarian edge still feel right to **you** (soft human check).  
 2. Write down the current thesis and the main customer groups under consideration.  
-3. Run honest synthetic research across several groups (not just the favorite).  
-4. Create simple **reward/risk scorecards** for the top candidates.  
-5. Rank them by evidence, not by preference.  
-6. Do real conversations and small tests with the strongest groups.  
-7. Only then lock a primary focus and a tiny first slice (with the slice artifact checklist).  
-8. Put the thin AI instructions into root `AGENTS.md` / your main tool.  
-9. Define clear **numeric** pass/fail thresholds for the first slice **before** building further.  
-10. Set up a **minimal evaluation harness** so the slice can be run repeatedly against synthetic personas ([`live-runtime.md`](live-runtime.md)).  
-11. Run evaluation-driven increments (Spec → Harness → Implement → Gate).  
-12. Keep asking: “What evidence do we actually have?” and “What would make us kill this hypothesis?”  
-13. Keep decision traces for anything that changes phase, ICP, monetization path, autonomy, or spend.
+3. For market claims, write **what the evidence supports** and **what it does not establish**.  
+4. Run honest synthetic research across several groups (not just the favorite), with evidence labels and a staged trust reveal when you score trust or price interest.  
+5. Create **reward/risk scorecards** for the top candidates (optional “what to say” fields only after rank/hold is clear).  
+6. Rank them by evidence, not by preference; demote weak groups explicitly; keep promote = **hold**.  
+7. Run the **next pack**: light synthetic product sandbox (Track A) and/or real interest tests such as waitlists (Track B) — parallel is fine.  
+8. Founder gate on sandbox + interest results before a heavy build.  
+9. Do deeper real conversations and small paid or concierge tests with the strongest groups.  
+10. Only then lock a primary focus and a tiny first slice (with the slice artifact checklist).  
+11. Sketch a **virtual office**: who does each function today, what comes out this week, who approves external claims.  
+12. Put the thin AI instructions into root `AGENTS.md` / your main tool.  
+13. Define clear **numeric** pass/fail thresholds for the first slice **before** building further.  
+14. Keep sandbox scenario ids as the seed of a **minimal evaluation harness** ([`live-runtime.md`](live-runtime.md)).  
+15. Run evaluation-driven increments (Spec → Harness → Implement → Gate).  
+16. Keep asking: “What evidence do we actually have?” and “What would make us kill this hypothesis?”  
+17. Keep decision traces for anything that changes phase, customer group, monetization path, autonomy, or spend.
 
 ---
 
@@ -567,13 +862,15 @@ Thin-slice gates should set numeric thresholds on at least Completion, Extractio
 Every company should maintain its own list. Starter prompts:
 
 - Which customer groups currently have the strongest **combined reward/risk** profile?  
-- What exact price (if any) are people willing to pay?  
+- Did the light synthetic product sandbox pass baseline paths for the top groups?  
+- Did real interest tests clear pre-written thresholds (waitlist, replies, calls)?  
+- What exact price (if any) are people willing to pay? (real-world proof only — not simulated tables)  
 - What are the **numeric pass thresholds** for the current thin slice?  
-- How often should the system ask the human for approval versus acting within a safe draft/dry-run band (**autonomy level**)?  
+- How often should the system ask the human for approval versus acting within a safe draft/dry-run band (**how much the system may do alone**)?  
 - What legal and ethical rules apply to outreach in our channels?  
 - When do the risks of staying solo become larger than the risks of adding help?  
-- What is the **minimum viable set of channels** that still produces real value?  
-- How aggressively should multi-party outreach run in **parallel** vs sequential trust-building?  
+- What is the **smallest set of channels** that still produces real value?  
+- How aggressively should multi-party outreach run in **parallel** vs building trust one step at a time?  
 - How will real usage data be captured and fed back into synthetic personas and decision traces?  
 - Which failures become permanent **stress scenarios**?  
 - What would make us **kill** the current hypothesis cleanly?
@@ -584,12 +881,19 @@ Every company should maintain its own list. Starter prompts:
 
 - Treating a polished deck or long roadmap as proof  
 - Building a platform before a single complete user loop works  
-- Protecting a favorite ICP when scores are weak  
+- Protecting a favorite customer group when scores are weak  
+- Treating simulated prices or “I would buy” lines as demand  
+- Treating “if we had this feature” scores as proof the product already works  
+- Treating a green synthetic product sandbox as demand or product–market fit  
+- Treating waitlist size alone as willingness to pay  
+- Building a huge multi-role simulated world before a thin baseline path works  
+- Scaling paid ads while the thin path fails sandbox runs  
 - Optimizing operational scores while ignoring a weak hypothesis  
 - Letting AI silently change strategy or phase  
 - Building without an evaluation harness or numeric gate  
 - Copying another startup’s product because their OS docs lived in the same monorepo  
 - Expanding channels or multi-agent complexity before the thin slice works  
+- Fake org charts (generic bot labels, empty roles with no outputs or human gates)  
 - Silently rewriting this template every time one product ships a feature  
 
 ---
@@ -603,6 +907,8 @@ Every company should maintain its own list. Starter prompts:
 | 2.1 | Live runtime: persistent state + 7-stage continuous loop; two clocks (journey vs loop); framework-agnostic compute (LangGraph/CrewAI as examples) — see `live-runtime.md` |
 | 2.2 | Reward/risk ICP scorecards; learning-loop feedback into personas/agents; company-as-code categories; portable multi-agent + channel principles; eval harness continuity (see live-runtime); refined score groups; monetization interjection |
 | 2.3 | Enhance-only recovery from earlier drafts: formal lifecycle aliases; EDD loop; AGENTS.md thin enforcement; structured phase gates; TTR / channel distribution / early-revenue metrics; thin-slice artifact checklist; autonomy interjection; optional company/support/infrastructure leaves; template change policy pointer |
+| 2.4 | Evidence labels (outside facts / company signals / assumed capability / needs real-world proof); staged trust reveal; market “supports vs does not establish”; optional “what to say” fields on scorecards; virtual office cards + hire triggers; plain-language pass on ranking section |
+| 2.5 | Next pack after synthetic ranking: light isolated synthetic product sandbox (capability/feasibility under multi-party mess) + real interest tests; parallel/sequence rules; founder gate before heavy build |
 
 ---
 
