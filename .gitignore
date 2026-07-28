@@ -55,3 +55,6 @@ next-env.d.ts
 traces/decisions/*.json
 traces/decisions/*.jsonl
 !traces/decisions/README.md
+
+# Firecrawl scrape cache (local research tooling)
+.firecrawl/
