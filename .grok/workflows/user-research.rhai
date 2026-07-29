@@ -1,33 +1,83 @@
 let meta = #{
     name: "user-research",
-    description: "Multi-round synthetic ICP research and validation per Company OS; founder gates until ready for real-world tests",
-    when_to_use: "Journey/loop stages for synthetic research and product-idea validation; generate and rank 5 ICPs, score reward/risk, synthetic dialogues, founder review loops until agree ready for real-world testing",
+    description: "Synthetic ICP filter: N peers (default 10), parallel score+dialogue, binary verdict, founder gate",
+    when_to_use: "Rank ICP candidates before real tests; diversity sample; iterate until agree_ready or kill",
     phases: [
-        #{ title: "Context", detail: "Load thesis, OS blueprint, existing ICPs, prior founder feedback" },
-        #{ title: "Propose", detail: "Best-guess set of exactly 5 ICP candidates" },
-        #{ title: "Scorecards", detail: "Reward/risk scorecard per ICP (parallel)" },
-        #{ title: "Synthetic", detail: "Synthetic research dialogues and scenarios per ICP (parallel)" },
-        #{ title: "Challenge", detail: "Adversarial skeptic on ranking and promotion claims" },
-        #{ title: "Report", detail: "Write round report + feedback template for founder" },
-        #{ title: "Founder gate", detail: "Founder reviews, writes feedback file, resume to iterate or agree" },
+        #{ title: "Context", detail: "Thesis + tried set + founder notes" },
+        #{ title: "Propose", detail: "N diverse ICP peers (keep strong_fit + new axes)" },
+        #{ title: "Scorecards", detail: "Reward/risk scores (parallel)" },
+        #{ title: "Synthetic", detail: "Dialogues + binary verdict (parallel)" },
+        #{ title: "Challenge", detail: "Adversarial rank + ready flag" },
+        #{ title: "Report", detail: "ROUND report + FOUNDER_FEEDBACK template" },
+        #{ title: "Founder gate", detail: "iterate | agree_ready | kill" },
     ],
 };
 
-// args.mode: "round" (default) | "status"
-// args.round_label: optional string for report naming (e.g. "1", "post-feedback-2")
-// args.founder_notes: optional seed notes when starting a fresh process
-// args.max_rounds: optional number 1-5 (default 4) — founder-gated loops inside one run
-//
-// Founder control (after each report, edit then resume):
-//   research/icps/FOUNDER_FEEDBACK.md  — required on resume
-//     decision: iterate | agree_ready | kill
-//     notes: free text for next round
-//   research/icps/READY_FOR_REAL_WORLD.md — written only when founder agrees
+// args: mode=round|status, round_label, founder_notes, max_rounds(1-5), slate_n(5-10, default 10)
+
+let RULES = "";
+RULES += "PUBLIC-SAFE: no real names, emails, phones, street addresses, personal zips.\n";
+RULES += "SYNTHETIC ONLY: filter not PMF; real jobs still required later.\n";
+RULES += "THESIS: Shape A job PM (host LLM + Totbox MCP checklist, human approve-before-send).\n";
+RULES += "  Hard no vendor directory/marketplace. Beachhead: recurring HVAC PM + house cleaning.\n";
+RULES += "VERDICT binary only: strong_fit = real-test shortlist | weak_fit = out this round.\n";
+RULES += "  Uncertain → weak_fit. Forbidden: promote_lean, hold, demote, poor_fit, unclear.\n";
+RULES += "AUDIENCE: teenage solo founders using Company OS. Write plain English a sharp 16-year-old\n";
+RULES += "  can skim. No dense jargon piles. Prefer everyday words over score jargon.\n";
+RULES += "RATIONALE (verdict_key_factors) style — required for the table column:\n";
+RULES += "  - One short sentence, max ~20 words. One idea: why this verdict.\n";
+RULES += "  - Pattern: \"Keep — …\" if strong_fit, or \"Out — …\" if weak_fit.\n";
+RULES += "  - Say what a founder would feel/do, not score names (avoid: channel_fit, TTS, WTP,\n";
+RULES += "    LTV, SaaS gravity, dual-approve, pay_or_act, Shape A as unexplained jargon).\n";
+RULES += "  - OK plain words: email, phone, partner, budget, hard to reach, few jobs a year,\n";
+RULES += "    other apps already win, people won't pay, takes too long to learn.\n";
+RULES += "  - Bad: \"Self-approve Shape A, high channel_fit, soft WTP; residual falsifiers open\"\n";
+RULES += "  - Good: \"Keep — one person can decide fast; still unproven if they'll pay.\"\n";
+RULES += "  - Bad: \"PM-SaaS gravity, triple stall, thin reach/slow TTS\"\n";
+RULES += "  - Good: \"Out — too much like big property software; too hard to get a first customer.\"\n";
+
+// MECE diversity axes — each NEW challenger claims exactly one primary cell; no two NEW share same cell.
+let DIVERSITY = "";
+DIVERSITY += "DIVERSITY SAMPLING (anti-infinite similar weak_fits):\n";
+DIVERSITY += "1) EXCLUDE: never re-propose ids already tried as slate members unless KEEP list.\n";
+DIVERSITY += "2) KEEP strong_fit peers as re-scored equals (not automatic winners).\n";
+DIVERSITY += "3) Each NEW challenger MUST set diversity_axis + diversity_value (primary stress only):\n";
+DIVERSITY += "   axes (MECE): buyer_seat | cadence | channel | monetization | vertical | ops_context\n";
+DIVERSITY += "   values examples:\n";
+DIVERSITY += "     buyer_seat: single_dm | dual_household | association | remote_care | property_mgr |\n";
+DIVERSITY += "                 adult_child | employer_payer | operator_payer | str_host | nonprofit_facility\n";
+DIVERSITY += "     cadence: recurring_preventive | episodic_burst | seasonal | emergency | continuous_service\n";
+DIVERSITY += "     channel: email_first | phone_first | portal_native | hybrid\n";
+DIVERSITY += "     monetization: household_user | association_budget | operator_payer | employer_b2b2c | high_wtp\n";
+DIVERSITY += "     vertical: hvac_cleaning | tree_arborist | grounds | multi_home_service | restoration_claim\n";
+DIVERSITY += "     ops_context: urban_metro | rural_after_hours | second_home_snowbird | new_build_warranty |\n";
+DIVERSITY += "                  pcs_relocation | multi_gen_household | short_term_rental\n";
+DIVERSITY += "4) Across NEW seats: diversity_value cells must be UNIQUE (no two NEW share same value).\n";
+DIVERSITY += "5) Prefer unfilled cells from landscape gaps; do not clone prior weak_fits with new names.\n";
+DIVERSITY += "6) Max 1 pure operator_payer; max 1 emergency cadence; max 1 phone_first channel.\n";
+
+// Ids already on prior slates (do not recycle as NEW). KEEP may re-include strong_fit.
+let TRIED = "";
+TRIED += "TRIED_EXCLUDE (do not re-use as NEW challengers):\n";
+TRIED += "KEEP only: household-single-decision-maker-recurring, household-dual-income-recurring.\n";
+TRIED += "R1: remote-care-or-multi-site-coordinator, household-seasonal-tree-arborist,\n";
+TRIED += "  operator-agentic-inbound-payer, sms-phone-native-grounds.\n";
+TRIED += "1-r2: household-new-homeowner-move-in-burst, small-landlord-tenant-split-coordinator,\n";
+TRIED += "  household-emergency-hvac-repair.\n";
+TRIED += "1-r3: household-aging-in-place-adult-child-coordinator, household-membership-portal-native,\n";
+TRIED += "  household-white-glove-concierge.\n";
+TRIED += "1-r4: condo-hoa-common-area-coordinator, b2b2c-hvac-cleaning-operator-partnership,\n";
+TRIED += "  household-phone-native-low-email-recurring.\n";
+TRIED += "1-r5: multi-home-snowbird-second-home, multi-gen-household-shared-home,\n";
+TRIED += "  new-build-warranty-punch-window, short-term-rental-host-turnover,\n";
+TRIED += "  mid-portfolio-property-manager, insurance-claim-restoration-coordinator,\n";
+TRIED += "  corporate-relocation-employer-paid, rural-after-hours-home-service.\n";
 
 let mode = "round";
 let round_label = "1";
 let founder_notes = "";
 let max_rounds = 4;
+let slate_n = 10;
 
 if args != () {
     if args.mode != () { mode = args.mode; }
@@ -37,8 +87,11 @@ if args != () {
         let mr = args.max_rounds;
         if mr >= 1 && mr <= 5 { max_rounds = mr; }
     }
+    if args.slate_n != () {
+        let sn = args.slate_n;
+        if sn >= 5 && sn <= 10 { slate_n = sn; }
+    }
 }
-
 if mode != "round" && mode != "status" {
     pause("verification", "args.mode must be round | status");
 }
@@ -47,28 +100,30 @@ if mode != "round" && mode != "status" {
 
 let context_schema = #{
     "type": "object",
-    "required": ["thesis_summary", "existing_icp_notes", "open_questions", "prior_feedback", "product_constraints"],
+    "required": ["thesis_summary", "existing_icp_notes", "prior_feedback", "product_constraints", "tried_ids"],
     "properties": #{
         "thesis_summary": #{ "type": "string" },
         "existing_icp_notes": #{ "type": "string" },
-        "open_questions": #{ "type": "string" },
         "prior_feedback": #{ "type": "string" },
         "product_constraints": #{ "type": "string" },
+        "tried_ids": #{ "type": "string" },
     },
 };
 
 let propose_schema = #{
     "type": "object",
-    "required": ["icps", "rationale"],
+    "required": ["icps", "rationale", "diversity_map"],
     "properties": #{
         "rationale": #{ "type": "string" },
+        "diversity_map": #{ "type": "string" },
         "icps": #{
-            "type": "array",
-            "minItems": 5,
-            "maxItems": 5,
+            "type": "array", "minItems": 5, "maxItems": 10,
             "items": #{
                 "type": "object",
-                "required": ["id", "name", "who", "pain", "job_to_be_done", "why_candidate"],
+                "required": [
+                    "id", "name", "who", "pain", "job_to_be_done", "why_candidate",
+                    "seat_role", "diversity_axis", "diversity_value", "prior_status"
+                ],
                 "properties": #{
                     "id": #{ "type": "string" },
                     "name": #{ "type": "string" },
@@ -76,6 +131,10 @@ let propose_schema = #{
                     "pain": #{ "type": "string" },
                     "job_to_be_done": #{ "type": "string" },
                     "why_candidate": #{ "type": "string" },
+                    "seat_role": #{ "type": "string" },
+                    "diversity_axis": #{ "type": "string" },
+                    "diversity_value": #{ "type": "string" },
+                    "prior_status": #{ "type": "string" },
                 },
             },
         },
@@ -87,7 +146,7 @@ let scorecard_schema = #{
     "required": [
         "icp_id", "icp_name", "reward_notes", "risk_notes",
         "pain_score", "pay_or_act_score", "reach_score", "channel_fit_score",
-        "risk_score", "time_to_signal_score", "composite_notes", "kill_criteria", "promote_lean"
+        "risk_score", "time_to_signal_score", "kill_criteria"
     ],
     "properties": #{
         "icp_id": #{ "type": "string" },
@@ -100,9 +159,7 @@ let scorecard_schema = #{
         "channel_fit_score": #{ "type": "number" },
         "risk_score": #{ "type": "number" },
         "time_to_signal_score": #{ "type": "number" },
-        "composite_notes": #{ "type": "string" },
         "kill_criteria": #{ "type": "string" },
-        "promote_lean": #{ "type": "string" },
     },
 };
 
@@ -110,20 +167,12 @@ let synthetic_schema = #{
     "type": "object",
     "required": [
         "icp_id", "persona_sketch", "dialogue_summaries",
-        "pain_realism", "status_quo", "would_try", "would_pay_or_act",
-        "trust_barriers", "say_no_reasons", "synthetic_verdict",
-        "verdict_key_factors", "evidence_notes"
+        "synthetic_verdict", "verdict_key_factors", "evidence_notes"
     ],
     "properties": #{
         "icp_id": #{ "type": "string" },
         "persona_sketch": #{ "type": "string" },
         "dialogue_summaries": #{ "type": "string" },
-        "pain_realism": #{ "type": "string" },
-        "status_quo": #{ "type": "string" },
-        "would_try": #{ "type": "string" },
-        "would_pay_or_act": #{ "type": "string" },
-        "trust_barriers": #{ "type": "string" },
-        "say_no_reasons": #{ "type": "string" },
         "synthetic_verdict": #{ "type": "string" },
         "verdict_key_factors": #{ "type": "string" },
         "evidence_notes": #{ "type": "string" },
@@ -132,21 +181,27 @@ let synthetic_schema = #{
 
 let challenge_schema = #{
     "type": "object",
-    "required": ["ranking_sound", "overclaimed", "missing_challengers", "recommended_rank_order", "ready_for_real_world_ai", "rationale", "conditions"],
+    "required": [
+        "ranking_sound", "overclaimed", "missing_challengers",
+        "recommended_rank_order", "ready_for_real_world_ai", "conditions", "diversity_ok"
+    ],
     "properties": #{
         "ranking_sound": #{ "type": "boolean" },
         "overclaimed": #{ "type": "string" },
         "missing_challengers": #{ "type": "string" },
         "recommended_rank_order": #{ "type": "string" },
         "ready_for_real_world_ai": #{ "type": "boolean" },
-        "rationale": #{ "type": "string" },
         "conditions": #{ "type": "string" },
+        "diversity_ok": #{ "type": "boolean" },
     },
 };
 
 let report_schema = #{
     "type": "object",
-    "required": ["ok", "report_path", "feedback_path", "top3_summary", "primary_recommendation", "ai_ready_for_real_world", "message"],
+    "required": [
+        "ok", "report_path", "feedback_path", "top3_summary",
+        "primary_recommendation", "ai_ready_for_real_world", "message"
+    ],
     "properties": #{
         "ok": #{ "type": "boolean" },
         "report_path": #{ "type": "string" },
@@ -160,13 +215,11 @@ let report_schema = #{
 
 let feedback_schema = #{
     "type": "object",
-    "required": ["decision", "notes", "agrees_with_ai_ready", "file_found"],
+    "required": ["decision", "notes", "file_found"],
     "properties": #{
         "decision": #{ "type": "string" },
         "notes": #{ "type": "string" },
-        "agrees_with_ai_ready": #{ "type": "boolean" },
         "file_found": #{ "type": "boolean" },
-        "raw_excerpt": #{ "type": "string" },
     },
 };
 
@@ -181,19 +234,168 @@ let status_out_schema = #{
     },
 };
 
-// --- status path (short) ---
+// Seed: 2 KEEP strong_fit + 8 NEW never-tried (unique diversity cells). Used if propose fails.
+// Cells used in 1-r5 NEW: employer_b2b2c, property_mgr, second_home_snowbird, str_host,
+// new_build_warranty, phone_first, multi_gen_household, restoration_claim — do not reuse.
+let seed_icps = [
+    #{
+        id: "household-single-decision-maker-recurring",
+        name: "Single decision-maker household (recurring home-service PM)",
+        who: "Owner-occupant alone owns money/access/booking for HVAC PM + cleaning",
+        pain: "Solo cognitive load, quote loops, forgotten next-due",
+        job_to_be_done: "Finish jobs with fewer touchpoints; self-approve money/time",
+        why_candidate: "KEEP strong_fit learning seat",
+        seat_role: "user",
+        diversity_axis: "buyer_seat",
+        diversity_value: "single_dm",
+        prior_status: "keep",
+    },
+    #{
+        id: "household-dual-income-recurring",
+        name: "Busy dual-income household (HVAC + cleaning chore PM)",
+        who: "Dual-income household coordinating HVAC PM + cleaning with partner approve",
+        pain: "Partner lag, dual calendars, multi-turn quotes, next-due forget",
+        job_to_be_done: "Complete jobs across two adults with fewer touchpoints",
+        why_candidate: "KEEP strong_fit multi-party topology A/B",
+        seat_role: "user",
+        diversity_axis: "buyer_seat",
+        diversity_value: "dual_household",
+        prior_status: "keep",
+    },
+    #{
+        id: "military-pcs-relocation-household",
+        name: "Military PCS / frequent-move household",
+        who: "Service family resetting HVAC and cleaning setup at each permanent-change-of-station move",
+        pain: "Short setup window, new metro each move, re-find vendors, calendar chaos",
+        job_to_be_done: "Stand up preventive home services after each move with fewer emails",
+        why_candidate: "NEW ops_context: pcs_relocation (not employer RMC 1-r5)",
+        seat_role: "user",
+        diversity_axis: "ops_context",
+        diversity_value: "pcs_relocation",
+        prior_status: "new",
+    },
+    #{
+        id: "small-nonprofit-facility-coordinator",
+        name: "Small nonprofit / faith-community facility coordinator",
+        who: "Volunteer or staff who books HVAC and cleaning for a small building (not HOA plant)",
+        pain: "Board budget, sparse volunteers, seasonal events, vendor follow-up",
+        job_to_be_done: "Finish facility jobs without association software",
+        why_candidate: "NEW buyer_seat: nonprofit_facility (not condo-HOA 1-r4)",
+        seat_role: "user",
+        diversity_axis: "buyer_seat",
+        diversity_value: "nonprofit_facility",
+        prior_status: "new",
+    },
+    #{
+        id: "pool-spa-seasonal-service-household",
+        name: "Pool / spa seasonal service household",
+        who: "Homeowner with pool/spa needing open/close and mid-season service plus HVAC cadence",
+        pain: "Seasonal windows, multi-vendor (pool + HVAC), forgotten next open/close",
+        job_to_be_done: "Track seasonal pool jobs and preventive home services together",
+        why_candidate: "NEW vertical: pool_spa_seasonal (not tree/grounds R1)",
+        seat_role: "user",
+        diversity_axis: "vertical",
+        diversity_value: "pool_spa_seasonal",
+        prior_status: "new",
+    },
+    #{
+        id: "ev-charger-install-plus-home-service",
+        name: "EV charger install + ongoing home-service household",
+        who: "Homeowner adding EV charger then keeping HVAC/cleaning coordination in one place",
+        pain: "One-time install quote chaos plus recurring home services after",
+        job_to_be_done: "Close install job then keep recurring cadence without re-research",
+        why_candidate: "NEW cadence: install_then_recurring hybrid",
+        seat_role: "user",
+        diversity_axis: "cadence",
+        diversity_value: "install_then_recurring",
+        prior_status: "new",
+    },
+    #{
+        id: "hoa-board-email-native-treasurer",
+        name: "HOA treasurer / email-native board seat (unit-owner view)",
+        who: "Board treasurer who mostly uses email for vendor bills and unit-owner HVAC issues",
+        pain: "Invoices, approvals, and vendor threads without full HOA ops suite",
+        job_to_be_done: "Clear board-related home-service jobs with human gates",
+        why_candidate: "NEW channel: email_board_finance (not condo plant coordinator 1-r4)",
+        seat_role: "user",
+        diversity_axis: "channel",
+        diversity_value: "email_board_finance",
+        prior_status: "new",
+    },
+    #{
+        id: "home-warranty-plan-subscriber",
+        name: "Home warranty plan subscriber (dispatch + rebook)",
+        who: "Homeowner with a home-warranty membership who still fights dispatch and rebook email",
+        pain: "Warranty portal + email thrash, denied claims, reschedule loops",
+        job_to_be_done: "Run warranty-covered service jobs without full portal autopilot myth",
+        why_candidate: "NEW monetization/path: warranty_plan_residual (not ST membership 1-r3)",
+        seat_role: "user",
+        diversity_axis: "monetization",
+        diversity_value: "warranty_plan_residual",
+        prior_status: "new",
+    },
+    #{
+        id: "accessible-aging-in-place-on-site",
+        name: "On-site aging-in-place household (accessibility mods + HVAC)",
+        who: "Older adult or co-residing family doing accessibility upgrades and HVAC at same home",
+        pain: "Multi-trade access mods, medical calendar, HVAC seasonal, approval among family on-site",
+        job_to_be_done: "Coordinate access-related and recurring jobs with safety gates",
+        why_candidate: "NEW buyer_seat: on_site_aging (not remote adult-child 1-r3)",
+        seat_role: "user",
+        diversity_axis: "buyer_seat",
+        diversity_value: "on_site_aging",
+        prior_status: "new",
+    },
+    #{
+        id: "solar-battery-plus-hvac-bundle",
+        name: "Solar / battery + HVAC bundle household",
+        who: "Homeowner with solar/battery install or service plus HVAC membership cadence",
+        pain: "Two tech stacks, warranty vs service confusion, multi-vendor email",
+        job_to_be_done: "Keep energy + HVAC jobs moving without marketplace inventory",
+        why_candidate: "NEW vertical: solar_battery_hvac",
+        seat_role: "user",
+        diversity_axis: "vertical",
+        diversity_value: "solar_battery_hvac",
+        prior_status: "new",
+    },
+];
+
+fn icp_field(ic, key, fallback) {
+    if ic == () { return fallback; }
+    if key == "id" && ic.id != () { return ic.id; }
+    if key == "name" && ic.name != () { return ic.name; }
+    if key == "who" && ic.who != () { return ic.who; }
+    if key == "pain" && ic.pain != () { return ic.pain; }
+    if key == "job" && ic.job_to_be_done != () { return ic.job_to_be_done; }
+    if key == "seat_role" && ic.seat_role != () { return ic.seat_role; }
+    if key == "diversity_axis" && ic.diversity_axis != () { return ic.diversity_axis; }
+    if key == "diversity_value" && ic.diversity_value != () { return ic.diversity_value; }
+    if key == "prior_status" && ic.prior_status != () { return ic.prior_status; }
+    fallback
+}
+
+fn take_n(list, seed, n) {
+    if list == () || list.len() < n { return seed; }
+    if list.len() == n { return list; }
+    let out = [];
+    let i = 0;
+    while i < n {
+        out.push(list[i]);
+        i += 1;
+    }
+    out
+}
+
+// --- status ---
 
 if mode == "status" {
     phase("Context");
     let sp = "";
-    sp += "Inspect Totbox user-research artifacts (read-only). Read if present:\n";
-    sp += "- research/icps/README.md\n";
-    sp += "- research/icps/FOUNDER_FEEDBACK.md\n";
-    sp += "- research/icps/READY_FOR_REAL_WORLD.md\n";
-    sp += "- research/icps/ (list latest ROUND_*-report.md if any)\n";
-    sp += "- company/state/company-state.json\n";
-    sp += "Set has_report, has_feedback, ready_marker, and a short summary of research readiness.\n";
-    sp += "Do not invent files. Public-safe only.\n";
+    sp += "Read-only status of Totbox user-research. Use tools; do not invent files.\n";
+    sp += "Check: research/icps/README.md, latest ROUND_*_report.md, FOUNDER_FEEDBACK.md,\n";
+    sp += "READY_FOR_REAL_WORLD.md, company/state/company-state.json.\n";
+    sp += "Return has_report, has_feedback, ready_marker, short summary.\n";
+    sp += RULES;
     let st = agent(sp, #{
         label: "ur-status",
         capability_mode: "read-only",
@@ -210,77 +412,55 @@ if mode == "status" {
     if st.output.has_report == true { hr = true; }
     if st.output.has_feedback == true { hf = true; }
     if st.output.ready_marker == true { rm = true; }
-    let report = "";
-    report += "# User research status\n\n";
-    report += sum + "\n\n";
+    let report = "# User research status\n\n" + sum + "\n\n";
     report += "- has_report: " + hr.to_string() + "\n";
     report += "- has_feedback: " + hf.to_string() + "\n";
-    report += "- ready_for_real_world marker: " + rm.to_string() + "\n";
+    report += "- ready_marker: " + rm.to_string() + "\n";
     let p = write_scratch_file("user-research-status.md", report);
     complete(#{
-        mode: "status",
-        path: p,
-        has_report: hr,
-        has_feedback: hf,
-        ready_marker: rm,
-        summary: sum,
+        mode: "status", path: p,
+        has_report: hr, has_feedback: hf, ready_marker: rm, summary: sum,
     });
 }
 
-// --- multi-round synthetic research ---
+// --- round loop ---
 
 let round_i = 1;
-let finished = false;
-let last_decision = "none";
 let last_notes = founder_notes;
 let last_primary = "";
 let last_top3 = "";
 let last_report_path = "";
 let ai_ready = false;
 
-while !finished {
+while true {
     if round_i > max_rounds {
         await_user(
             "user",
-            "user-research hit max_rounds without founder agree_ready. Review research/icps/ reports, edit FOUNDER_FEEDBACK.md (decision: iterate|agree_ready|kill), then re-launch user-research with higher max_rounds or after agreeing."
+            "max_rounds hit. Edit research/icps/FOUNDER_FEEDBACK.md then re-launch with higher max_rounds or agree_ready."
         );
-        pause(
-            "verification",
-            "Re-launch user-research after founder decision, or set FOUNDER_FEEDBACK.md decision=agree_ready and run again."
-        );
+        pause("verification", "Re-launch user-research after founder decision.");
     }
 
     let this_label = round_label;
     if round_i > 1 {
         this_label = round_label + "-r" + round_i.to_string();
     }
-
-    log("user-research round " + round_i.to_string() + " label=" + this_label);
+    log("user-research round " + round_i.to_string() + " label=" + this_label + " slate_n=" + slate_n.to_string());
 
     // ===== Context =====
     phase("Context");
-
     let ctx_p = "";
-    ctx_p += "You are loading context for Totbox SYNTHETIC user research (Company OS instance).\n";
-    ctx_p += "Use read_file / list_dir. Do NOT invent contents of missing files.\n";
-    ctx_p += "Read in order:\n";
-    ctx_p += "1) docs/company-os/operating-system.md — sections on early phases, synthetic research, reward/risk ICP ranking\n";
-    ctx_p += "2) docs/company-os/live-runtime.md — stages 1-2 if present\n";
-    ctx_p += "3) docs/company-os/instance/thesis.md and docs/product_thesis.md\n";
-    ctx_p += "4) docs/strategy/bootstrap_pmf_and_agentic_gap.md (venture shape A)\n";
-    ctx_p += "5) docs/research/home_services_email_insights.md (patterns only)\n";
-    ctx_p += "6) research/icps/README.md and any *.md under research/icps/\n";
-    ctx_p += "7) research/icps/FOUNDER_FEEDBACK.md if present\n";
-    ctx_p += "8) company/state/company-state.json\n";
-    ctx_p += "9) docs/company-os/applied-here.md gap notes on ICPs\n";
-    ctx_p += "Round label: " + this_label + "\n";
-    if last_notes != "" {
-        ctx_p += "Seed/prior founder notes for this process:\n";
-        ctx_p += last_notes + "\n";
-    }
-    ctx_p += "Return: thesis_summary, existing_icp_notes, open_questions, prior_feedback, product_constraints.\n";
-    ctx_p += "HARD RULES: public-safe only; no real names, emails, phones, street addresses, personal zips.\n";
-    ctx_p += "Synthetic research is a filter, not final proof. Real-world is still required later.\n";
+    ctx_p += "Load Totbox user-research context. Tools only; do not invent missing files.\n";
+    ctx_p += "Read: docs/product_thesis.md, docs/company-os/instance/thesis.md,\n";
+    ctx_p += "docs/company-os/operating-system.md (synthetic + reward/risk),\n";
+    ctx_p += "research/icps/README.md + ALL ROUND_*_report.md + FOUNDER_FEEDBACK.md,\n";
+    ctx_p += "list research/icps/*.md for tried ICP ids, company/state/company-state.json.\n";
+    ctx_p += "Round: " + this_label + " slate_n=" + slate_n.to_string() + "\n";
+    if last_notes != "" { ctx_p += "Founder notes:\n" + last_notes + "\n"; }
+    ctx_p += TRIED;
+    ctx_p += "Return short: thesis_summary, existing_icp_notes, prior_feedback,\n";
+    ctx_p += "product_constraints, tried_ids (comma list of ids already slated).\n";
+    ctx_p += RULES;
 
     let ctx = agent(ctx_p, #{
         label: "ur-context-" + round_i.to_string(),
@@ -290,44 +470,40 @@ while !finished {
 
     let thesis_s = "";
     let existing_s = "";
-    let open_s = "";
     let prior_s = "";
     let constr_s = "";
+    let tried_s = TRIED;
     if ctx != () && ctx.success && ctx.output != () {
         if ctx.output.thesis_summary != () { thesis_s = ctx.output.thesis_summary; }
         if ctx.output.existing_icp_notes != () { existing_s = ctx.output.existing_icp_notes; }
-        if ctx.output.open_questions != () { open_s = ctx.output.open_questions; }
         if ctx.output.prior_feedback != () { prior_s = ctx.output.prior_feedback; }
         if ctx.output.product_constraints != () { constr_s = ctx.output.product_constraints; }
+        if ctx.output.tried_ids != () { tried_s = ctx.output.tried_ids; }
     } else {
-        log("context agent weak; continuing with empty context strings");
+        log("context weak; continuing");
     }
 
-    // ===== Propose exactly 5 ICPs =====
+    // ===== Propose =====
     phase("Propose");
-
     let prop_p = "";
-    prop_p += "Propose exactly FIVE distinct ICP candidates for Totbox synthetic validation.\n";
-    prop_p += "Follow Company OS: several groups, not one favorite; challenge the current ranking.\n";
-    prop_p += "Use tools to re-read research/icps/ and docs/product_thesis.md if needed.\n\n";
-    prop_p += "Thesis context:\n" + thesis_s + "\n\n";
-    prop_p += "Existing ICP notes:\n" + existing_s + "\n\n";
-    prop_p += "Open questions:\n" + open_s + "\n\n";
-    prop_p += "Prior founder feedback:\n" + prior_s + "\n";
-    if last_notes != "" {
-        prop_p += "\nFounder notes this loop:\n" + last_notes + "\n";
-    }
-    prop_p += "\nProduct constraints:\n" + constr_s + "\n\n";
-    prop_p += "REQUIREMENTS:\n";
-    prop_p += "- Exactly 5 ICPs in the array (min and max 5).\n";
-    prop_p += "- Include the current beachhead hypothesis as one candidate (not automatic winner).\n";
-    prop_p += "- Include at least 2 genuine challengers (different buyer, pain, or monetization path).\n";
-    prop_p += "- Include at most one pure operator/payer ICP if relevant (label clearly as payer vs user).\n";
-    prop_p += "- ids: stable kebab-case (icp-1 ... or descriptive).\n";
-    prop_p += "- who/pain/job_to_be_done/why_candidate: concrete, public-safe composites only.\n";
-    prop_p += "- Do NOT promote yet. Do NOT invent real people or private addresses.\n";
-    prop_p += "- rationale: why this slate of five tests the thesis well.\n";
-    prop_p += "If founder notes demand replacing an ICP, honor them.\n";
+    prop_p += "Propose exactly " + slate_n.to_string() + " peer ICPs for synthetic validation.\n";
+    prop_p += "Thesis:\n" + thesis_s + "\nExisting:\n" + existing_s + "\n";
+    prop_p += "Prior feedback:\n" + prior_s + "\nConstraints:\n" + constr_s + "\n";
+    prop_p += "Tried ids:\n" + tried_s + "\n";
+    if last_notes != "" { prop_p += "Founder notes (honor KEEP/DROP):\n" + last_notes + "\n"; }
+    prop_p += DIVERSITY;
+    prop_p += TRIED;
+    prop_p += "Slate construction:\n";
+    prop_p += "- Exactly " + slate_n.to_string() + " ICPs.\n";
+    prop_p += "- KEEP strong_fit: household-single-decision-maker-recurring +\n";
+    prop_p += "  household-dual-income-recurring (re-score peers; prior_status=keep).\n";
+    prop_p += "- Remaining seats: NEW only (prior_status=new). Never re-use TRIED as new.\n";
+    prop_p += "- Each ICP: id, name, who, pain, job_to_be_done, why_candidate,\n";
+    prop_p += "  seat_role (user|payer|payer_hybrid|channel_control),\n";
+    prop_p += "  diversity_axis, diversity_value, prior_status (keep|new).\n";
+    prop_p += "- diversity_map: one line per NEW: value → id (prove unique cells).\n";
+    prop_p += "- rationale: why this slate covers orthogonal axes vs past weak_fits.\n";
+    prop_p += "- No verdict yet. " + RULES;
 
     let prop = agent(prop_p, #{
         label: "ur-propose-" + round_i.to_string(),
@@ -335,125 +511,45 @@ while !finished {
         output_schema: propose_schema,
     });
 
-    // Deterministic seed slate (Totbox-relevant challengers). Used when the propose
-    // agent fails or returns <5 ICPs so the script always validates exactly five.
-    let seed_icps = [
-        #{
-            id: "icp-dual-income-hvac-cleaning",
-            name: "Dual-income household HVAC+cleaning",
-            who: "Busy dual-income household coordinating preventive HVAC and recurring cleaning",
-            pain: "Multi-turn quote/schedule loops, partner approval, forgotten next-due",
-            job_to_be_done: "Complete home-service jobs with fewer touchpoints via host+MCP job PM",
-            why_candidate: "Current beachhead hypothesis from email intensity research",
-        },
-        #{
-            id: "icp-hvac-preventive-only",
-            name: "HVAC preventive-only household",
-            who: "Homeowners focused on AC tune-up/membership cadence, less cleaning coordination",
-            pain: "Membership PDF comparison, seasonal windows, rebook last provider",
-            job_to_be_done: "Book and track HVAC preventive without inbox chaos",
-            why_candidate: "Challenger: narrower vertical may show clearer signal faster",
-        },
-        #{
-            id: "icp-cleaning-recurring",
-            name: "Recurring cleaning household",
-            who: "Households with biweekly/monthly clean and custom priority lists",
-            pain: "Quote tiers, specials, partner forward, reschedule churn",
-            job_to_be_done: "Stable cleaning cadence with clear scope and fewer emails",
-            why_candidate: "Challenger: high frequency may differ from HVAC ticket size",
-        },
-        #{
-            id: "icp-small-landlord",
-            name: "Small landlord / multi-unit coordinator",
-            who: "Owner of a few residential units coordinating vendors across properties",
-            pain: "Multi-site status, PM handoffs, repeated vendor threads",
-            job_to_be_done: "Track jobs across units without a full PM stack",
-            why_candidate: "Challenger buyer; may need different product surface",
-        },
-        #{
-            id: "icp-operator-inbound-payer",
-            name: "Small operator (structured inbound payer)",
-            who: "Solo/small HVAC or cleaning operator drowning in unqualified email/SMS leads",
-            pain: "Quote ping-pong, no structured brief, calendar friction",
-            job_to_be_done: "Receive structured job briefs and reduce back-and-forth",
-            why_candidate: "Monetization-path ICP (payer) vs household user — test separately",
-        },
-    ];
-
     let icps = seed_icps;
-    let propose_rationale = "Fallback seed slate of 5 Totbox-relevant ICPs (propose agent incomplete).";
-    let used_seed = true;
-
+    let propose_rationale = "seed slate (propose incomplete)";
+    let diversity_map = "seed diversity map";
     if prop != () && prop.success && prop.output != () && prop.output.icps != () {
-        let proposed = prop.output.icps;
-        if proposed.len() >= 5 {
-            used_seed = false;
-            icps = proposed;
+        if prop.output.icps.len() >= slate_n {
+            icps = take_n(prop.output.icps, seed_icps, slate_n);
             if prop.output.rationale != () { propose_rationale = prop.output.rationale; }
-            else { propose_rationale = "Agent-proposed slate"; }
+            else { propose_rationale = "agent slate"; }
+            if prop.output.diversity_map != () { diversity_map = prop.output.diversity_map; }
         } else {
-            log("Propose returned " + proposed.len().to_string() + " ICPs (<5); using seed slate");
+            log("propose n=" + prop.output.icps.len().to_string() + " < slate_n; seed");
         }
     } else {
-        log("Propose agent failed or empty; using deterministic seed slate of 5 ICPs");
+        log("propose failed; seed");
     }
+    icps = take_n(icps, seed_icps, slate_n);
+    log("slate n=" + icps.len().to_string() + " diversity_map=" + diversity_map);
 
-    // Enforce exactly 5 in script (agents are untrusted)
-    if icps.len() > 5 {
-        log("Truncating proposed ICPs from " + icps.len().to_string() + " to 5");
-        let trimmed = [];
-        let ti = 0;
-        while ti < 5 {
-            trimmed.push(icps[ti]);
-            ti += 1;
-        }
-        icps = trimmed;
-    }
-    if icps.len() < 5 {
-        log("ICP list still short after guards; forcing seed slate");
-        icps = seed_icps;
-        used_seed = true;
-    }
-    if used_seed {
-        log("Using seed ICP slate for this round (agent slate incomplete)");
-    }
-
-    log("Proposed " + icps.len().to_string() + " ICPs for synthetic validation");
-
-    // ===== Scorecards (parallel, one per ICP) =====
+    // ===== Scorecards (parallel) =====
     phase("Scorecards");
-
     let score_jobs = [];
     let si = 0;
     while si < icps.len() {
         let ic = icps[si];
-        let ic_id = "icp-" + si.to_string();
-        let ic_name = "unnamed";
-        let ic_who = "";
-        let ic_pain = "";
-        let ic_job = "";
-        if ic.id != () { ic_id = ic.id; }
-        if ic.name != () { ic_name = ic.name; }
-        if ic.who != () { ic_who = ic.who; }
-        if ic.pain != () { ic_pain = ic.pain; }
-        if ic.job_to_be_done != () { ic_job = ic.job_to_be_done; }
-
+        let ic_id = icp_field(ic, "id", "icp-" + si.to_string());
+        let ic_name = icp_field(ic, "name", "unnamed");
         let sc_p = "";
-        sc_p += "Write a Company OS reward/risk scorecard for ONE ICP candidate (solo-founder bootstrap).\n";
-        sc_p += "Read docs/company-os/operating-system.md reward/risk section if needed.\n";
-        sc_p += "ICP id: " + ic_id + "\n";
-        sc_p += "Name: " + ic_name + "\n";
-        sc_p += "Who: " + ic_who + "\n";
-        sc_p += "Pain: " + ic_pain + "\n";
-        sc_p += "Job: " + ic_job + "\n";
-        sc_p += "Thesis: " + thesis_s + "\n";
-        sc_p += "Scores 0.0-1.0: pain_score, pay_or_act_score, reach_score, channel_fit_score,\n";
-        sc_p += "  risk_score (higher = riskier), time_to_signal_score (higher = faster clear signal).\n";
-        sc_p += "reward_notes and risk_notes must be concrete.\n";
-        sc_p += "promote_lean: promote | hold | demote (lean only; synthetic not done yet).\n";
-        sc_p += "kill_criteria: clear falsifiers for this ICP.\n";
-        sc_p += "Public-safe. No PII. Set icp_id and icp_name to match input.\n";
-
+        sc_p += "Score ONE ICP (solo-founder bootstrap).\n";
+        sc_p += "id=" + ic_id + " name=" + ic_name + "\n";
+        sc_p += "who=" + icp_field(ic, "who", "") + "\n";
+        sc_p += "pain=" + icp_field(ic, "pain", "") + "\n";
+        sc_p += "job=" + icp_field(ic, "job", "") + "\n";
+        sc_p += "seat_role=" + icp_field(ic, "seat_role", "") + "\n";
+        sc_p += "axis=" + icp_field(ic, "diversity_axis", "") + " value=" + icp_field(ic, "diversity_value", "") + "\n";
+        sc_p += "thesis:\n" + thesis_s + "\n";
+        sc_p += "Scores 0–1: pain, pay_or_act, reach, channel_fit, risk (higher=riskier),\n";
+        sc_p += "time_to_signal (higher=faster). reward_notes + risk_notes concrete.\n";
+        sc_p += "kill_criteria. Set icp_id/icp_name. No verdict.\n";
+        sc_p += RULES;
         score_jobs.push(#{
             prompt: sc_p,
             label: "ur-score-" + round_i.to_string() + "-" + si.to_string(),
@@ -471,75 +567,51 @@ while !finished {
         if sr != () && sr.success && sr.output != () {
             scorecards.push(sr.output);
         } else {
-            log("Scorecard failed for index " + sj.to_string() + " — fail-closed placeholder");
-            let fb = #{
+            log("score fail idx=" + sj.to_string());
+            scorecards.push(#{
                 icp_id: "unknown-" + sj.to_string(),
                 icp_name: "score-failed",
-                reward_notes: "score agent failed",
-                risk_notes: "unscored — treat as high uncertainty",
+                reward_notes: "score failed",
+                risk_notes: "unscored",
                 pain_score: 0.0,
                 pay_or_act_score: 0.0,
                 reach_score: 0.0,
                 channel_fit_score: 0.0,
                 risk_score: 1.0,
                 time_to_signal_score: 0.0,
-                composite_notes: "FAIL_CLOSED_UNSCORED",
-                kill_criteria: "Cannot validate without scorecard",
-                promote_lean: "hold",
-            };
-            scorecards.push(fb);
+                kill_criteria: "no scorecard",
+            });
         }
         sj += 1;
     }
 
-    // ===== Synthetic research (parallel per ICP) =====
+    // ===== Synthetic (parallel) =====
     phase("Synthetic");
-
     let syn_jobs = [];
     let yi = 0;
     while yi < icps.len() {
         let ic2 = icps[yi];
-        let id2 = "icp-" + yi.to_string();
-        let name2 = "unnamed";
-        let who2 = "";
-        let pain2 = "";
-        let job2 = "";
-        if ic2.id != () { id2 = ic2.id; }
-        if ic2.name != () { name2 = ic2.name; }
-        if ic2.who != () { who2 = ic2.who; }
-        if ic2.pain != () { pain2 = ic2.pain; }
-        if ic2.job_to_be_done != () { job2 = ic2.job_to_be_done; }
-
+        let id2 = icp_field(ic2, "id", "icp-" + yi.to_string());
         let sc_blob = "";
-        if yi < scorecards.len() {
-            sc_blob = json_encode(scorecards[yi]);
-        }
+        if yi < scorecards.len() { sc_blob = json_encode(scorecards[yi]); }
 
         let sy_p = "";
-        sy_p += "Run SYNTHETIC user research for ONE ICP (Company OS synthetic leg).\n";
-        sy_p += "This is a filter, not final proof. Be realistic and willing to falsify the hypothesis.\n";
-        sy_p += "Use tools to re-read docs/company-os/operating-system.md synthetic research questions and\n";
-        sy_p += "docs/research/home_services_email_insights.md for pattern grounding (not as proof of this ICP).\n\n";
-        sy_p += "ICP id: " + id2 + "\nName: " + name2 + "\nWho: " + who2 + "\n";
-        sy_p += "Pain: " + pain2 + "\nJob: " + job2 + "\n";
-        sy_p += "Scorecard JSON:\n" + sc_blob + "\n\n";
-        sy_p += "Product shape: host LLM + Totbox MCP job PM for home-service coordination;\n";
-        sy_p += "NOT a public vendor directory. Channels: email/SMS/form first.\n\n";
-        sy_p += "REQUIRED work product:\n";
-        sy_p += "1) persona_sketch: public-safe composite (role, constraints, tech literacy) — NOT a real person.\n";
-        sy_p += "2) Run THREE synthetic dialogue scenarios (summarize in dialogue_summaries):\n";
-        sy_p += "   a) Discovery: how they handle the job today; friction moments.\n";
-        sy_p += "   b) Offer reaction: host chat + job PM checklist + human approve-before-send; quote paste.\n";
-        sy_p += "   c) Objection: trust, privacy, money/time, partner approval, or provider messiness.\n";
-        sy_p += "3) Answer OS questions: pain_realism, status_quo, would_try, would_pay_or_act,\n";
-        sy_p += "   trust_barriers, say_no_reasons.\n";
-        sy_p += "4) synthetic_verdict: strong_fit | weak_fit | poor_fit | unclear\n";
-        sy_p += "5) verdict_key_factors: ONE short phrase (roughly 12-25 words) naming the main drivers\n";
-        sy_p += "   that produced this verdict (e.g. scores, channel fit, falsifiers, reach, risk).\n";
-        sy_p += "   Must explain the verdict at a glance for a table column — not a full paragraph.\n";
-        sy_p += "6) evidence_notes: what would real-world testing need to confirm/kill.\n";
-        sy_p += "Set icp_id to " + id2 + ".\n";
-        sy_p += "HARD: no PII; no real emails/phones/addresses; label everything synthetic.\n";
+        sy_p += "Synthetic research for ONE ICP. Willing to falsify.\n";
+        sy_p += "id=" + id2 + " name=" + icp_field(ic2, "name", "") + "\n";
+        sy_p += "who=" + icp_field(ic2, "who", "") + "\n";
+        sy_p += "pain=" + icp_field(ic2, "pain", "") + "\n";
+        sy_p += "job=" + icp_field(ic2, "job", "") + "\n";
+        sy_p += "seat_role=" + icp_field(ic2, "seat_role", "") + "\n";
+        sy_p += "axis=" + icp_field(ic2, "diversity_axis", "") + " value=" + icp_field(ic2, "diversity_value", "") + "\n";
+        sy_p += "scorecard:\n" + sc_blob + "\n";
+        sy_p += "Output:\n";
+        sy_p += "1) persona_sketch — who they are in plain words (not a real person)\n";
+        sy_p += "2) dialogue_summaries — discovery | offer | objection (plain English)\n";
+        sy_p += "3) synthetic_verdict — strong_fit | weak_fit only (uncertain→weak_fit)\n";
+        sy_p += "4) verdict_key_factors — HUMAN Rationale for founders (see RULES):\n";
+        sy_p += "   one short sentence, \"Keep — …\" or \"Out — …\", everyday words only\n";
+        sy_p += "5) evidence_notes — what a real trial must prove or kill (plain English)\n";
+        sy_p += "Set icp_id=" + id2 + ". " + RULES;
 
         syn_jobs.push(#{
             prompt: sy_p,
@@ -556,55 +628,65 @@ while !finished {
     while yj < syn_results.len() {
         let yr = syn_results[yj];
         if yr != () && yr.success && yr.output != () {
-            synthetics.push(yr.output);
+            let o = yr.output;
+            let verdict = "weak_fit";
+            if o.synthetic_verdict == "strong_fit" { verdict = "strong_fit"; }
+            let persona = "";
+            let dialogues = "";
+            let factors = "";
+            let evidence = "";
+            let oid = "unknown-" + yj.to_string();
+            if o.icp_id != () { oid = o.icp_id; }
+            if o.persona_sketch != () { persona = o.persona_sketch; }
+            if o.dialogue_summaries != () { dialogues = o.dialogue_summaries; }
+            if o.verdict_key_factors != () { factors = o.verdict_key_factors; }
+            if o.evidence_notes != () { evidence = o.evidence_notes; }
+            synthetics.push(#{
+                icp_id: oid,
+                persona_sketch: persona,
+                dialogue_summaries: dialogues,
+                synthetic_verdict: verdict,
+                verdict_key_factors: factors,
+                evidence_notes: evidence,
+            });
         } else {
-            log("Synthetic research failed for index " + yj.to_string() + " — fail-closed");
+            log("synth fail idx=" + yj.to_string());
             synthetics.push(#{
                 icp_id: "unknown-" + yj.to_string(),
-                persona_sketch: "unavailable",
-                dialogue_summaries: "synthetic agent failed",
-                pain_realism: "unknown",
-                status_quo: "unknown",
-                would_try: "unknown",
-                would_pay_or_act: "unknown",
-                trust_barriers: "unknown",
-                say_no_reasons: "agent failure",
-                synthetic_verdict: "unclear",
-                verdict_key_factors: "Synthetic agent failed — treat as unverified",
-                evidence_notes: "FAIL_CLOSED_NO_SYNTHETIC",
+                persona_sketch: "n/a",
+                dialogue_summaries: "synthetic failed",
+                synthetic_verdict: "weak_fit",
+                verdict_key_factors: "Out — research agent failed; treat as not ready.",
+                evidence_notes: "Need a successful synthetic run before any real test.",
             });
         }
         yj += 1;
     }
 
-    // ===== Adversarial challenge =====
+    // ===== Challenge =====
     phase("Challenge");
-
     let pack = #{
         icps: icps,
         scorecards: scorecards,
         synthetics: synthetics,
         propose_rationale: propose_rationale,
+        diversity_map: diversity_map,
         thesis: thesis_s,
         founder_notes: last_notes,
+        slate_n: slate_n,
     };
     let pack_json = json_encode(pack);
 
     let ch_p = "";
-    ch_p += "You are an adversarial skeptic on Totbox ICP ranking (fail closed).\n";
-    ch_p += "Read the research pack JSON and Company OS promotion rules.\n";
-    ch_p += "Re-read docs/company-os/operating-system.md ranking/promotion rules with tools.\n\n";
-    ch_p += "Research pack:\n" + pack_json + "\n\n";
-    ch_p += "Tasks:\n";
-    ch_p += "- ranking_sound: true only if ordering is justified by synthetic evidence + reward/risk, not favorite bias.\n";
-    ch_p += "- overclaimed: list claims that synthetic work does NOT support.\n";
-    ch_p += "- missing_challengers: groups we should have tested but did not.\n";
-    ch_p += "- recommended_rank_order: best → worst by id or name (string).\n";
-    ch_p += "- ready_for_real_world_ai: true ONLY if top ICPs are high-quality enough that real-world\n";
-    ch_p += "  tests would not waste founder time — still synthetic-only; never claim real PMF.\n";
-    ch_p += "  Default false if scorecards/synthetics failed, verdicts unclear, or beachhead unchallenged.\n";
-    ch_p += "- rationale and conditions (what must be true before real tests).\n";
-    ch_p += "Public-safe. Prefer demote over promote when uncertain.\n";
+    ch_p += "Adversarial skeptic. Fail closed. Pack:\n" + pack_json + "\n";
+    ch_p += "Return:\n";
+    ch_p += "- ranking_sound: order justified by evidence+scores (not favorite)\n";
+    ch_p += "- diversity_ok: true only if NEW seats use unique diversity_value cells and no TRIED recycle\n";
+    ch_p += "- overclaimed / missing_challengers / conditions\n";
+    ch_p += "- recommended_rank_order: best→worst; all strong_fit before weak_fit\n";
+    ch_p += "- ready_for_real_world_ai: true only if ≥1 strong_fit worth shadow tests;\n";
+    ch_p += "  default false if failures, zero strong_fit, diversity broken, or beachhead unchallenged\n";
+    ch_p += RULES + DIVERSITY;
 
     let chal = agent(ch_p, #{
         label: "ur-challenge-" + round_i.to_string(),
@@ -613,72 +695,65 @@ while !finished {
     });
 
     let ranking_sound = false;
-    let overclaimed = "challenge agent failed — treat ranking as unverified";
+    let diversity_ok = false;
+    let overclaimed = "challenge failed";
     let missing_ch = "";
     let rank_order = "unverified";
     let ready_ai = false;
-    let chal_rationale = "fail-closed";
-    let conditions = "Re-run challenge successfully before real-world tests.";
+    let conditions = "re-run challenge before real tests";
     if chal != () && chal.success && chal.output != () {
         if chal.output.ranking_sound == true { ranking_sound = true; }
+        if chal.output.diversity_ok == true { diversity_ok = true; }
         if chal.output.overclaimed != () { overclaimed = chal.output.overclaimed; }
         if chal.output.missing_challengers != () { missing_ch = chal.output.missing_challengers; }
         if chal.output.recommended_rank_order != () { rank_order = chal.output.recommended_rank_order; }
         if chal.output.ready_for_real_world_ai == true { ready_ai = true; }
-        if chal.output.rationale != () { chal_rationale = chal.output.rationale; }
         if chal.output.conditions != () { conditions = chal.output.conditions; }
     } else {
-        log("Challenge agent failed — ready_for_real_world_ai forced false");
+        log("challenge failed → ready=false");
+        ready_ai = false;
+    }
+    // Fail closed if diversity broken
+    if !diversity_ok {
+        log("diversity_ok=false; ready forced false");
         ready_ai = false;
     }
     ai_ready = ready_ai;
 
-    // ===== Report + persist =====
+    // ===== Report =====
     phase("Report");
-
     let rep_p = "";
-    rep_p += "Write the founder-facing user-research ROUND REPORT for Totbox and persist artifacts.\n";
-    rep_p += "Use write tools (read-write). Public-safe only — never write PII.\n\n";
-    rep_p += "Round label: " + this_label + "\n";
-    rep_p += "AI ready_for_real_world (skeptic): " + ready_ai.to_string() + "\n";
-    rep_p += "ranking_sound: " + ranking_sound.to_string() + "\n";
-    rep_p += "recommended_rank_order: " + rank_order + "\n";
+    rep_p += "Write ROUND report + gate template. Write tools. Round=" + this_label + "\n";
+    rep_p += "slate_n=" + slate_n.to_string() + " ready=" + ready_ai.to_string() + "\n";
+    rep_p += "ranking_sound=" + ranking_sound.to_string() + " diversity_ok=" + diversity_ok.to_string() + "\n";
+    rep_p += "rank_order: " + rank_order + "\n";
     rep_p += "overclaimed: " + overclaimed + "\n";
     rep_p += "missing_challengers: " + missing_ch + "\n";
-    rep_p += "skeptic rationale: " + chal_rationale + "\n";
-    rep_p += "conditions: " + conditions + "\n\n";
-    rep_p += "Full pack JSON:\n" + pack_json + "\n\n";
-    rep_p += "WRITE these files (create dirs if needed):\n";
-    rep_p += "1) research/icps/ROUND_" + this_label + "_report.md — full markdown report with:\n";
-    rep_p += "   - Executive summary\n";
-    rep_p += "   - Method (Company OS synthetic filter; not real-world proof)\n";
-    rep_p += "   - REQUIRED ranked verdict table (all 5 ICPs) with columns exactly:\n";
-    rep_p += "     Rank | ICP | Synthetic verdict | Key factors | promote_lean\n";
-    rep_p += "     where Key factors is a brief (one short phrase) summary of the drivers that\n";
-    rep_p += "     produced the verdict — prefer each ICP's verdict_key_factors from the pack;\n";
-    rep_p += "     if missing, synthesize from scorecard + synthetic notes (still one short phrase).\n";
-    rep_p += "   - Full scorecard table (numeric scores) — may be separate from the verdict table\n";
-    rep_p += "   - Ranked top 3 with why\n";
-    rep_p += "   - Primary recommendation + kill criteria\n";
-    rep_p += "   - Skeptic section (overclaims, conditions)\n";
-    rep_p += "   - What real-world tests should do next (concierge jobs, metrics)\n";
-    rep_p += "   - Explicit label: SYNTHETIC ONLY\n";
-    rep_p += "2) research/icps/FOUNDER_FEEDBACK.md — OVERWRITE with a template:\n";
-    rep_p += "   ```\n";
-    rep_p += "   # Founder feedback (user-research)\n";
-    rep_p += "   decision: iterate | agree_ready | kill\n";
-    rep_p += "   # Pick ONE decision word on the next line after 'decision:'\n";
-    rep_p += "   decision: \n";
-    rep_p += "   agrees_with_ai_ready: yes | no\n";
-    rep_p += "   notes:\n";
-    rep_p += "   (Write concrete feedback: which ICPs to drop/add, score disputes, constraints.)\n";
-    rep_p += "   ```\n";
-    rep_p += "3) Update research/icps/README.md index of candidates and latest round pointer.\n";
-    rep_p += "4) Optionally write one short file per top ICP under research/icps/<id>.md if helpful.\n";
-    rep_p += "5) Do NOT write READY_FOR_REAL_WORLD.md unless you are told founder already agreed (you are not).\n";
-    rep_p += "6) Optionally append a public-safe decision note under traces/decisions/ (no PII).\n\n";
-    rep_p += "Return ok, report_path, feedback_path, top3_summary, primary_recommendation,\n";
-    rep_p += "ai_ready_for_real_world (must match skeptic " + ready_ai.to_string() + "), message.\n";
+    rep_p += "conditions: " + conditions + "\n";
+    rep_p += "diversity_map: " + diversity_map + "\n";
+    rep_p += "pack:\n" + pack_json + "\n\n";
+    rep_p += "WRITE:\n";
+    rep_p += "1) research/icps/ROUND_" + this_label + "_report.md\n";
+    rep_p += "   a) Header: SYNTHETIC ONLY, round, slate_n, ready, ranking_sound, diversity_ok\n";
+    rep_p += "   b) Exec: ≤2 short plain-English paras (teen-founder readable) + FIRST table:\n";
+    rep_p += "      Rank | ICP | seat_role | Synthetic verdict | Rationale\n";
+    rep_p += "      All " + slate_n.to_string() + " rows. Verdict strong_fit|weak_fit only.\n";
+    rep_p += "      Rationale MUST be humanized: one short \"Keep — …\" or \"Out — …\" sentence\n";
+    rep_p += "      from verdict_key_factors (rewrite denser pack text into plain English).\n";
+    rep_p += "      Forbidden: promote_lean columns; forbidden jargon piles (channel_fit, TTS, WTP,\n";
+    rep_p += "      LTV, SaaS gravity, pay_or_act, dual-approve) in the Rationale column.\n";
+    rep_p += "   c) Diversity map table: diversity_value | ICP id | prior_status\n";
+    rep_p += "   d) Method + tried-exclusion (short; plain English)\n";
+    rep_p += "   e) Scorecard numeric table (all N) — scores may stay technical\n";
+    rep_p += "   f) Top 3 why in plain English; shortlist = strong_fit only; kill criteria\n";
+    rep_p += "   g) Skeptic; next real tests if any strong_fit (plain English)\n";
+    rep_p += "   h) Label SYNTHETIC ONLY\n";
+    rep_p += "2) FOUNDER_FEEDBACK.md template (decision blank)\n";
+    rep_p += "3) README.md latest pointer + same rank columns (+ optional Brief)\n";
+    rep_p += "4) Optional briefs for strong_fit only\n";
+    rep_p += "5) Do NOT write READY_FOR_REAL_WORLD.md\n";
+    rep_p += "ai_ready_for_real_world must be " + ready_ai.to_string() + ".\n";
+    rep_p += RULES;
 
     let rep = agent(rep_p, #{
         label: "ur-report-" + round_i.to_string(),
@@ -690,72 +765,46 @@ while !finished {
     let feedback_path = "research/icps/FOUNDER_FEEDBACK.md";
     let top3 = "";
     let primary = "";
-    let rep_msg = "report step finished";
-    let rep_ok = false;
+    let rep_msg = "report done";
     if rep != () && rep.success && rep.output != () {
-        if rep.output.ok == true { rep_ok = true; }
         if rep.output.report_path != () { report_path = rep.output.report_path; }
         if rep.output.feedback_path != () { feedback_path = rep.output.feedback_path; }
         if rep.output.top3_summary != () { top3 = rep.output.top3_summary; }
         if rep.output.primary_recommendation != () { primary = rep.output.primary_recommendation; }
         if rep.output.message != () { rep_msg = rep.output.message; }
-        if rep.output.ai_ready_for_real_world == true { ai_ready = true; }
         if rep.output.ai_ready_for_real_world == false { ai_ready = false; }
     } else {
-        log("Report agent failed — founder should still review partial agent outputs");
+        log("report agent failed");
     }
     last_report_path = report_path;
     last_top3 = top3;
     last_primary = primary;
 
-    let scratch = "";
-    scratch += "# User research round " + this_label + "\n\n";
-    scratch += rep_msg + "\n\n";
+    let scratch = "# Round " + this_label + " slate_n=" + slate_n.to_string() + "\n\n" + rep_msg + "\n\n";
     scratch += "- report: " + report_path + "\n";
-    scratch += "- feedback template: " + feedback_path + "\n";
+    scratch += "- feedback: " + feedback_path + "\n";
     scratch += "- top3: " + top3 + "\n";
     scratch += "- primary: " + primary + "\n";
-    scratch += "- ai_ready_for_real_world: " + ai_ready.to_string() + "\n";
-    scratch += "- ranking_sound: " + ranking_sound.to_string() + "\n";
-    scratch += "- rank_order: " + rank_order + "\n";
-    scratch += "\n## Founder next step\n";
-    scratch += "1. Read " + report_path + "\n";
-    scratch += "2. Edit " + feedback_path + " set decision to iterate | agree_ready | kill and write notes\n";
-    scratch += "3. Resume this workflow (or re-launch if process died)\n";
+    scratch += "- ready: " + ai_ready.to_string() + " diversity_ok: " + diversity_ok.to_string() + "\n";
+    scratch += "- rank: " + rank_order + "\n";
     let spath = write_scratch_file("user-research-round-" + this_label + ".md", scratch);
 
     // ===== Founder gate =====
     phase("Founder gate");
-
     let gate_msg = "";
-    gate_msg += "USER RESEARCH ROUND " + this_label + " complete.\n\n";
-    gate_msg += "Report: " + report_path + "\n";
-    gate_msg += "Scratch: " + spath + "\n";
-    gate_msg += "AI skeptic ready_for_real_world: " + ai_ready.to_string() + "\n";
-    gate_msg += "Primary recommendation: " + primary + "\n";
-    gate_msg += "Top 3: " + top3 + "\n\n";
-    gate_msg += "FOUNDER ACTION (required before continue):\n";
-    gate_msg += "1) Review the report on disk.\n";
-    gate_msg += "2) Edit research/icps/FOUNDER_FEEDBACK.md:\n";
-    gate_msg += "   - decision: iterate  (run another synthetic round with your notes)\n";
-    gate_msg += "   - decision: agree_ready  (you AND process agree ICPs are high quality enough for real-world tests)\n";
-    gate_msg += "   - decision: kill  (stop this research line)\n";
-    gate_msg += "   - notes: concrete redirects for the next round\n";
-    gate_msg += "3) Resume this workflow.\n";
-    gate_msg += "agree_ready should mean you accept top ICPs for concierge/shadow real tests — not that PMF is proven.\n";
-
+    gate_msg += "ROUND " + this_label + " complete (slate_n=" + slate_n.to_string() + ").\n";
+    gate_msg += "Report: " + report_path + "\nScratch: " + spath + "\n";
+    gate_msg += "AI ready: " + ai_ready.to_string() + " diversity_ok: " + diversity_ok.to_string() + "\n";
+    gate_msg += "Primary: " + primary + "\nTop3: " + top3 + "\n\n";
+    gate_msg += "Edit research/icps/FOUNDER_FEEDBACK.md:\n";
+    gate_msg += "  decision: iterate | agree_ready | kill\n";
+    gate_msg += "  notes: redirects (keep/drop must respect diversity cells)\n";
+    gate_msg += "Then resume. agree_ready = OK for shadow real tests, not PMF.\n";
     await_user("user", gate_msg);
 
-    // After resume: read founder feedback from disk
     let fb_p = "";
-    fb_p += "Read research/icps/FOUNDER_FEEDBACK.md with read_file (required).\n";
-    fb_p += "Parse founder intent. Map decision to exactly one of: iterate | agree_ready | kill.\n";
-    fb_p += "If file missing or decision blank/unclear, decision=iterate and file_found=false.\n";
-    fb_p += "agrees_with_ai_ready: true only if founder explicitly agrees ICPs are ready for real-world testing\n";
-    fb_p += "(decision agree_ready, or notes clearly say ready for real tests).\n";
-    fb_p += "notes: copy founder notes for the next research round.\n";
-    fb_p += "raw_excerpt: short excerpt. Public-safe.\n";
-
+    fb_p += "Read research/icps/FOUNDER_FEEDBACK.md. decision: iterate|agree_ready|kill.\n";
+    fb_p += "Blank/missing → iterate, file_found=false. Copy notes.\n";
     let fb = agent(fb_p, #{
         label: "ur-feedback-" + round_i.to_string(),
         capability_mode: "read-only",
@@ -764,108 +813,61 @@ while !finished {
 
     let decision = "iterate";
     let fb_notes = "";
-    let agrees = false;
-    let file_found = false;
     if fb != () && fb.success && fb.output != () {
         if fb.output.decision != () { decision = fb.output.decision; }
         if fb.output.notes != () { fb_notes = fb.output.notes; }
-        if fb.output.agrees_with_ai_ready == true { agrees = true; }
-        if fb.output.file_found == true { file_found = true; }
-    } else {
-        log("Feedback parse failed — defaulting to iterate");
-        decision = "iterate";
     }
-
-    // Normalize decision strings loosely
     if decision != "iterate" && decision != "agree_ready" && decision != "kill" {
-        // agents may return messy text; treat non-exact as iterate unless contains markers
-        log("Non-canonical decision '" + decision + "' — coercing carefully");
+        log("bad decision → iterate");
         decision = "iterate";
     }
-
-    last_decision = decision;
-    if fb_notes != "" {
-        last_notes = fb_notes;
-    }
-
-    log("Founder decision=" + decision + " agrees=" + agrees.to_string() + " file_found=" + file_found.to_string());
+    if fb_notes != "" { last_notes = fb_notes; }
+    log("decision=" + decision);
 
     if decision == "kill" {
-        let kill_scratch = "";
-        kill_scratch += "# User research stopped (founder kill)\n\n";
-        kill_scratch += "Last report: " + last_report_path + "\n";
-        kill_scratch += "Notes: " + last_notes + "\n";
-        let kp = write_scratch_file("user-research-killed.md", kill_scratch);
+        let kp = write_scratch_file(
+            "user-research-killed.md",
+            "# killed\nreport: " + last_report_path + "\nnotes: " + last_notes + "\n"
+        );
         complete(#{
-            mode: "round",
-            outcome: "kill",
-            path: kp,
-            last_report: last_report_path,
-            primary: last_primary,
-            top3: last_top3,
-            rounds_completed: round_i,
-            message: "Founder killed this research line.",
+            mode: "round", outcome: "kill", path: kp,
+            last_report: last_report_path, primary: last_primary, top3: last_top3,
+            rounds_completed: round_i, message: "Founder kill",
         });
     }
 
-    // Agreement requires founder agree_ready; AI ready alone is insufficient
     if decision == "agree_ready" {
-        // Persist ready marker via agent
         let ready_p = "";
-        ready_p += "Founder decision is agree_ready for Totbox ICP synthetic research.\n";
-        ready_p += "Write research/icps/READY_FOR_REAL_WORLD.md with:\n";
-        ready_p += "- Statement that founder agrees top ICPs are high quality enough for real-world testing\n";
-        ready_p += "- primary recommendation: " + last_primary + "\n";
-        ready_p += "- top3: " + last_top3 + "\n";
-        ready_p += "- last report: " + last_report_path + "\n";
-        ready_p += "- AI skeptic ready flag was: " + ai_ready.to_string() + "\n";
-        ready_p += "- Explicit: synthetic filter only; real jobs still required for PMF\n";
-        ready_p += "- Suggested real-world plan: 3-5 concierge/shadow jobs; touchpoint metrics; kill criteria\n";
-        ready_p += "- Public-safe only\n";
-        ready_p += "Also update research/icps/README.md to note ready marker present.\n";
-        ready_p += "Optionally write a short traces/decisions/ note (no PII).\n";
-        ready_p += "Return ok=true, report_path=" + last_report_path + ", feedback_path=research/icps/FOUNDER_FEEDBACK.md,\n";
-        ready_p += "top3_summary, primary_recommendation, ai_ready_for_real_world, message confirming marker written.\n";
+        ready_p += "Founder agree_ready. Write research/icps/READY_FOR_REAL_WORLD.md:\n";
+        ready_p += "- founder accepts strong_fit ICPs for shadow real tests\n";
+        ready_p += "- primary: " + last_primary + "\n- top3: " + last_top3 + "\n";
+        ready_p += "- report: " + last_report_path + "\n- AI ready was: " + ai_ready.to_string() + "\n";
+        ready_p += "- not PMF; 3–5 instrumented shadow jobs + kill criteria\n";
+        ready_p += "Update README. " + RULES;
+        ready_p += "Return report schema; ok=true.\n";
 
         let ready_w = agent(ready_p, #{
-            label: "ur-ready-marker-" + round_i.to_string(),
+            label: "ur-ready-" + round_i.to_string(),
             capability_mode: "read-write",
             output_schema: report_schema,
         });
-
-        let ready_msg = "Founder agreed ICPs ready for real-world testing.";
+        let ready_msg = "agree_ready marker written";
         if ready_w != () && ready_w.success && ready_w.output != () && ready_w.output.message != () {
             ready_msg = ready_w.output.message;
         }
-
-        let done_scratch = "";
-        done_scratch += "# User research: founder agree_ready\n\n";
-        done_scratch += ready_msg + "\n\n";
-        done_scratch += "- last_report: " + last_report_path + "\n";
-        done_scratch += "- primary: " + last_primary + "\n";
-        done_scratch += "- top3: " + last_top3 + "\n";
-        done_scratch += "- ai_ready_flag: " + ai_ready.to_string() + "\n";
-        done_scratch += "- rounds: " + round_i.to_string() + "\n";
-        done_scratch += "- marker: research/icps/READY_FOR_REAL_WORLD.md\n";
-        done_scratch += "\nNext: real-world concierge/shadow tests; company-operating-loop stages 2/6.\n";
-        let dp = write_scratch_file("user-research-ready.md", done_scratch);
-
+        let dp = write_scratch_file(
+            "user-research-ready.md",
+            "# agree_ready\n" + ready_msg + "\nreport: " + last_report_path + "\n"
+        );
         complete(#{
-            mode: "round",
-            outcome: "agree_ready",
-            path: dp,
-            last_report: last_report_path,
-            primary: last_primary,
-            top3: last_top3,
-            rounds_completed: round_i,
-            ai_ready_for_real_world: ai_ready,
-            ready_marker: "research/icps/READY_FOR_REAL_WORLD.md",
-            message: ready_msg,
+            mode: "round", outcome: "agree_ready", path: dp,
+            last_report: last_report_path, primary: last_primary, top3: last_top3,
+            rounds_completed: round_i, ai_ready_for_real_world: ai_ready,
+            ready_marker: "research/icps/READY_FOR_REAL_WORLD.md", message: ready_msg,
         });
     }
 
-    // iterate — next while loop
-    log("Founder requested iterate; starting next synthetic round with updated notes");
+    log("iterate → next round");
     round_i += 1;
 }
 
