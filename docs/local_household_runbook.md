@@ -5,6 +5,8 @@
 
 **Bootstrap focus (now):** Prove one house-service job end-to-end (HVAC or cleaning) with fewer touchpoints. Operator revenue and ServiceTitan-class provider MCP are **later**, after paid proof. See README **Bootstrap roadmap**.
 
+**Phase 1 beachhead (current):** single decision-maker ICP; **first real path = cleaning exception/rebook** (not pure standing-Tuesday autopilot). Pass/kill questions + scorecard: [`docs/company-os/instance/phase1_single_dm_cleaning.md`](../company-os/instance/phase1_single_dm_cleaning.md) · [`scores.md`](../company-os/instance/scores.md).
+
 ---
 
 ## 1. Install (once)
