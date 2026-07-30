@@ -2,30 +2,40 @@
 
 import { useEffect, useState } from 'react';
 
-export function McpConnectPanel({ compact = false }: { compact?: boolean }) {
-  const [endpoint, setEndpoint] = useState('');
+type Props = {
+  /** Server-resolved absolute MCP URL (preferred). Client falls back to origin. */
+  endpoint: string;
+  compact?: boolean;
+};
+
+export function McpConnectPanel({ endpoint: serverEndpoint, compact = false }: Props) {
+  const [endpoint, setEndpoint] = useState(serverEndpoint);
   const [copied, setCopied] = useState<'url' | 'cmd' | null>(null);
   const [toolCount, setToolCount] = useState<number | null>(null);
   const [probeOk, setProbeOk] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const url = `${window.location.origin}/mcp`;
-    setEndpoint(url);
-
+    // Prefer live browser origin (preview host may differ from internal host header)
+    if (typeof window !== 'undefined') {
+      const live = `${window.location.origin}/mcp`;
+      if (live && live !== endpoint) setEndpoint(live);
+    }
     fetch('/mcp', { method: 'GET' })
       .then(async (r) => {
         if (!r.ok) throw new Error('bad status');
         const data = await r.json();
         setToolCount(Array.isArray(data.tools) ? data.tools.length : null);
         setProbeOk(true);
+        if (typeof data.mcpEndpoint === 'string' && data.mcpEndpoint.includes('/mcp')) {
+          // Keep browser origin if already set; only fill if empty
+        }
       })
       .catch(() => setProbeOk(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const grokCmd = endpoint
-    ? `grok mcp add --transport http totbox ${endpoint}`
-    : 'grok mcp add --transport http totbox <endpoint>';
+  const display = endpoint || serverEndpoint;
+  const grokCmd = `grok mcp add --transport http totbox ${display}`;
 
   async function copy(text: string, which: 'url' | 'cmd') {
     try {
@@ -81,12 +91,12 @@ export function McpConnectPanel({ compact = false }: { compact?: boolean }) {
                   data-testid="mcp-endpoint-url"
                   className="input-field flex-1 break-all font-mono text-[var(--text-xs)] sm:text-[var(--text-sm)]"
                 >
-                  {endpoint || 'Resolving…'}
+                  {display}
                 </code>
                 <button
                   type="button"
-                  disabled={!endpoint}
-                  onClick={() => copy(endpoint, 'url')}
+                  disabled={!display}
+                  onClick={() => copy(display, 'url')}
                   className="btn btn-primary shrink-0"
                 >
                   {copied === 'url' ? 'Copied' : 'Copy URL'}
@@ -107,7 +117,7 @@ export function McpConnectPanel({ compact = false }: { compact?: boolean }) {
                 </code>
                 <button
                   type="button"
-                  disabled={!endpoint}
+                  disabled={!display}
                   onClick={() => copy(grokCmd, 'cmd')}
                   className="btn btn-secondary shrink-0"
                 >
@@ -137,8 +147,8 @@ export function McpConnectPanel({ compact = false }: { compact?: boolean }) {
           </div>
 
           <p className="mt-4 text-[var(--text-xs)] leading-relaxed text-[var(--fg-subtle)]">
-            Local-only alternative: npm run dev:mcp → http://localhost:3001/mcp (same machine as Grok
-            CLI). This panel shows the public endpoint for this running instance.
+            Local alternative: npm run dev:mcp → http://localhost:3001/mcp (same machine as Grok CLI).
+            No auth for household tools.
           </p>
         </div>
       </div>

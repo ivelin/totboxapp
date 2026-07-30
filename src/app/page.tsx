@@ -1,8 +1,13 @@
 import Link from 'next/link';
 import { SiteHeader } from '@/components/SiteHeader';
 import { McpConnectPanel } from '@/components/McpConnectPanel';
+import { getPublicMcpEndpoint } from '@/lib/public-origin';
 
-export default function TotboxHome() {
+export const dynamic = 'force-dynamic';
+
+export default async function TotboxHome() {
+  const mcpEndpoint = await getPublicMcpEndpoint();
+
   return (
     <div className="min-h-full bg-[var(--bg)] text-[var(--fg)]">
       <SiteHeader />
@@ -26,13 +31,12 @@ export default function TotboxHome() {
               Try household jobs
             </Link>
           </div>
-          <p className="mt-4 text-[var(--text-sm)] text-[var(--fg-subtle)]">
-            No new consumer app. Point Grok at the MCP endpoint below.
+          <p className="mt-4 break-all font-mono text-[var(--text-xs)] text-[var(--fg-subtle)] sm:text-[var(--text-sm)]">
+            {mcpEndpoint}
           </p>
         </section>
 
-        {/* MCP URL — primary connect surface for testing */}
-        <McpConnectPanel />
+        <McpConnectPanel endpoint={mcpEndpoint} />
 
         <section className="border-b border-[var(--border)] bg-[var(--bg)] py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
