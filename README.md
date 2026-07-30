@@ -66,6 +66,8 @@ Ask naturally, for example:
 - “Book a 3hr priority clean focusing on blinds, windows, under beds, corners — share options before I confirm”
 - “Get live-oak pruning quotes and flag Oak Wilt season constraints”
 
+**Browser console (same Job PM as MCP):** `npm run dev` → open **[/jobs](/jobs)** — walk a Phase 1 cleaning job with dry-run send, quote paste, money/time gate, and next-due.
+
 **For providers (small operators)**
 
 Add the Totbox MCP endpoint in your chat setup and connect your existing **calendar** (MVP). **ServiceTitan** operators get a deeper path later: qualified bookings into their tenant, webhooks for status, invoice-aware records. Inbound jobs arrive as structured briefs.
@@ -95,6 +97,7 @@ Chat Apps (Grok / Claude / ChatGPT)
 |  - Rules / trust / recurring     |
 |  - Household approval gates      |
 |  - Records / archive hooks       |
+|  - Browser job console (/jobs)   |
 +----------------------------------+
     |
     |  OAuth / webhooks
@@ -130,7 +133,10 @@ npm run dev:mcp      # start_job, get_workflow, record_user_approval, …
 
 **Workflow visibility:** ask the host anytime — `get_workflow` (general or `service_kind`) or `get_workflow({ job_id })` / `get_job` for the live strip. Same 8 steps for every house service; you stay in control of approvals. Structured as `totbox.workflow_def` / `totbox.workflow_progress` with optional Mermaid projection (`diagrams.mermaid`) — see [`docs/workflows/format.md`](docs/workflows/format.md).
 
-**Interactive sample (browser):** `npm run dev` → open [**/workflow**](http://localhost:3000/workflow) — mobile-friendly strip, tap a step for You vs App, sample “approve message” card.
+**Interactive surfaces (browser):**
+- **`/jobs`** — live household console (real Job PM API; Phase 1 cleaning path)
+- **`/workflow`** — static sample strip + You vs App roles
+- **`/dashboard`** — provider register / MCP token / calendar demo
 
 Host loop: follow each `next_action` (prefer host memory/Gmail/SMS/voice tools) → `record_user_approval` → never send without grant → dry-run or `hostPerformed` send → `ingest_provider_message`.
 
@@ -142,7 +148,7 @@ Also: `npm run smoke:house-owner` (legacy fixture compare). Docs: [`docs/host_ll
 
 ```bash
 npm install
-npm run dev          # Next.js UI on :3000 (src/, public/)
+npm run dev          # Next.js UI (src/, public/)
 npm run dev:mcp      # MCP on :3001 (product/server/)
 npm run smoke:job    # product/scripts/job-smoke.ts
 npm run company-os -- status
@@ -163,6 +169,8 @@ npm test && npm run typecheck && npm run build
 
 MCP job tools: `get_workflow`, `start_job`, `get_job`, `list_jobs`, `update_job_facts`, `submit_draft_for_approval`, `record_user_approval`, `approve_and_send_message`, `ingest_provider_message`, `normalize_quote`, `confirm_appointment`, `record_job_completion`, …
 
+Browser API (same tools): `GET/POST /api/jobs`, `GET/POST /api/jobs/:jobId` with `{ action: "update_facts" | "submit_draft" | "approve" | "send" | "ingest" | "confirm" | "complete" | … }`.
+
 ---
 
 ## Implementation status
@@ -171,6 +179,7 @@ MCP job tools: `get_workflow`, `start_job`, `get_job`, `list_jobs`, `update_job_
 |------|--------|
 | Stages 1–6 scaffold | On `main` |
 | Job PM + host-LLM safety gates | On `main` |
+| Browser household console (`/jobs`) | On `main` — Phase 1 cleaning path UI over shared Job PM |
 | Phase 1 full household path (paste quote → book → next-due) | **Now** — see Bootstrap roadmap |
 | Always-on 24/7 daemon / real SMS vendor | Non-goal for now |
 | Operator paid pilots (Phase 2) | Deferred until shadow PMF |

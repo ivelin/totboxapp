@@ -1,8 +1,74 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Surfaces — light editorial */
+  --bg: #f7f7f5;
+  --bg-elevated: #ffffff;
+  --bg-subtle: #efefec;
+  --fg: #141416;
+  --fg-muted: #5c5c66;
+  --fg-subtle: #8a8a93;
+  --border: color-mix(in oklab, var(--fg) 10%, transparent);
+  --border-strong: color-mix(in oklab, var(--fg) 18%, transparent);
+
+  /* Single cool accent — ink slate, not purple */
+  --accent: #c8ccd4;
+  --accent-strong: #3d5a80;
+  --accent-soft: color-mix(in oklab, var(--accent-strong) 12%, transparent);
+  --accent-fg: #0a0a0b;
+
+  /* Semantic (small badges only) */
+  --success: #1f7a4c;
+  --success-soft: color-mix(in oklab, var(--success) 12%, transparent);
+  --warn: #9a6b12;
+  --warn-fg: #3d2a05;
+  --warn-soft: color-mix(in oklab, var(--warn) 14%, transparent);
+  --danger: #b42318;
+  --danger-soft: color-mix(in oklab, var(--danger) 12%, transparent);
+
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Type */
+  --font-display: var(--font-geist-sans), system-ui, sans-serif;
+  --font-body: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --text-xs: clamp(0.75rem, 0.7rem + 0.2vw, 0.8125rem);
+  --text-sm: clamp(0.875rem, 0.82rem + 0.25vw, 0.9375rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.5vw, 1.25rem);
+  --text-xl: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  --text-2xl: clamp(2rem, 1.4rem + 2vw, 2.75rem);
+  --text-3xl: clamp(2.5rem, 1.6rem + 3vw, 3.75rem);
+
+  --motion-quick: 150ms;
+  --motion-fast: 250ms;
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --background: var(--bg);
+  --foreground: var(--fg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0a0a0b;
+    --bg-elevated: #121214;
+    --bg-subtle: #1a1a1e;
+    --fg: #f4f4f5;
+    --fg-muted: #a1a1aa;
+    --fg-subtle: #71717a;
+    --accent-strong: #8ba3c7;
+    --accent-soft: color-mix(in oklab, var(--accent-strong) 16%, transparent);
+    --success: #3ecf8e;
+    --warn: #e0b44a;
+    --warn-fg: #1a1405;
+    --danger: #f07167;
+  }
 }
 
 @theme inline {
@@ -12,15 +78,30 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    overflow-x: clip;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  overflow-x: clip;
 }
