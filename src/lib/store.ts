@@ -45,7 +45,12 @@ export function reloadProviders() {
 
 function saveProviders() {
   ensureDataDir();
-  fs.writeFileSync(PROVIDERS_FILE, JSON.stringify(providers, null, 2));
+  try {
+    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(PROVIDERS_FILE, JSON.stringify(providers, null, 2));
+  } catch {
+    /* serverless / read-only FS */
+  }
 }
 
 let providers: Provider[] = [];

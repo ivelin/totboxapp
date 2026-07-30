@@ -3,26 +3,31 @@
 import { useEffect, useState } from 'react';
 
 type Props = {
-  /** Server-resolved absolute MCP URL (preferred). Client falls back to origin. */
   endpoint: string;
+  /** Request-origin URL (may be sandbox-only). */
+  originEndpoint?: string;
+  localOnly?: boolean;
   compact?: boolean;
 };
 
-export function McpConnectPanel({ endpoint: serverEndpoint, compact = false }: Props) {
+export function McpConnectPanel({
+  endpoint: serverEndpoint,
+  originEndpoint,
+  localOnly = false,
+  compact = false,
+}: Props) {
   const [endpoint, setEndpoint] = useState(serverEndpoint);
   const [copied, setCopied] = useState<'url' | 'cmd' | null>(null);
   const [toolCount, setToolCount] = useState<number | null>(null);
   const [probeOk, setProbeOk] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const live = `${window.location.origin}/mcp`;
-      if (live && live !== endpoint) setEndpoint(live);
-    }
-    fetch('/mcp', {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-    })
+    setEndpoint(serverEndpoint);
+  }, [serverEndpoint]);
+
+  useEffect(() => {
+    // Probe via same-origin /mcp (works in preview); external Grok uses public URL
+    fetch('/mcp', { method: 'GET', headers: { Accept: 'application/json' } })
       .then(async (r) => {
         if (!r.ok) throw new Error('bad status');
         const data = await r.json();
@@ -30,7 +35,6 @@ export function McpConnectPanel({ endpoint: serverEndpoint, compact = false }: P
         setProbeOk(true);
       })
       .catch(() => setProbeOk(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const display = endpoint || serverEndpoint;
@@ -64,19 +68,28 @@ export function McpConnectPanel({ endpoint: serverEndpoint, compact = false }: P
             Totbox MCP endpoint
           </h2>
           <p className="mt-2 text-[var(--text-sm)] leading-relaxed text-[var(--fg-muted)]">
-            Household job PM needs <strong className="text-[var(--fg)]">no token</strong>. Use{' '}
-            <strong className="text-[var(--fg)]">Streamable HTTP</strong> (not SSE-legacy alone). No auth.
+            Use this URL in the Grok app connector as{' '}
+            <strong className="text-[var(--fg)]">Streamable HTTP</strong>. No auth / no token for
+            household job PM tools.
           </p>
+
+          {localOnly && (
+            <div className="mt-4 rounded-[var(--radius-md)] border border-[color-mix(in_srgb,var(--warning)_40%,var(--border))] bg-[color-mix(in_srgb,var(--warning)_12%,var(--bg))] px-3 py-2 text-[var(--text-xs)] leading-relaxed text-[var(--fg)]">
+              <strong>Sandbox / local hosts are not reachable from Grok cloud.</strong> Prefer a
+              public tunnel or deployed URL below. Preview hosts (grok-sandbox) only work in your
+              browser — not as a Grok connector.
+            </div>
+          )}
 
           <div className="mt-5 space-y-3">
             <div>
               <div className="mb-1.5 flex items-center justify-between gap-2">
                 <span className="text-[var(--text-xs)] font-medium text-[var(--fg-subtle)]">
-                  MCP URL · Streamable HTTP
+                  MCP URL for Grok · Streamable HTTP
                 </span>
                 {probeOk === true && (
                   <span className="text-[var(--text-xs)] font-medium text-[var(--success)]">
-                    Live{toolCount != null ? ` · ${toolCount} tools` : ''}
+                    Server live{toolCount != null ? ` · ${toolCount} tools` : ''}
                   </span>
                 )}
                 {probeOk === false && (
@@ -124,15 +137,22 @@ export function McpConnectPanel({ endpoint: serverEndpoint, compact = false }: P
                 </button>
               </div>
             </div>
+
+            {originEndpoint && originEndpoint !== display && (
+              <p className="text-[var(--text-xs)] text-[var(--fg-subtle)]">
+                Same-origin (preview only):{' '}
+                <code className="break-all text-[var(--fg-muted)]">{originEndpoint}</code>
+              </p>
+            )}
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             {[
               {
                 t: '1. Connector',
-                d: 'Add server → HTTP / Streamable HTTP → paste URL. Leave auth empty.',
+                d: 'Grok → Add MCP server → HTTP / Streamable HTTP → paste the public URL. Auth empty.',
               },
-              { t: '2. Restart', d: 'Reload Grok so tools reload after connect succeeds.' },
+              { t: '2. Restart', d: 'Reload Grok so tools load after connect succeeds.' },
               {
                 t: '3. Try',
                 d: '“Using Totbox: get_workflow, then start_job for a deep clean.”',
@@ -147,12 +167,6 @@ export function McpConnectPanel({ endpoint: serverEndpoint, compact = false }: P
               </div>
             ))}
           </div>
-
-          <p className="mt-4 text-[var(--text-xs)] leading-relaxed text-[var(--fg-subtle)]">
-            Fixed: responses now use <code className="text-[var(--fg-muted)]">text/event-stream</code> SSE
-            (required by Grok). If connect still fails, confirm the host can reach this URL from the
-            internet (preview URLs must be public).
-          </p>
         </div>
       </div>
     </section>

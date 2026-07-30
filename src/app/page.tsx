@@ -1,12 +1,18 @@
 import Link from 'next/link';
 import { SiteHeader } from '@/components/SiteHeader';
 import { McpConnectPanel } from '@/components/McpConnectPanel';
-import { getPublicMcpEndpoint } from '@/lib/public-origin';
+import {
+  getPublicMcpEndpoint,
+  getPublicOrigin,
+  isLocalOnlyMcpUrl,
+} from '@/lib/public-origin';
 
 export const dynamic = 'force-dynamic';
 
 export default async function TotboxHome() {
   const mcpEndpoint = await getPublicMcpEndpoint();
+  const originEndpoint = `${await getPublicOrigin()}/mcp`;
+  const localOnly = isLocalOnlyMcpUrl(mcpEndpoint);
 
   return (
     <div className="min-h-full bg-[var(--bg)] text-[var(--fg)]">
@@ -36,7 +42,11 @@ export default async function TotboxHome() {
           </p>
         </section>
 
-        <McpConnectPanel endpoint={mcpEndpoint} />
+        <McpConnectPanel
+          endpoint={mcpEndpoint}
+          originEndpoint={originEndpoint}
+          localOnly={localOnly}
+        />
 
         <section className="border-b border-[var(--border)] bg-[var(--bg)] py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
