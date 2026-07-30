@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { SiteHeader } from '@/components/SiteHeader';
+import { McpConnectPanel } from '@/components/McpConnectPanel';
 
 export default function TotboxHome() {
   return (
@@ -7,7 +8,7 @@ export default function TotboxHome() {
       <SiteHeader />
 
       <main>
-        <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 text-center sm:px-6 sm:pt-20">
+        <section className="mx-auto max-w-6xl px-4 pb-12 pt-14 text-center sm:px-6 sm:pt-20">
           <div className="chip mb-6">Job PM · MCP · Grok / Claude / ChatGPT</div>
           <h1 className="mx-auto max-w-4xl text-[var(--text-3xl)] font-semibold tracking-[-0.03em] leading-[1.05] text-[var(--fg)]">
             Disappear the logistics
@@ -18,19 +19,22 @@ export default function TotboxHome() {
             inside the chat apps you already use. You stay in control of send, money, and time.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/jobs" className="btn btn-primary">
+            <a href="#connect-mcp" className="btn btn-primary">
+              Get MCP URL for Grok
+            </a>
+            <Link href="/jobs" className="btn btn-secondary">
               Try household jobs
-            </Link>
-            <Link href="/workflow" className="btn btn-secondary">
-              See the 8-step path
             </Link>
           </div>
           <p className="mt-4 text-[var(--text-sm)] text-[var(--fg-subtle)]">
-            No new consumer app. Chat hosts call Totbox MCP tools as the job PM.
+            No new consumer app. Point Grok at the MCP endpoint below.
           </p>
         </section>
 
-        <section className="border-y border-[var(--border)] bg-[var(--bg-elevated)] py-16">
+        {/* MCP URL — primary connect surface for testing */}
+        <McpConnectPanel />
+
+        <section className="border-b border-[var(--border)] bg-[var(--bg)] py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <p className="text-[var(--text-xs)] font-semibold uppercase tracking-[0.14em] text-[var(--accent-strong)]">
               Phase 1 beachhead
@@ -98,7 +102,10 @@ export default function TotboxHome() {
   → record_user_approval (money/time)
   → confirm_appointment
   → record_job_completion`}</pre>
-                <Link href="/jobs" className="mt-4 inline-block text-[var(--text-sm)] font-semibold text-[var(--accent-strong)] no-underline hover:underline">
+                <Link
+                  href="/jobs"
+                  className="mt-4 inline-block text-[var(--text-sm)] font-semibold text-[var(--accent-strong)] no-underline hover:underline"
+                >
                   Run it in the household console →
                 </Link>
               </div>
@@ -113,23 +120,8 @@ export default function TotboxHome() {
             </h2>
             <p className="mt-3 max-w-2xl text-[var(--text-base)] text-[var(--fg-muted)]">
               Phase 2 after household shadow PMF. Today: register, get an MCP token, connect calendar
-              (demo). ServiceTitan path is designed for later, demand-funded pilots.
+              (demo).
             </p>
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              {[
-                { step: '1', title: 'Add MCP endpoint', desc: 'One URL in Grok / Claude / ChatGPT.' },
-                { step: '2', title: 'Connect calendar', desc: 'Google Calendar OAuth for availability.' },
-                { step: '3', title: 'Receive structured briefs', desc: 'Qualified inbound, less phone tag.' },
-              ].map((s) => (
-                <div key={s.step} className="surface p-5">
-                  <p className="text-[var(--text-xs)] uppercase tracking-widest text-[var(--fg-subtle)]">
-                    Step {s.step}
-                  </p>
-                  <p className="mt-2 font-semibold text-[var(--fg)]">{s.title}</p>
-                  <p className="mt-1 text-[var(--text-sm)] text-[var(--fg-muted)]">{s.desc}</p>
-                </div>
-              ))}
-            </div>
             <Link
               href="/dashboard"
               className="mt-8 inline-block text-[var(--text-sm)] font-semibold text-[var(--accent-strong)] no-underline hover:underline"

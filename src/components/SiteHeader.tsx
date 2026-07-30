@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const links = [
+  { href: '/#connect-mcp', label: 'MCP', short: 'MCP' },
   { href: '/jobs', label: 'Jobs', short: 'Jobs' },
   { href: '/workflow', label: 'Path', short: 'Path' },
   { href: '/dashboard', label: 'Providers', short: 'Ops' },
@@ -31,7 +32,10 @@ export function SiteHeader() {
 
         <nav className="flex min-w-0 items-center gap-0.5 sm:gap-1">
           {links.map((l) => {
-            const active = pathname === l.href || pathname?.startsWith(l.href + '/');
+            const pathOnly = l.href.split('#')[0] || '/';
+            const active =
+              pathOnly !== '/' &&
+              (pathname === pathOnly || pathname?.startsWith(pathOnly + '/'));
             return (
               <Link
                 key={l.href}
