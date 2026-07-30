@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Totbox — Disappear the logistics of family life",
-  description: "Totbox helps families discover and book local services via chat apps (MCP) and helps small operators reduce admin with calendar sync and inbound automation.",
+  description:
+    "Totbox is the job project manager for home services (HVAC, cleaning, tree). Host LLM + MCP safety gates — not another app to install.",
   icons: {
     icon: "/favicon.ico",
   },

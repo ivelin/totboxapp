@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { SiteHeader } from '@/components/SiteHeader';
 import { WorkflowProgressSample } from '@/components/WorkflowProgressSample';
 import { getConsumerWorkflowSample } from '@/lib/workflow-sample';
 
@@ -15,8 +16,11 @@ export const metadata: Metadata = {
 export default function WorkflowSamplePage() {
   const sample = getConsumerWorkflowSample();
   return (
-    <main className="min-h-full bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:to-zinc-900">
-      <WorkflowProgressSample sample={sample} />
-    </main>
+    <div className="min-h-full bg-[var(--bg)]">
+      <SiteHeader />
+      <main className="min-h-full">
+        <WorkflowProgressSample sample={sample} />
+      </main>
+    </div>
   );
 }
