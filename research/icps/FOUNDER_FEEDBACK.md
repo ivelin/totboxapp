@@ -1,15 +1,22 @@
 # Founder feedback (user-research)
 decision: iterate | agree_ready | kill
 # Pick ONE decision word on the next line after 'decision:'
-decision:
-agrees_with_ai_ready:
+decision: agree_ready
+agrees_with_ai_ready: yes
 notes:
-# ROUND 1-r6 complete — slate_n=10; ranking_sound=true; diversity_ok=true
-# AI ready_for_real_world=true (thin shadow plan on strong_fit only — not PMF/LOI)
-# Real-test shortlist (strong_fit): #1 single-DM primary, #2 dual-income A/B
-# weak_fit ranks 3–10 OUT (PCS, EV, warranty, solar, HOA treasurer, pool, on-site aging, nonprofit)
-# If agree_ready: pick 1–2 strong_fit only; instrument HVAC PM + cleaning rebook/exception shadows;
-# hard no vendor directory; human approve-before-send; dual partner gate must finish jobs;
-# standing cleaner + HVAC portal residual falsifier required; public-safe only.
-# If iterate: state KEEP/DROP/NEW seeds (never recycle 1-r5 or older weak_fits; no snowbird/STR/rural/employer clones).
-# If kill: stop this research line.
+Founder accepts beachhead ICP for real shadow / concierge tests (not PMF, not primary-focus forever lock).
+
+PRIMARY beachhead (full cycle first):
+- household-single-decision-maker-recurring — single decision-maker, recurring HVAC preventive + house cleaning job PM
+
+SECONDARY A/B (only after primary cycle completes — Phase 1 instrumented jobs + stage-6 feedback + re-rank):
+- household-dual-income-recurring — dual-income topology A/B; do not open dual real-test pipeline in parallel
+
+OUT of near-term real tests: all 1-r6 weak_fit ranks 3–10 and prior weak_fits.
+
+Real-test constraints:
+- User-sourced providers only (Google/AI/memory) — hard no Totbox directory/inventory
+- Dry-run + human approve-before-send; money/time gates
+- Instrument touchpoints status-quo vs tool; unfinished jobs; residual after standing cleaner + HVAC portal
+- Public-safe decision traces only (no PII in git)
+- READY_FOR_REAL_WORLD = good enough for shadow tests, not LOI/PMF
