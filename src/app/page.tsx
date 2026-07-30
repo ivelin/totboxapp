@@ -3,15 +3,12 @@ import { SiteHeader } from '@/components/SiteHeader';
 
 export default function TotboxHome() {
   return (
-    <div className="min-h-full bg-[var(--bg)]">
+    <div className="min-h-full bg-[var(--bg)] text-[var(--fg)]">
       <SiteHeader />
 
       <main>
-        {/* Hero */}
         <section className="mx-auto max-w-6xl px-4 pb-16 pt-14 text-center sm:px-6 sm:pt-20">
-          <div className="mb-6 inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-1 text-[var(--text-xs)] font-medium uppercase tracking-[0.14em] text-[var(--fg-muted)]">
-            Job PM · MCP · Grok / Claude / ChatGPT
-          </div>
+          <div className="chip mb-6">Job PM · MCP · Grok / Claude / ChatGPT</div>
           <h1 className="mx-auto max-w-4xl text-[var(--text-3xl)] font-semibold tracking-[-0.03em] leading-[1.05] text-[var(--fg)]">
             Disappear the logistics
             <br className="hidden sm:block" /> of family life.
@@ -21,16 +18,10 @@ export default function TotboxHome() {
             inside the chat apps you already use. You stay in control of send, money, and time.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/jobs"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-[var(--fg)] px-8 text-[var(--text-sm)] font-semibold text-[var(--bg)] no-underline transition active:scale-[0.98]"
-            >
+            <Link href="/jobs" className="btn btn-primary">
               Try household jobs
             </Link>
-            <Link
-              href="/workflow"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-[var(--border-strong)] bg-[var(--bg-elevated)] px-8 text-[var(--text-sm)] font-semibold text-[var(--fg)] no-underline transition hover:bg-[var(--bg-subtle)]"
-            >
+            <Link href="/workflow" className="btn btn-secondary">
               See the 8-step path
             </Link>
           </div>
@@ -39,10 +30,9 @@ export default function TotboxHome() {
           </p>
         </section>
 
-        {/* Beachhead */}
         <section className="border-y border-[var(--border)] bg-[var(--bg-elevated)] py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <p className="text-[var(--text-xs)] font-semibold uppercase tracking-wider text-[var(--accent-strong)]">
+            <p className="text-[var(--text-xs)] font-semibold uppercase tracking-[0.14em] text-[var(--accent-strong)]">
               Phase 1 beachhead
             </p>
             <h2 className="mt-2 max-w-xl text-[var(--text-xl)] font-semibold tracking-tight text-[var(--fg)]">
@@ -67,10 +57,7 @@ export default function TotboxHome() {
                   body: 'Describe → Details → Contact → Send → Hear back → Choose → Booked → Done. Transparent strip in chat or browser.',
                 },
               ].map((c) => (
-                <div
-                  key={c.title}
-                  className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg)] p-5"
-                >
+                <div key={c.title} className="surface p-5">
                   <h3 className="text-[var(--text-base)] font-semibold text-[var(--fg)]">{c.title}</h3>
                   <p className="mt-2 text-[var(--text-sm)] leading-relaxed text-[var(--fg-muted)]">{c.body}</p>
                 </div>
@@ -79,7 +66,6 @@ export default function TotboxHome() {
           </div>
         </section>
 
-        {/* Example asks */}
         <section className="py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="grid items-start gap-10 md:grid-cols-2">
@@ -88,22 +74,22 @@ export default function TotboxHome() {
                   Ask naturally
                 </h2>
                 <ul className="mt-6 space-y-3 text-[var(--text-base)] text-[var(--fg-muted)]">
-                  <li className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-3">
-                    “Deep clean this week — blinds, under beds, corners. Share options before I confirm.”
-                  </li>
-                  <li className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-3">
-                    “AC maintenance under $300 in the next 2 weeks with my usual tech.”
-                  </li>
-                  <li className="rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg-elevated)] px-4 py-3">
-                    “Live-oak pruning quotes and flag Oak Wilt season constraints.”
-                  </li>
+                  {[
+                    'Deep clean this week — blinds, under beds, corners. Share options before I confirm.',
+                    'AC maintenance under $300 in the next 2 weeks with my usual tech.',
+                    'Live-oak pruning quotes and flag Oak Wilt season constraints.',
+                  ].map((q) => (
+                    <li key={q} className="surface px-4 py-3 text-left">
+                      “{q}”
+                    </li>
+                  ))}
                 </ul>
               </div>
-              <div className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-6 font-mono text-[var(--text-xs)] leading-relaxed text-[var(--fg-muted)] sm:text-[var(--text-sm)]">
+              <div className="surface p-6 font-mono text-[var(--text-xs)] leading-relaxed text-[var(--fg-muted)] sm:text-[var(--text-sm)]">
                 <p className="text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--fg-subtle)]">
                   Chat → MCP loop
                 </p>
-                <pre className="mt-3 whitespace-pre-wrap">{`start_job
+                <pre className="mt-3 whitespace-pre-wrap text-[var(--fg)]">{`start_job
   → update_job_facts (address)
   → submit_draft_for_approval
   → record_user_approval (send)
@@ -112,10 +98,7 @@ export default function TotboxHome() {
   → record_user_approval (money/time)
   → confirm_appointment
   → record_job_completion`}</pre>
-                <Link
-                  href="/jobs"
-                  className="mt-4 inline-block text-[var(--text-sm)] font-medium text-[var(--accent-strong)] no-underline hover:underline"
-                >
+                <Link href="/jobs" className="mt-4 inline-block text-[var(--text-sm)] font-semibold text-[var(--accent-strong)] no-underline hover:underline">
                   Run it in the household console →
                 </Link>
               </div>
@@ -123,7 +106,6 @@ export default function TotboxHome() {
           </div>
         </section>
 
-        {/* Providers */}
         <section id="providers" className="border-t border-[var(--border)] bg-[var(--bg-elevated)] py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <h2 className="text-[var(--text-xl)] font-semibold tracking-tight text-[var(--fg)]">
@@ -139,10 +121,7 @@ export default function TotboxHome() {
                 { step: '2', title: 'Connect calendar', desc: 'Google Calendar OAuth for availability.' },
                 { step: '3', title: 'Receive structured briefs', desc: 'Qualified inbound, less phone tag.' },
               ].map((s) => (
-                <div
-                  key={s.step}
-                  className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg)] p-5"
-                >
+                <div key={s.step} className="surface p-5">
                   <p className="text-[var(--text-xs)] uppercase tracking-widest text-[var(--fg-subtle)]">
                     Step {s.step}
                   </p>
@@ -153,7 +132,7 @@ export default function TotboxHome() {
             </div>
             <Link
               href="/dashboard"
-              className="mt-8 inline-block text-[var(--text-sm)] font-medium text-[var(--accent-strong)] no-underline hover:underline"
+              className="mt-8 inline-block text-[var(--text-sm)] font-semibold text-[var(--accent-strong)] no-underline hover:underline"
             >
               Open provider dashboard →
             </Link>
@@ -165,7 +144,7 @@ export default function TotboxHome() {
         Built to make family life logistics disappear. Apache-2.0 ·{' '}
         <a
           href="https://github.com/ivelin/totboxapp"
-          className="text-[var(--fg-muted)] underline-offset-2 hover:underline"
+          className="font-medium text-[var(--fg-muted)] underline-offset-2 hover:underline"
         >
           github.com/ivelin/totboxapp
         </a>

@@ -77,6 +77,15 @@ async function apiJson<T>(url: string, init?: RequestInit): Promise<T> {
   return data as T;
 }
 
+function fillDraft(skeleton: string, providerLabel: string, address: string) {
+  return skeleton
+    .replace(/\{\{provider_name\}\}/g, providerLabel)
+    .replace(/\{\{priorities\}\}/g, 'blinds, under beds, corners')
+    .replace(/\{\{windows\}\}/g, 'this week')
+    .replace(/\{\{budget\}\}/g, 'under $250')
+    .replace(/\{\{service_address\}\}/g, address);
+}
+
 export function HouseholdJobsConsole() {
   const [jobs, setJobs] = useState<ListItem[]>([]);
   const [active, setActive] = useState<JobView | null>(null);
@@ -85,7 +94,6 @@ export function HouseholdJobsConsole() {
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
 
-  // Form state for guided steps
   const [intent, setIntent] = useState(DEMO_CLEANING.intent);
   const [providerLabel, setProviderLabel] = useState(DEMO_CLEANING.provider_label);
   const [providerEmail, setProviderEmail] = useState(DEMO_CLEANING.provider_email);
@@ -110,22 +118,18 @@ export function HouseholdJobsConsole() {
     setJobs(data.jobs || []);
   }, []);
 
-  const loadJob = useCallback(async (jobId: string) => {
-    const data = await apiJson<JobView>(`/api/jobs/${jobId}`);
-    setActive(data);
-    setSelectedStep(data.progress?.current_step_id);
-    if (data.next_action?.draftSkeleton && !draftBody) {
-      setDraftBody(
-        data.next_action.draftSkeleton
-          .replace(/\{\{provider_name\}\}/g, providerLabel)
-          .replace(/\{\{priorities\}\}/g, 'blinds, under beds, corners')
-          .replace(/\{\{windows\}\}/g, 'this week')
-          .replace(/\{\{budget\}\}/g, 'under $250')
-          .replace(/\{\{service_address\}\}/g, address)
-      );
-    }
-    return data;
-  }, [address, draftBody, providerLabel]);
+  const loadJob = useCallback(
+    async (jobId: string) => {
+      const data = await apiJson<JobView>(`/api/jobs/${jobId}`);
+      setActive(data);
+      setSelectedStep(data.progress?.current_step_id);
+      if (data.next_action?.draftSkeleton && !draftBody) {
+        setDraftBody(fillDraft(data.next_action.draftSkeleton, providerLabel, address));
+      }
+      return data;
+    },
+    [address, draftBody, providerLabel]
+  );
 
   useEffect(() => {
     refreshList().catch((e) => setError(e.message));
@@ -158,18 +162,8 @@ export function HouseholdJobsConsole() {
       });
       setActive(job);
       setSelectedStep(job.progress?.current_step_id);
-      // Prefill draft from skeleton once address is set
       const sk = job.next_action?.draftSkeleton || '';
-      if (sk) {
-        setDraftBody(
-          sk
-            .replace(/\{\{provider_name\}\}/g, providerLabel)
-            .replace(/\{\{priorities\}\}/g, 'blinds, under beds, corners')
-            .replace(/\{\{windows\}\}/g, 'this week')
-            .replace(/\{\{budget\}\}/g, 'under $250')
-            .replace(/\{\{service_address\}\}/g, address)
-        );
-      }
+      if (sk) setDraftBody(fillDraft(sk, providerLabel, address));
     }, 'Job started — confirm details next');
 
   const saveAddress = () =>
@@ -187,14 +181,7 @@ export function HouseholdJobsConsole() {
       setActive(job);
       setSelectedStep(job.progress?.current_step_id);
       const sk = job.next_action?.draftSkeleton || draftBody;
-      setDraftBody(
-        sk
-          .replace(/\{\{provider_name\}\}/g, providerLabel)
-          .replace(/\{\{priorities\}\}/g, 'blinds, under beds, corners')
-          .replace(/\{\{windows\}\}/g, 'this week')
-          .replace(/\{\{budget\}\}/g, 'under $250')
-          .replace(/\{\{service_address\}\}/g, address)
-      );
+      setDraftBody(fillDraft(sk, providerLabel, address));
     }, 'Address saved — review outreach draft');
 
   const submitDraft = () =>
@@ -292,8 +279,7 @@ export function HouseholdJobsConsole() {
     if (na === 'draft_for_user_approval') return 'draft';
     if (na === 'await_user_approval' || active.status === 'awaiting_user_approval') return 'approve_send';
     if (na === 'await_provider_reply') return 'hear_back';
-    if (na === 'user_decision' || na === 'ingest_and_extract') return 'choose';
-    if (na === 'confirm_appointment') return 'choose';
+    if (na === 'user_decision' || na === 'ingest_and_extract' || na === 'confirm_appointment') return 'choose';
     if (na === 'mark_done') return 'complete';
     return 'active';
   }, [active, na]);
@@ -302,7 +288,6 @@ export function HouseholdJobsConsole() {
 
   return (
     <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[240px_1fr]">
-      {/* Sidebar job list */}
       <aside className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-[var(--text-sm)] font-semibold text-[var(--fg)]">Jobs</h2>
@@ -314,14 +299,14 @@ export function HouseholdJobsConsole() {
               setError(null);
               setFlash(null);
             }}
-            className="rounded-full border border-[var(--border)] px-2.5 py-1 text-[var(--text-xs)] font-medium text-[var(--fg-muted)] hover:text-[var(--fg)]"
+            className="btn btn-secondary btn-sm"
           >
             New
           </button>
         </div>
         <ul className="space-y-2">
           {jobs.length === 0 && (
-            <li className="rounded-[var(--radius-md)] border border-dashed border-[var(--border)] p-3 text-[var(--text-xs)] text-[var(--fg-subtle)]">
+            <li className="surface border-dashed p-3 text-[var(--text-xs)] text-[var(--fg-subtle)]">
               No jobs yet. Start a Phase 1 cleaning path.
             </li>
           )}
@@ -329,16 +314,18 @@ export function HouseholdJobsConsole() {
             <li key={j.job_id}>
               <button
                 type="button"
-                onClick={() => run(async () => { await loadJob(j.job_id); })}
+                onClick={() =>
+                  run(async () => {
+                    await loadJob(j.job_id);
+                  })
+                }
                 className={`w-full rounded-[var(--radius-md)] border p-3 text-left transition ${
                   active?.job_id === j.job_id
-                    ? 'border-[var(--fg)]/20 bg-[var(--bg-elevated)]'
-                    : 'border-[var(--border)] bg-[var(--bg)] hover:bg-[var(--bg-subtle)]'
+                    ? 'border-[var(--accent)] bg-[var(--accent-soft)]'
+                    : 'border-[var(--border)] bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)]'
                 }`}
               >
-                <p className="line-clamp-2 text-[var(--text-sm)] font-medium text-[var(--fg)]">
-                  {j.intent}
-                </p>
+                <p className="line-clamp-2 text-[var(--text-sm)] font-medium text-[var(--fg)]">{j.intent}</p>
                 <p className="mt-1 text-[var(--text-xs)] text-[var(--fg-subtle)]">
                   {j.service_kind} · {j.status}
                 </p>
@@ -351,37 +338,36 @@ export function HouseholdJobsConsole() {
         </p>
       </aside>
 
-      {/* Main panel */}
       <div className="min-w-0 space-y-4">
         <header className="space-y-1">
-          <p className="text-[var(--text-xs)] font-semibold uppercase tracking-wider text-[var(--accent-strong)]">
+          <p className="text-[var(--text-xs)] font-semibold uppercase tracking-[0.14em] text-[var(--accent-strong)]">
             Phase 1 · single-DM cleaning shadow path
           </p>
           <h1 className="text-[var(--text-2xl)] font-semibold tracking-tight text-[var(--fg)]">
             Household job console
           </h1>
           <p className="max-w-2xl text-[var(--text-sm)] leading-relaxed text-[var(--fg-muted)]">
-            Same Job PM the chat MCP uses — checklist, safety gates, and progress strip.
-            Walk a fair cleaning exception end-to-end without leaving the browser.
+            Same Job PM the chat MCP uses — checklist, safety gates, and progress strip. Walk a fair
+            cleaning exception end-to-end without leaving the browser.
           </p>
         </header>
 
         {error && (
           <div
             role="alert"
-            className="rounded-[var(--radius-md)] border border-[var(--danger)]/30 bg-[var(--danger-soft)] px-4 py-3 text-[var(--text-sm)] text-[var(--danger)]"
+            className="rounded-[var(--radius-md)] border border-[var(--danger)] bg-[var(--danger-soft)] px-4 py-3 text-[var(--text-sm)] text-[var(--danger)]"
           >
             {error}
           </div>
         )}
         {flash && (
-          <div className="rounded-[var(--radius-md)] border border-[var(--success)]/30 bg-[var(--success-soft)] px-4 py-3 text-[var(--text-sm)] text-[var(--success)]">
+          <div className="rounded-[var(--radius-md)] border border-[var(--success)] bg-[var(--success-soft)] px-4 py-3 text-[var(--text-sm)] text-[var(--success)]">
             {flash}
           </div>
         )}
 
         {!active ? (
-          <section className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-5 sm:p-6">
+          <section className="surface p-5 sm:p-6">
             <h2 className="text-[var(--text-lg)] font-semibold text-[var(--fg)]">Start a cleaning job</h2>
             <p className="mt-1 text-[var(--text-sm)] text-[var(--fg-muted)]">
               Prefills a residual-mess scenario (cancel / deep clean) — not standing-Tuesday autopilot.
@@ -395,7 +381,7 @@ export function HouseholdJobsConsole() {
                   value={intent}
                   onChange={(e) => setIntent(e.target.value)}
                   rows={3}
-                  className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-[var(--text-sm)] text-[var(--fg)] outline-none focus:ring-2 focus:ring-[var(--accent-strong)]/40"
+                  className="input-field"
                 />
               </label>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -406,7 +392,7 @@ export function HouseholdJobsConsole() {
                   <input
                     value={providerLabel}
                     onChange={(e) => setProviderLabel(e.target.value)}
-                    className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-[var(--text-sm)] text-[var(--fg)] outline-none focus:ring-2 focus:ring-[var(--accent-strong)]/40"
+                    className="input-field"
                   />
                 </label>
                 <label className="block">
@@ -416,24 +402,18 @@ export function HouseholdJobsConsole() {
                   <input
                     value={providerEmail}
                     onChange={(e) => setProviderEmail(e.target.value)}
-                    className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-[var(--text-sm)] text-[var(--fg)] outline-none focus:ring-2 focus:ring-[var(--accent-strong)]/40"
+                    className="input-field"
                   />
                 </label>
               </div>
-              <button
-                type="button"
-                disabled={busy || !intent.trim()}
-                onClick={startDemoJob}
-                className="inline-flex h-11 items-center justify-center rounded-full bg-[var(--fg)] px-6 text-[var(--text-sm)] font-semibold text-[var(--bg)] transition active:scale-[0.98] disabled:opacity-50"
-              >
+              <button type="button" disabled={busy || !intent.trim()} onClick={startDemoJob} className="btn btn-primary">
                 {busy ? 'Starting…' : 'Start job'}
               </button>
             </div>
           </section>
         ) : (
           <>
-            {/* Job summary + strip */}
-            <section className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-5">
+            <section className="surface p-5">
               <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-[var(--text-xs)] text-[var(--fg-subtle)]">
@@ -441,9 +421,7 @@ export function HouseholdJobsConsole() {
                   </p>
                   <p className="mt-1 font-medium text-[var(--fg)]">{active.intent}</p>
                   {active.progress?.summary && (
-                    <p className="mt-2 text-[var(--text-sm)] text-[var(--fg-muted)]">
-                      {active.progress.summary}
-                    </p>
+                    <p className="mt-2 text-[var(--text-sm)] text-[var(--fg-muted)]">{active.progress.summary}</p>
                   )}
                   {active.progress?.role_line && (
                     <p className="mt-1 text-[var(--text-sm)] font-medium text-[var(--warn)]">
@@ -490,9 +468,8 @@ export function HouseholdJobsConsole() {
               )}
             </section>
 
-            {/* Guided action panel by phase */}
             {phase === 'details' && (
-              <section className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-5">
+              <section className="surface p-5">
                 <h3 className="font-semibold text-[var(--fg)]">Details</h3>
                 <p className="mt-1 text-[var(--text-sm)] text-[var(--fg-muted)]">
                   Address is never invented. Confirm a fixture address for the demo.
@@ -501,17 +478,13 @@ export function HouseholdJobsConsole() {
                   <span className="mb-1.5 block text-[var(--text-xs)] font-medium text-[var(--fg-subtle)]">
                     Service address
                   </span>
-                  <input
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-[var(--text-sm)] text-[var(--fg)] outline-none focus:ring-2 focus:ring-[var(--accent-strong)]/40"
-                  />
+                  <input value={address} onChange={(e) => setAddress(e.target.value)} className="input-field" />
                 </label>
                 <button
                   type="button"
                   disabled={busy || !address.trim()}
                   onClick={saveAddress}
-                  className="mt-4 inline-flex h-11 items-center rounded-full bg-[var(--fg)] px-5 text-[var(--text-sm)] font-semibold text-[var(--bg)] disabled:opacity-50"
+                  className="btn btn-primary mt-4"
                 >
                   Save details
                 </button>
@@ -519,7 +492,7 @@ export function HouseholdJobsConsole() {
             )}
 
             {phase === 'draft' && (
-              <section className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-5">
+              <section className="surface p-5">
                 <h3 className="font-semibold text-[var(--fg)]">Contact draft</h3>
                 <p className="mt-1 text-[var(--text-sm)] text-[var(--fg-muted)]">
                   Edit the outreach, then submit for your approval.
@@ -528,13 +501,13 @@ export function HouseholdJobsConsole() {
                   value={draftBody}
                   onChange={(e) => setDraftBody(e.target.value)}
                   rows={8}
-                  className="mt-4 w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 font-mono text-[var(--text-xs)] leading-relaxed text-[var(--fg)] outline-none focus:ring-2 focus:ring-[var(--accent-strong)]/40 sm:text-[var(--text-sm)]"
+                  className="input-field mt-4 font-mono text-[var(--text-xs)] sm:text-[var(--text-sm)]"
                 />
                 <button
                   type="button"
                   disabled={busy || !draftBody.trim()}
                   onClick={submitDraft}
-                  className="mt-4 inline-flex h-11 items-center rounded-full bg-[var(--fg)] px-5 text-[var(--text-sm)] font-semibold text-[var(--bg)] disabled:opacity-50"
+                  className="btn btn-primary mt-4"
                 >
                   Submit for approval
                 </button>
@@ -542,13 +515,13 @@ export function HouseholdJobsConsole() {
             )}
 
             {phase === 'approve_send' && (
-              <section className="rounded-[var(--radius-xl)] border border-dashed border-[var(--warn)]/50 bg-[var(--warn-soft)] p-5">
+              <section className="rounded-[var(--radius-xl)] border border-dashed border-[var(--warn)] bg-[var(--warn-soft)] p-5">
                 <h3 className="font-semibold text-[var(--fg)]">Approve send</h3>
                 <p className="mt-1 text-[var(--text-sm)] text-[var(--fg-muted)]">
                   Safety gate: nothing sends without your OK. Demo uses dry-run only.
                 </p>
                 {active.pending_draft && (
-                  <div className="mt-3 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] p-3">
+                  <div className="mt-3 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg-elevated)] p-3">
                     <p className="text-[var(--text-xs)] text-[var(--fg-subtle)]">
                       To: {active.pending_draft.to} · {active.pending_draft.channel}
                     </p>
@@ -558,19 +531,14 @@ export function HouseholdJobsConsole() {
                     </pre>
                   </div>
                 )}
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={approveAndDryRunSend}
-                  className="mt-4 inline-flex h-11 items-center rounded-full bg-[var(--fg)] px-5 text-[var(--text-sm)] font-semibold text-[var(--bg)] disabled:opacity-50"
-                >
+                <button type="button" disabled={busy} onClick={approveAndDryRunSend} className="btn btn-primary mt-4">
                   Approve & dry-run send
                 </button>
               </section>
             )}
 
             {phase === 'hear_back' && (
-              <section className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-5">
+              <section className="surface p-5">
                 <h3 className="font-semibold text-[var(--fg)]">Hear back</h3>
                 <p className="mt-1 text-[var(--text-sm)] text-[var(--fg-muted)]">
                   Paste the vendor reply. Price and windows are extracted when present.
@@ -579,13 +547,13 @@ export function HouseholdJobsConsole() {
                   value={replyBody}
                   onChange={(e) => setReplyBody(e.target.value)}
                   rows={5}
-                  className="mt-4 w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-[var(--text-sm)] text-[var(--fg)] outline-none focus:ring-2 focus:ring-[var(--accent-strong)]/40"
+                  className="input-field mt-4"
                 />
                 <button
                   type="button"
                   disabled={busy || !replyBody.trim()}
                   onClick={ingestReply}
-                  className="mt-4 inline-flex h-11 items-center rounded-full bg-[var(--fg)] px-5 text-[var(--text-sm)] font-semibold text-[var(--bg)] disabled:opacity-50"
+                  className="btn btn-primary mt-4"
                 >
                   Ingest reply
                 </button>
@@ -593,7 +561,7 @@ export function HouseholdJobsConsole() {
             )}
 
             {phase === 'choose' && (
-              <section className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-5">
+              <section className="surface p-5">
                 <h3 className="font-semibold text-[var(--fg)]">Choose & book</h3>
                 <p className="mt-1 text-[var(--text-sm)] text-[var(--fg-muted)]">
                   Separate money/time gate — send approval is not enough to book.
@@ -624,22 +592,17 @@ export function HouseholdJobsConsole() {
                     type="datetime-local"
                     value={scheduledAt}
                     onChange={(e) => setScheduledAt(e.target.value)}
-                    className="w-full max-w-xs rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-[var(--text-sm)] text-[var(--fg)] outline-none focus:ring-2 focus:ring-[var(--accent-strong)]/40"
+                    className="input-field max-w-xs"
                   />
                 </label>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={approveBook}
-                  className="mt-4 inline-flex h-11 items-center rounded-full bg-[var(--fg)] px-5 text-[var(--text-sm)] font-semibold text-[var(--bg)] disabled:opacity-50"
-                >
+                <button type="button" disabled={busy} onClick={approveBook} className="btn btn-primary mt-4">
                   Approve price/time & book
                 </button>
               </section>
             )}
 
             {phase === 'complete' && (
-              <section className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-5">
+              <section className="surface p-5">
                 <h3 className="font-semibold text-[var(--fg)]">Mark done</h3>
                 <p className="mt-1 text-[var(--text-sm)] text-[var(--fg-muted)]">
                   Explicit completion + optional next-due. No silent auto-close.
@@ -648,11 +611,7 @@ export function HouseholdJobsConsole() {
                   <span className="mb-1.5 block text-[var(--text-xs)] font-medium text-[var(--fg-subtle)]">
                     Notes
                   </span>
-                  <input
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-[var(--text-sm)] text-[var(--fg)] outline-none focus:ring-2 focus:ring-[var(--accent-strong)]/40"
-                  />
+                  <input value={notes} onChange={(e) => setNotes(e.target.value)} className="input-field" />
                 </label>
                 <label className="mt-3 block">
                   <span className="mb-1.5 block text-[var(--text-xs)] font-medium text-[var(--fg-subtle)]">
@@ -662,22 +621,17 @@ export function HouseholdJobsConsole() {
                     type="date"
                     value={nextDue}
                     onChange={(e) => setNextDue(e.target.value)}
-                    className="w-full max-w-xs rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-[var(--text-sm)] text-[var(--fg)] outline-none focus:ring-2 focus:ring-[var(--accent-strong)]/40"
+                    className="input-field max-w-xs"
                   />
                 </label>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={completeJob}
-                  className="mt-4 inline-flex h-11 items-center rounded-full bg-[var(--fg)] px-5 text-[var(--text-sm)] font-semibold text-[var(--bg)] disabled:opacity-50"
-                >
+                <button type="button" disabled={busy} onClick={completeJob} className="btn btn-primary mt-4">
                   Complete job
                 </button>
               </section>
             )}
 
             {phase === 'done' && (
-              <section className="rounded-[var(--radius-xl)] border border-[var(--success)]/30 bg-[var(--success-soft)] p-5">
+              <section className="rounded-[var(--radius-xl)] border border-[var(--success)] bg-[var(--success-soft)] p-5">
                 <h3 className="font-semibold text-[var(--success)]">Job complete</h3>
                 <p className="mt-2 text-[var(--text-sm)] text-[var(--fg)]">
                   {active.completion_notes || 'Closed with explicit completion record.'}
@@ -688,12 +642,12 @@ export function HouseholdJobsConsole() {
                   </p>
                 )}
                 <p className="mt-3 text-[var(--text-xs)] text-[var(--fg-subtle)]">
-                  After a real house run: answer the 5 pass/kill questions in scores.md and leave a redacted stage-6 note.
+                  After a real house run: answer the 5 pass/kill questions in scores.md and leave a redacted
+                  stage-6 note.
                 </p>
               </section>
             )}
 
-            {/* Audit + safety footer */}
             <section className="rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--bg)] p-4">
               <p className="text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--fg-subtle)]">
                 Safety & audit

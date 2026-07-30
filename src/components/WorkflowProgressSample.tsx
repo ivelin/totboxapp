@@ -66,12 +66,12 @@ export function WorkflowProgressSample({ sample }: { sample: SamplePayload }) {
   );
 
   return (
-    <div className="mx-auto w-full max-w-lg px-4 py-8 sm:py-12">
+    <div className="mx-auto w-full max-w-lg px-4 py-8 text-[var(--fg)] sm:py-12">
       <header className="mb-6 space-y-2">
-        <p className="text-[var(--text-xs)] font-semibold uppercase tracking-wider text-[var(--accent-strong)]">
+        <p className="text-[var(--text-xs)] font-semibold uppercase tracking-[0.14em] text-[var(--accent-strong)]">
           Totbox · house_service_v1
         </p>
-        <h1 className="text-[var(--text-2xl)] font-semibold tracking-tight text-[var(--fg)] sm:text-[var(--text-xl)]">
+        <h1 className="text-[var(--text-2xl)] font-semibold tracking-tight text-[var(--fg)]">
           {sample.title}
         </h1>
         <p className="text-[var(--text-sm)] leading-relaxed text-[var(--fg-muted)]">{sample.subtitle}</p>
@@ -104,7 +104,7 @@ export function WorkflowProgressSample({ sample }: { sample: SamplePayload }) {
 
       {tab === 'job' ? (
         <>
-          <section className="mb-4 rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-4 shadow-sm">
+          <section className="surface mb-4 p-4">
             <div className="mb-1 flex items-start justify-between gap-2">
               <div>
                 <p className="text-[var(--text-xs)] text-[var(--fg-subtle)]">Sample HVAC request</p>
@@ -117,9 +117,7 @@ export function WorkflowProgressSample({ sample }: { sample: SamplePayload }) {
             <p className="mt-3 text-[var(--text-sm)] font-medium text-[var(--fg)]">
               {sample.sample_job.progress.summary}
             </p>
-            <p className="mt-1 text-[var(--text-sm)] text-[var(--warn)]">
-              {sample.sample_job.progress.role_line}
-            </p>
+            <p className="mt-1 text-[var(--text-sm)] text-[var(--warn)]">{sample.sample_job.progress.role_line}</p>
           </section>
 
           <section className="mb-4">
@@ -132,9 +130,9 @@ export function WorkflowProgressSample({ sample }: { sample: SamplePayload }) {
           </section>
 
           {selected && (
-            <section className="mb-4 space-y-3 rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-4">
+            <section className="surface mb-4 space-y-3 p-4">
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-[var(--accent-strong)] px-2 py-0.5 text-[var(--text-xs)] font-bold text-white">
+                <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-[var(--text-xs)] font-bold text-[var(--accent-fg)]">
                   {selected.label}
                 </span>
                 <span className="text-[var(--text-xs)] text-[var(--fg-subtle)]">
@@ -159,7 +157,7 @@ export function WorkflowProgressSample({ sample }: { sample: SamplePayload }) {
           )}
 
           {selected?.id === 'send' && sample.sample_job.draft_preview && (
-            <section className="mb-4 rounded-[var(--radius-xl)] border border-dashed border-[var(--warn)]/50 bg-[var(--warn-soft)] p-4">
+            <section className="mb-4 rounded-[var(--radius-xl)] border border-dashed border-[var(--warn)] bg-[var(--warn-soft)] p-4">
               <p className="text-[var(--text-xs)] font-semibold uppercase tracking-wide text-[var(--warn)]">
                 Message ready for your OK
               </p>
@@ -169,23 +167,17 @@ export function WorkflowProgressSample({ sample }: { sample: SamplePayload }) {
               <p className="mt-2 text-[var(--text-sm)] font-medium text-[var(--fg)]">
                 {sample.sample_job.draft_preview.subject}
               </p>
-              <pre className="mt-2 whitespace-pre-wrap rounded-[var(--radius-md)] bg-[var(--bg)] p-3 text-[var(--text-xs)] leading-relaxed text-[var(--fg-muted)]">
+              <pre className="mt-2 whitespace-pre-wrap rounded-[var(--radius-md)] bg-[var(--bg-elevated)] p-3 text-[var(--text-xs)] leading-relaxed text-[var(--fg-muted)]">
                 {sample.sample_job.draft_preview.body}
               </pre>
               <p className="mt-2 text-[var(--text-xs)] text-[var(--fg-subtle)]">
                 {sample.sample_job.draft_preview.note}
               </p>
               <div className="mt-3 flex gap-2">
-                <a
-                  href="/jobs"
-                  className="flex flex-1 items-center justify-center rounded-[var(--radius-md)] bg-[var(--fg)] px-3 py-2.5 text-center text-[var(--text-sm)] font-semibold text-[var(--bg)] no-underline"
-                >
+                <a href="/jobs" className="btn btn-primary flex-1 no-underline">
                   Run live console
                 </a>
-                <button
-                  type="button"
-                  className="rounded-[var(--radius-md)] border border-[var(--border-strong)] px-3 py-2.5 text-[var(--text-sm)] font-medium text-[var(--fg)]"
-                >
+                <button type="button" className="btn btn-secondary">
                   Sample only
                 </button>
               </div>
@@ -194,7 +186,7 @@ export function WorkflowProgressSample({ sample }: { sample: SamplePayload }) {
         </>
       ) : (
         <>
-          <section className="mb-4 rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-4">
+          <section className="surface mb-4 p-4">
             <p className="text-[var(--text-xs)] text-[var(--fg-subtle)]">
               {sample.template.workflow_id} · v{sample.template.workflow_version}
               {sample.template.format ? (
@@ -224,10 +216,7 @@ export function WorkflowProgressSample({ sample }: { sample: SamplePayload }) {
           </section>
           <section className="space-y-2">
             {sample.template.steps.map((step) => (
-              <div
-                key={step.id}
-                className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-3"
-              >
+              <div key={step.id} className="surface p-3">
                 <p className="text-[var(--text-sm)] font-semibold text-[var(--fg)]">
                   {step.n}. {step.label}
                 </p>
@@ -259,11 +248,11 @@ export function WorkflowProgressSample({ sample }: { sample: SamplePayload }) {
           Sample job {sample.sample_job.job_id} · MCP: get_workflow / get_job
         </p>
         <p>
-          <a href="/jobs" className="text-[var(--accent-strong)] underline-offset-2 hover:underline">
+          <a href="/jobs" className="font-medium text-[var(--accent-strong)] underline-offset-2 hover:underline">
             Household jobs
           </a>
           {' · '}
-          <a href="/" className="text-[var(--accent-strong)] underline-offset-2 hover:underline">
+          <a href="/" className="font-medium text-[var(--accent-strong)] underline-offset-2 hover:underline">
             Home
           </a>
         </p>

@@ -15,7 +15,7 @@ function stateClass(state: StepState) {
   switch (state) {
     case 'done':
       return {
-        ring: 'border-[var(--success)]/40 bg-[var(--success-soft)] text-[var(--success)]',
+        ring: 'border-[var(--success)]/50 bg-[var(--success-soft)] text-[var(--success)]',
         badge: 'bg-[var(--success)] text-white',
       };
     case 'needs_you':
@@ -30,13 +30,13 @@ function stateClass(state: StepState) {
       };
     case 'current':
       return {
-        ring: 'border-[var(--accent-strong)] bg-[var(--accent-soft)] text-[var(--fg)] shadow-sm',
-        badge: 'bg-[var(--accent-strong)] text-white',
+        ring: 'border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--fg)] shadow-sm',
+        badge: 'bg-[var(--accent)] text-[var(--accent-fg)]',
       };
     default:
       return {
-        ring: 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--fg-subtle)]',
-        badge: 'bg-[var(--bg-elevated)] text-[var(--fg-muted)]',
+        ring: 'border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--fg-subtle)]',
+        badge: 'bg-[var(--bg-subtle)] text-[var(--fg-muted)]',
       };
   }
 }
@@ -68,7 +68,7 @@ export function JobProgressStrip({
               type={onSelect ? 'button' : undefined}
               onClick={onSelect ? () => onSelect(step.id) : undefined}
               className={`flex min-w-[4.5rem] flex-col items-center gap-1.5 rounded-[var(--radius-lg)] border px-2 py-3 transition duration-[var(--motion-quick)] ${st.ring} ${
-                active ? 'ring-2 ring-[var(--accent-strong)]/50 ring-offset-2 ring-offset-[var(--bg)]' : ''
+                active ? 'ring-2 ring-[var(--accent)]/40 ring-offset-2 ring-offset-[var(--bg)]' : ''
               } ${onSelect ? 'cursor-pointer' : ''}`}
             >
               <span

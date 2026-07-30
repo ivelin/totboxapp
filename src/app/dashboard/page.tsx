@@ -114,7 +114,7 @@ export default function ProviderDashboard() {
   }
 
   return (
-    <div className="min-h-full bg-[var(--bg)]">
+    <div className="min-h-full bg-[var(--bg)] text-[var(--fg)]">
       <SiteHeader />
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
         <div className="mb-8 flex flex-wrap items-start justify-between gap-3">
@@ -126,18 +126,16 @@ export default function ProviderDashboard() {
               Register · MCP token · calendar connect (Phase 2 path)
             </p>
           </div>
-          <div className="rounded-full border border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-1 text-[var(--text-xs)] font-medium text-[var(--fg-muted)]">
-            Operators later
-          </div>
+          <div className="chip">Operators later</div>
         </div>
 
-        <div className="mb-4 rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-4">
+        <div className="surface mb-4 p-4">
           <div className="mb-1 text-[var(--text-sm)] text-[var(--fg-muted)]">
             Load existing registration by token
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <input
-              className="flex-1 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] p-2.5 text-[var(--text-sm)] text-[var(--fg)]"
+              className="input-field flex-1"
               placeholder="paste your secret token"
               value={loadToken}
               onChange={(e) => setLoadToken(e.target.value)}
@@ -159,25 +157,20 @@ export default function ProviderDashboard() {
                   setLoading(false);
                 }
               }}
-              className="rounded-full border border-[var(--border-strong)] px-4 py-2 text-[var(--text-sm)] font-medium text-[var(--fg)]"
+              className="btn btn-secondary"
             >
               Load
             </button>
           </div>
         </div>
 
-        <form
-          onSubmit={onRegister}
-          className="mb-8 rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--bg-elevated)] p-6"
-        >
-          <h2 className="mb-4 text-[var(--text-lg)] font-semibold text-[var(--fg)]">
-            Register your service
-          </h2>
+        <form onSubmit={onRegister} className="surface mb-8 p-6">
+          <h2 className="mb-4 text-[var(--text-lg)] font-semibold text-[var(--fg)]">Register your service</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="block">
               <div className="mb-1 text-[var(--text-sm)] text-[var(--fg-subtle)]">Business name</div>
               <input
-                className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] p-2.5 text-[var(--text-sm)] text-[var(--fg)]"
+                className="input-field"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Demo Hill Country Comfort"
@@ -187,7 +180,7 @@ export default function ProviderDashboard() {
             <label className="block">
               <div className="mb-1 text-[var(--text-sm)] text-[var(--fg-subtle)]">Location</div>
               <input
-                className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] p-2.5 text-[var(--text-sm)] text-[var(--fg)]"
+                className="input-field"
                 value={form.location}
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
                 placeholder="Austin, TX"
@@ -195,11 +188,9 @@ export default function ProviderDashboard() {
               />
             </label>
             <label className="block md:col-span-2">
-              <div className="mb-1 text-[var(--text-sm)] text-[var(--fg-subtle)]">
-                Services (comma separated)
-              </div>
+              <div className="mb-1 text-[var(--text-sm)] text-[var(--fg-subtle)]">Services (comma separated)</div>
               <input
-                className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] p-2.5 text-[var(--text-sm)] text-[var(--fg)]"
+                className="input-field"
                 value={form.services}
                 onChange={(e) => setForm({ ...form, services: e.target.value })}
               />
@@ -209,24 +200,20 @@ export default function ProviderDashboard() {
                 Availability (e.g. Tue,Thu,Sat 09:00-17:00)
               </div>
               <input
-                className="w-full rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg)] p-2.5 text-[var(--text-sm)] text-[var(--fg)]"
+                className="input-field"
                 value={form.rules}
                 onChange={(e) => setForm({ ...form, rules: e.target.value })}
               />
             </label>
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-4 rounded-full bg-[var(--fg)] px-5 py-2.5 text-[var(--text-sm)] font-semibold text-[var(--bg)] disabled:opacity-60"
-          >
+          <button type="submit" disabled={loading} className="btn btn-primary mt-4">
             {loading ? 'Registering…' : 'Register & get MCP token'}
           </button>
           {error && <div className="mt-2 text-[var(--text-sm)] text-[var(--danger)]">{error}</div>}
         </form>
 
         {registered && (
-          <div className="mb-8 rounded-[var(--radius-xl)] border border-[var(--success)]/30 bg-[var(--bg-elevated)] p-6">
+          <div className="surface mb-8 border-[var(--success)] p-6">
             <h2 className="text-[var(--text-lg)] font-semibold text-[var(--fg)]">
               Registration complete — {registered.name}
             </h2>
@@ -248,7 +235,7 @@ export default function ProviderDashboard() {
                   Regenerate
                 </button>
               </div>
-              <div className="break-all rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--fg)] p-3 font-mono text-[var(--text-sm)] text-[var(--success)]">
+              <div className="break-all rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--bg-inverse)] p-3 font-mono text-[var(--text-sm)] text-[var(--success)]">
                 {registered.token}
               </div>
             </div>
@@ -263,11 +250,7 @@ export default function ProviderDashboard() {
               {registered.calendarConnected ? (
                 <div className="text-[var(--text-sm)] text-[var(--success)]">Google Calendar connected</div>
               ) : (
-                <button
-                  type="button"
-                  onClick={connectCalendar}
-                  className="rounded-full border border-[var(--border-strong)] bg-[var(--bg)] px-3 py-1.5 text-[var(--text-sm)] font-medium text-[var(--fg)]"
-                >
+                <button type="button" onClick={connectCalendar} className="btn btn-secondary btn-sm">
                   Connect Google Calendar
                 </button>
               )}
