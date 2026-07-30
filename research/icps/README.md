@@ -4,8 +4,9 @@ Candidate customer groups and evidence notes for the Totbox company OS instance.
 
 **Latest synthetic round:** [**ROUND 1-r6**](ROUND_1-r6_report.md) — `SYNTHETIC ONLY`; AI `ready_for_real_world=true` (thin shadow plan on strong_fit only — not PMF/LOI); slate_n=`10`; ranking_sound=`true`; diversity_ok=`true` (single-DM #1 over dual topology A/B; eight never-tried diversity seats falsified as near-term shortlist). **Actionable binary only:** `strong_fit` (real-test shortlist) | `weak_fit` (drop from near-term real tests). No `promote_lean` / hold / demote.  
 **Prior rounds:** [ROUND 1-r5](ROUND_1-r5_report.md) (founder `iterate` → KEEP single-DM + dual; DROP full 1-r5 weak_fits; eight NEW diversity seats for 1-r6), [ROUND 1-r4](ROUND_1-r4_report.md), [ROUND 1-r3](ROUND_1-r3_report.md), [ROUND 1-r2](ROUND_1-r2_report.md), [ROUND 1](ROUND_1_report.md).  
-**Founder gate:** [`FOUNDER_FEEDBACK.md`](FOUNDER_FEEDBACK.md) (pending decision).  
-**Do not create** `READY_FOR_REAL_WORLD.md` until founder `agree_ready` after conditions in the round report.
+**Founder gate:** [`FOUNDER_FEEDBACK.md`](FOUNDER_FEEDBACK.md) — **`agree_ready`** (2026-07-29).  
+**Real-world marker:** [`READY_FOR_REAL_WORLD.md`](READY_FOR_REAL_WORLD.md) — shadow tests only (not PMF).  
+**Beachhead:** single-DM primary full cycle first; dual-income **deferred A/B** after that cycle.
 
 ## Round 1-r6 recommended rank order (synthetic filter)
 
