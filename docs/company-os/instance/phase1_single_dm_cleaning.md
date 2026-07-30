@@ -57,3 +57,43 @@ npm run company-os -- run-stage --signal "single-DM cleaning job: pass|fail on 1
 - At least **one** fair cleaning job fully instrumented.  
 - Prefer **3–5** before declaring beachhead healthy or dead.  
 - Only then open dual-income A/B.
+
+---
+
+## Cleaning `start_job` example (placeholders only)
+
+```json
+{
+  "intent": "3hr deep clean: blinds, under beds, corners — need options before I confirm; this week if possible",
+  "provider_label": "YOUR_USUAL_CLEANER_OR_SEARCH_NAME",
+  "provider_email": "cleaner@example.com"
+}
+```
+
+Use a **second** `start_job` or parallel outreach only if you are truly comparing two user-sourced cleaners (still no Totbox directory).
+
+---
+
+## After-job scorecard (copy, fill, keep private or redact)
+
+```text
+Job type: cleaning exception / rebook / rescope
+Date: YYYY-MM-DD
+Rough hassle WITHOUT Totbox (N emails/calls): __
+Rough hassle WITH Totbox (N real decisions): __
+
+1 Less hassle?     yes / no / unclear
+2 Finished + gates? yes / no / unclear
+3 Your vendors?    yes / no / unclear
+4 Real leftover mess (not autopilot)? yes / no / unclear
+5 Safe?            yes / no
+
+One-line outcome: ________________________________
+Open bugs / product gaps: ________________________
+```
+
+Public-safe one-liner for git (optional):
+
+```bash
+npm run company-os -- run-stage --signal "single-DM cleaning: pass 1-5 = Y/N/…; outcome=…"
+```
