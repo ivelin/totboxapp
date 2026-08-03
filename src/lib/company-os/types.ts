@@ -14,6 +14,9 @@ export type GateStatus =
   | 'blocked'
   | 'waiting_for_founder';
 
+/** How much the system may do alone (OS v2.6). Default for early solo: strict. */
+export type AutonomyPosture = 'strict' | 'auto' | 'dangerous';
+
 export type TraceLabel = 'synthetic' | 'real' | 'mixed';
 
 export type FounderApprovalKind =
@@ -22,6 +25,8 @@ export type FounderApprovalKind =
   | 'stage_advance'
   | 'start_loop'
   | 'monetization_path'
+  | 'autonomy_posture'
+  /** @deprecated use autonomy_posture */
   | 'autonomy_level'
   | 'other';
 
@@ -58,6 +63,10 @@ export interface CompanyOsState {
   /** Live loop stage 1–7 */
   loopStage: number;
   gateStatus: GateStatus;
+  /** OS v2.6 — how much AI/tools may do alone. Default strict. */
+  autonomyPosture: AutonomyPosture;
+  /** ISO time of last weekly control-plane snapshot (learning ritual). */
+  lastSnapshotAt?: string;
   scores: CompanyScores;
   founderApprovals: FounderApproval[];
   openQuestions: string[];
@@ -87,24 +96,25 @@ export interface TransitionResult {
   message: string;
 }
 
+/** Simple primary names — match Company OS article / blueprint (teenager-friendly). */
 export const JOURNEY_PHASE_LABELS: Record<number, string> = {
-  1: 'Form thesis and list ICPs (Ideation)',
-  2: 'Define success per group (Vision/ICP)',
-  3: 'Synthetic research (Discovery synthetic leg)',
-  4: 'Real-world research + monetization stress',
-  5: 'Design simplest system (Architecture)',
-  6: 'Build tiny slice (Evaluation-Driven)',
-  7: 'Real/realistic users (Test & early launch)',
-  8: 'Learn & improve (Traction)',
-  9: 'Grow after proof (Scale)',
+  1: 'Form thesis and list possible customer groups',
+  2: 'Define what success looks like for each group',
+  3: 'Synthetic research and first validation',
+  4: 'Real-world research and validation',
+  5: 'Design the simplest system that can test the winner',
+  6: 'Build a tiny slice and test it hard',
+  7: 'Try it with real or realistic users',
+  8: 'Learn from what happens and improve',
+  9: 'Grow only after it clearly works',
 };
 
 export const LOOP_STAGE_LABELS: Record<number, string> = {
-  1: 'Synthetic user research',
-  2: 'Validation / concept testing',
-  3: 'Product building',
-  4: 'Testing (synthetic + automated)',
-  5: 'Evaluation',
-  6: 'Real user feedback ingestion',
-  7: 'Memory update & loop back',
+  1: 'Talk to AI-modeled customers (cheap filter)',
+  2: 'Test the idea (sandbox + real interest)',
+  3: 'Build the tiny slice',
+  4: 'Run tests (fixtures and automated checks)',
+  5: 'Score quality against pass/fail rules',
+  6: 'Bring in real feedback',
+  7: 'Update memory and set the next question',
 };

@@ -22,12 +22,15 @@
 
 ```bash
 npm run company-os -- status
+# prints journey, loop, posture (Strict/Auto/Dangerous), gate, last snapshot
 npm run company-os -- run-stage --signal "optional product note"
 npm run company-os -- continue
 npm run company-os -- advance-journey          # REFUSES without --approve
 npm run company-os -- advance-journey --approve
 npm run company-os -- start
 ```
+
+**OS v2.6 dogfood (instance):** autonomy posture defaults to **Strict** in `company/state/company-state.json`. Learning rituals live on the human scoreboard ([`scores.md`](scores.md)) — weekly snapshot + stage 7 after real jobs.
 
 ### User research (synthetic ICP filter)
 

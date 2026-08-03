@@ -72,10 +72,8 @@ function main() {
   const state = loadState(paths, true);
 
   if (cmd === 'status') {
+    // statusSummary is the full plain-language board (scores + questions included)
     console.log(statusSummary(state));
-    console.log('scores:', JSON.stringify(state.scores));
-    console.log('open_questions:', state.openQuestions.join(' | ') || '(none)');
-    console.log('state_path:', paths.statePath);
     process.exit(0);
   }
 

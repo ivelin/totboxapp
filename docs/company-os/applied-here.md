@@ -30,8 +30,11 @@ Product phase language (“Phase 0/1/2…”) is **Totbox’s** bootstrap roadma
 | Thesis as hypothesis | [`docs/product_thesis.md`](../product_thesis.md) — scheduling workflow, not directory |
 | Stay small / complete loop first | Bootstrap phases in README + strategy doc |
 | Contrarian edge | Physical services lag e‑com agent MCP — [`bootstrap_pmf_and_agentic_gap.md`](../strategy/bootstrap_pmf_and_agentic_gap.md) |
-| Founder / user control | Host LLM + explicit approvals ([`host_llm_safety.md`](../host_llm_safety.md)) |
+| Founder / user control | Host LLM + explicit approvals ([`host_llm_safety.md`](../host_llm_safety.md)); **autonomy posture Strict** |
+| Autonomy postures + deny list (OS v2.6) | Product: dry-run defaults + send/money/time gates. Company: `autonomyPosture` in state + [`instance/scores.md`](instance/scores.md) |
+| Learning rituals (OS v2.6) | Scoreboard control plane + stage 6/7 after real jobs — **discipline still open** (no weekly snapshot stamped yet) |
 | “Where are we?” (product) | `get_workflow` / progress strip; [`house_service_v1`](../workflows/house_service_v1.md) |
+| “Where are we?” (company) | `npm run company-os -- status` + [`instance/scores.md`](instance/scores.md) |
 | Tiny slice + hard tests | `npm run smoke:job`; [`local_household_runbook.md`](../local_household_runbook.md) |
 | Synthetic / continuous eval (design) | [`docs/eval/continuous_sim_eval.md`](../eval/continuous_sim_eval.md) |
 | Company-as-code | Product, strategy, workflows, tests, company-os in one public repo |
@@ -65,7 +68,9 @@ This is the **faithful gap analysis** for applying [`live-runtime.md`](live-runt
 | Research hypotheses & results | Strategy + research insights (anonymized) | Structured hypothesis ids + pass/fail after real house runs |
 | Real-usage feedback | Local `.data/` jobs (gitignored); runbook | Redacted feedback notes after each real job; never commit PII |
 | Scores snapshot | Engineering: tests green; business: informal | Explicit scoreboard for Phase 1 exit (touchpoints, completion, escalation) |
-| Loop cursor | Not formalized | One line in scores/decisions: “loop stage + journey gate” |
+| Loop cursor | `journeyPhase` / `loopStage` / `gateStatus` in `company-state.json` | Keep CLI + scores.md in sync after each cycle |
+| Autonomy posture | **Strict** in state (v2.6 dogfood) | Change only with founder decision + decision trace |
+| Learning rituals | Scoreboard has slots; snapshot not yet stamped | Weekly: status + scores.md; after real job: stage 6 note → stage 7 |
 | Product job state | `.data/jobs.json`, job PM | Remains product runtime — link job_ids into company traces when useful |
 
 **Compute frameworks:** Totbox product loop today is **MCP + TypeScript job PM + host LLM**, not LangGraph/CrewAI. Company-level multi-actor sim is **designed** in eval docs. Adopt LangGraph/CrewAI (or stay TS) only if they speed the company loop — not as a fashion requirement.
@@ -91,8 +96,10 @@ This is the **faithful gap analysis** for applying [`live-runtime.md`](live-runt
 | Scores with thresholds | Engineering yes; business Phase 1 exit qualitative |
 | Stage 4 in CI / known command | Yes (`npm test`, `smoke:job`) |
 | Stage 6 real input path | Manual (runbook); needs discipline |
-| Stage 7 writes next question | Ad hoc |
-| “Where are we?” under two minutes | Product job: yes via MCP; **company** gate: README + this file |
+| Stage 7 writes next question | Ad hoc — **ritual required after next real job** |
+| Autonomy posture written down | **Yes — Strict** |
+| Weekly control-plane snapshot | **Not yet** (scores.md board ready; stamp when run) |
+| “Where are we?” under two minutes | Product job: yes via MCP; **company**: `company-os status` + scores.md |
 
 ---
 
@@ -180,16 +187,17 @@ Today: Level ~1 harness (`smoke:job` + unit tests). Synthetic persona continuity
 
 Do these in order; each is an OS-faithful step, not feature creep:
 
-1. **Formalize company scoreboard + loop cursor** (markdown is enough) for Phase 1 exit metrics — include completion, escalation, approval friction, TTR if known, reward/risk.  
-2. **Reward/risk scorecard** for HVAC household vs cleaning vs any challenger ICP (public-safe notes only).  
-3. **Decision trace** after next real house job and after any strategy, monetization, or autonomy change.  
-4. **Stage 6 ritual**: every real job → redacted feedback note that **updates** persona/hypothesis notes (private if needed); seed stress scenarios from high-value failures.  
-5. **Lock numeric** thin-slice / Phase 1 business thresholds before more build scope.  
-6. **Stage 1/2 challenger ICPs** only if Phase 1 stalls (do not expand market while beachhead unproven).  
-7. **Eval harness continuity**: same synthetic household personas for research and later multi-actor sim ([`continuous_sim_eval.md`](../eval/continuous_sim_eval.md)); optional LangGraph only if it reduces glue vs TypeScript.  
-8. **Optional:** root company-OS instructions block (separate from public-repo PII `AGENTS.md` rules) if founder wants session enforcement.  
-9. **Never** auto-advance product Phase 2 (revenue/operators) without founder call + evidence.  
-10. **Do not** promote Totbox learnings into `operating-system.md` / `live-runtime.md` without explicit template approval.
+1. **Weekly control-plane snapshot** — `npm run company-os -- status` + update [`instance/scores.md`](instance/scores.md); set `lastSnapshotAt` when you mean it.  
+2. **Stay Strict** until a written reason to loosen (decision trace if posture changes).  
+3. **Reward/risk scorecard** for beachhead vs challengers (public-safe notes only).  
+4. **Decision trace** after next real house job and after any strategy, monetization, or autonomy-posture change.  
+5. **Stage 6 → 7 ritual**: every real job → redacted feedback note → update scores / open questions / hypothesis notes.  
+6. **Lock numeric** thin-slice / Phase 1 business thresholds before more build scope.  
+7. **Stage 1/2 challenger ICPs** only if Phase 1 stalls (do not expand market while beachhead unproven).  
+8. **Eval harness continuity**: same synthetic household personas for research and later multi-actor sim ([`continuous_sim_eval.md`](../eval/continuous_sim_eval.md)); optional LangGraph only if it reduces glue vs TypeScript.  
+9. **Optional:** root company-OS instructions block (separate from public-repo PII `AGENTS.md` rules) if founder wants session enforcement.  
+10. **Never** auto-advance product Phase 2 (revenue/operators) without founder call + evidence.  
+11. **Do not** promote Totbox learnings into template files without explicit template approval.
 
 ---
 

@@ -1,7 +1,7 @@
 # Live Company Runtime  
 ## Persistent state + continuous learning loop
 
-**Part of:** [Company Operating System](operating-system.md) (v2.5+)  
+**Part of:** [Company Operating System](operating-system.md) (v2.7+)  
 **Audience:** Solo founders implementing the OS; AI helpers; mentors  
 **Portable:** Yes — this is the *runtime shape*, not any one product  
 **Totbox mapping:** [`applied-here.md`](applied-here.md)  
@@ -63,7 +63,8 @@ Whatever tools you pick, the **live OS needs durable, versioned state** that bot
 | **Research hypotheses & results** | Customer-group ranking and validation outcomes | Hypothesis id, method, evidence labels, scores, pass/fail, demotions |
 | **Real-usage feedback** | What happened with real people | Redacted notes, outcomes, quotes (lawful capture only) |
 | **Scores snapshot** | Current board | Completion, willingness, escalation, trust, etc. |
-| **Loop cursor** | Where the runtime is | Current stage 1–7, last run id, blocked reason |
+| **Loop cursor** | Where the runtime is | Current stage 1–7, last run id, blocked reason; optional: last snapshot date |
+| **Autonomy posture** | How much the system may do alone | Strict / Auto / Dangerous ([blueprint](operating-system.md#autonomy-postures-how-much-the-system-may-do-alone)); default Strict |
 
 ### 3.2 Design rules for state
 
@@ -211,6 +212,8 @@ Founder gates sit between stages when strategy or spend would change.
 
 **Never skip stage 7.** Without memory update, you are generating noise, not running a company OS.
 
+**Learning rituals (blueprint):** Weekly control-plane snapshot is the **read-back**. Stage 7 is the **write-back**. Also: weekly scoreboard glance; monthly (or pre-hire) coordination-tax check. Full table: [operating-system — Learning rituals](operating-system.md#learning-rituals-your-crons-without-servers).
+
 ---
 
 ## 5. Mapping loop stages ↔ bootstrap journey phases
@@ -224,7 +227,7 @@ Founder gates sit between stages when strategy or spend would change.
 | 6 Build tiny slice | **3** + **4** (reuse sandbox scenario ids) |
 | 7 Real/realistic users | **4** + **5** + **6** |
 | 8 Learn & improve | **5** + **7** (full cycles) |
-| 9 Grow | Full loop; raise thresholds; expand slice only with proof |
+| 9 Grow | Full loop; [growth pack](operating-system.md#after-proof-the-growth-pack) only after proof markers; one channel hypothesis; expand spend only after founder promote |
 
 ---
 
@@ -237,6 +240,7 @@ The loop may be automated; **strategy must not**.
 | Advance / kill journey phase | Stage transition inside a locked plan |
 | Primary customer-group change | Persona draft updates |
 | Success threshold change | Score calculation |
+| Autonomy posture change (esp. toward looser) | Drafts / dry-runs under current posture |
 | Spend / hiring / co-founder | Test generation |
 | Shipping to real customers (first times) | Synthetic scenario runs |
 
@@ -311,12 +315,13 @@ Before heavy agent frameworks, a solo founder can run an honest loop with:
 1. Thesis + `research/` customer groups and personas (versioned by git)  
 2. Market notes: what outside evidence supports vs does not establish  
 3. `traces/` or `docs/decisions/YYYY-MM-DD-*.md`  
-4. Scoreboard + loop cursor (markdown is fine)  
-5. A weekly ritual: stages 1→7 with written outputs (even if stage 3 is “no build this week”)  
-6. After ranking: next pack — light synthetic product sandbox and/or real interest tests  
-7. Product tests that encode pass/fail for the tiny slice (reuse sandbox scenario ids)  
-8. Reward/risk scorecards for top groups ([operating-system](operating-system.md#reward--risk-thinking--customer-group-ranking))  
-9. Optional one-page virtual office (who does each function this week)  
+4. Scoreboard + loop cursor + **autonomy posture** (markdown is fine; default Strict)  
+5. Learning rituals: weekly control-plane snapshot; stage 7 after real/heavy cycles; optional weekly scoreboard glance  
+6. A weekly pass through stages 1→7 with written outputs (even if stage 3 is “no build this week”)  
+7. After ranking: next pack — light synthetic product sandbox and/or real interest tests  
+8. Product tests that encode pass/fail for the tiny slice (reuse sandbox scenario ids)  
+9. Reward/risk scorecards for top groups ([operating-system](operating-system.md#reward--risk-thinking--customer-group-ranking))  
+10. Optional one-page virtual office (who does each function this week)  
 
 **Then** add durable agent graphs when:
 
@@ -336,13 +341,18 @@ Before heavy agent frameworks, a solo founder can run an honest loop with:
 | New personas every eval week | No synthetic continuity; scores not comparable |
 | Framework first | Months of glue, zero evidence |
 | Auto-advance journey phase | Founder out of control |
+| Default **Dangerous** posture | Harm without pauses |
 | Channel expansion before thin slice works | Complexity without signal |
+| Skip stage 7 + weekly snapshot | Chat logs, not a company |
 | Simulated price tables treated as list prices | Fake demand; bad sales and bad fundraising stories |
 | Capability-stage scores treated as current product proof | You measured a wish list, not a product |
 | Green sandbox treated as product–market fit | Feasibility is not demand |
 | Waitlist size treated as willingness to pay | Interest is not payment |
 | Huge multi-role sim before thin baseline works | Complexity without a path |
 | Paid ads scaled while sandbox baselines fail | Spend on a broken story |
+| Growth pack without proof markers | Spend/reputation burn before the business is real ([growth pack](operating-system.md#after-proof-the-growth-pack)) |
+| Multi-channel spray in phase 9 | Solo complexity without comparable signal |
+| Vanity metrics as growth success | Optimizes noise; hides weak offer/channel |
 
 ---
 
@@ -359,7 +369,10 @@ Before heavy agent frameworks, a solo founder can run an honest loop with:
 - [ ] High-value failures have become stress scenarios or explicit “wontfix yet” notes  
 - [ ] Stage 6 has at least one real (or clearly labeled pilot) input path  
 - [ ] Stage 7 updates personas, hypotheses, scores, and the next stage 1 question  
-- [ ] Founder can answer “Where are we?” in under two minutes from state  
+- [ ] Founder can answer “Where are we?” in under two minutes from state (phase + loop stage + posture + gate)  
+- [ ] If claiming “growth,” proof markers and a growth-round note exist — or explicit hold-scale ([growth pack](operating-system.md#after-proof-the-growth-pack))  
+- [ ] Autonomy posture is written down (default Strict); standing deny list known  
+- [ ] Weekly control-plane snapshot happened recently  
 - [ ] Virtual office (if used) names who approves external claims — no fake bot titles
 
 ---

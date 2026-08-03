@@ -17,13 +17,26 @@ import {
 } from '../index';
 
 describe('company-os machine (shipped transitions)', () => {
-  it('default seed is journey 6 / loop 4 for totboxapp', () => {
+  it('default seed is journey 6 / loop 4 / strict posture for totboxapp', () => {
     const s = defaultCompanyState();
     expect(s.companyId).toBe('totboxapp');
     expect(s.journeyPhase).toBe(6);
     expect(s.loopStage).toBe(4);
-    expect(statusSummary(s)).toContain('journey: 6/9');
-    expect(statusSummary(s)).toContain('loop: 4/7');
+    expect(s.autonomyPosture).toBe('strict');
+    const board = statusSummary(s);
+    // Article promise: plain-language control plane — no cryptic dumps
+    expect(board).toContain('WHERE DO WE STAND?');
+    expect(board).toContain('step 6 of 9');
+    expect(board).toContain('step 4 of 7');
+    expect(board).toContain('Build a tiny slice and test it hard');
+    expect(board).toContain('Run tests (fixtures and automated checks)');
+    expect(board).toContain('Strict');
+    expect(board).toContain('How free is the AI?');
+    expect(board).toContain('Top open questions');
+    expect(board).toContain('One-line read');
+    expect(board).not.toContain('posture: strict');
+    expect(board).not.toContain('Evaluation-Driven');
+    expect(board).not.toMatch(/scores:\s*\{/);
   });
 
   it('startLoop resets to stage 1 without changing journey', () => {

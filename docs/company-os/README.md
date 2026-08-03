@@ -85,10 +85,23 @@ When a founder says: *“Take the Company OS from this repo and apply what’s u
 
 | Doc | Current |
 |-----|---------|
-| Operating system blueprint | **v2.5** |
-| Live runtime | **v2.5** (next pack in stage 2 + harness Level 1 = light sandbox) |
+| Operating system blueprint | **v2.7** |
+| Live runtime | **v2.7** (growth pack after proof; next pack in stage 2; postures / deny list / learning rituals) |
 
 ### Recent template additions (portable only)
+
+**v2.7 — growth pack (after proof)**
+
+- Entry criteria before growth machinery; message/offer + single-channel tracks  
+- Outcomes over vanity; audience quality before AI personalization  
+- Founder gate: iterate / promote channel / kill channel / hold scale  
+- Method in [`operating-system.md`](operating-system.md#after-proof-the-growth-pack) — not tooling folklore  
+
+**v2.6 — control hygiene (borrowed patterns, solo-shaped)**
+
+- Autonomy postures: Strict / Auto / Dangerous (default Strict)  
+- Standing deny list (always on, every posture)  
+- Learning rituals: weekly control-plane snapshot, stage 7 write-back, scoreboard glance, coordination-tax check  
 
 **v2.5 — next pack after synthetic ranking**
 

@@ -4,17 +4,19 @@
   "journeyPhase": 6,
   "loopStage": 4,
   "gateStatus": "open",
+  "autonomyPosture": "strict",
   "scores": {
     "completion": 0.86,
     "traceCompleteness": 0.7,
-    "notes": "Engineering smoke/tests strong; layout aligned to company-as-code; Phase 1 business exit (real house jobs) still open"
+    "notes": "Engineering tests look good. That is not proof people will pay or that real jobs get easier. Real household jobs still needed."
   },
   "founderApprovals": [],
   "openQuestions": [
-    "What numeric Phase 1 business thresholds lock before more build scope?",
-    "When will the next real household job produce a redacted stage-6 feedback note?"
+    "What numbers must a real job hit before we build more?",
+    "When is the next real household job, with a short honest write-up after?",
+    "When is the next weekly “where do we stand?” check-in?"
   ],
-  "lastAction": "run_stage_4",
+  "lastAction": "made status board plain English (observability hard rule)",
   "createdAt": "2026-07-27T00:00:00.000Z",
-  "updatedAt": "2026-07-30T15:57:45.048Z"
+  "updatedAt": "2026-08-03T14:00:00.000Z"
 }
