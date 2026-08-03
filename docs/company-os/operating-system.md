@@ -1,8 +1,8 @@
 # Company Operating System  
 ## For Solo Founders in Bootstrapping Mode
 
-**Version:** 2.5  
-**Last Updated:** 2026-07-28  
+**Version:** 2.7  
+**Last Updated:** 2026-08-03  
 **Status:** Living guideline (blueprint — not any one company’s live runtime)  
 **Audience:** Independent solo founders; mentors (e.g. Founder Institute, SCORE); AI helpers instructed to follow this system  
 **Isolation:** Portable across startups. Totbox-specific application lives in [`applied-here.md`](applied-here.md) only.  
@@ -135,9 +135,10 @@ Any “current focus” in a real company is only a **hypothesis that has surviv
 | 6 | Build a tiny slice and test it hard | Build (Evaluation-Driven Development) | Slice runs end-to-end (fixture/sim OK); gate scores |
 | 7 | Try it with real or realistic users | Test, Synthetic Evaluation & Early Launch | Observed behavior, not only compliments |
 | 8 | Learn from what happens and improve | Traction, Feedback & Continuous Learning | Decision traces + score movement |
-| 9 | Grow only after it clearly works | Scale & Expansion (after clear product–market fit) | Proof of value or payment; then expand |
+| 9 | Grow only after it clearly works | Scale & Expansion (after clear product–market fit) | Proof of value or payment; then [growth pack](#after-proof-the-growth-pack) — not spray-and-pray |
 
-**Monetization stress** (will they pay / which path?) lives mainly in journey phases **4–5** and in ongoing reward/risk scorecards — not as a separate tenth phase.
+**Monetization stress** (will they pay / which path?) lives mainly in journey phases **4–5** and in ongoing reward/risk scorecards — not as a separate tenth phase.  
+**Growth stress** (which channel, which message, when to spend) lives in journey phases **8–9** and the [growth pack](#after-proof-the-growth-pack) — not as a tenth phase and not before proof.
 
 ### Phase gates (structured)
 
@@ -426,6 +427,66 @@ Primary-focus **promotion** still requires the full promotion rule (synthetic + 
 
 ---
 
+## After Proof: The Growth Pack
+
+**When:** journey phases **8–9**, after proof — not a substitute for the [next pack](#after-synthetic-ranking-the-next-pack) (phases 3–5).  
+**What:** capped experiments on the **same proven customer group** and thin path.  
+**What not:** multi-channel acquisition machinery, channel-tooling folklore, or a tenth journey phase.
+
+**Entry criteria (all required before growth machinery):**
+
+1. Written proof of value **or** payment (founder-defined thresholds — not vibes).  
+2. Thin path still passes its eval / sandbox gates (do not scale a broken story).  
+3. Primary customer group is explicit; promote is no longer **hold** for that group.  
+4. Pre-written **outcome** metrics for the next round (rule 1 below).
+
+If any item fails → **Hold scale**. Stay in phases 7–8. List size and creative do not unlock entry.
+
+```text
+Proof markers + path still green
+        │
+        ▼
+Entry gate: growth machinery allowed? (yes / hold)
+        │
+        ├─ A. Message / offer experiments (same group)
+        └─ B. Channel experiments (one primary channel hypothesis)
+        │
+        ▼
+Founder gate: iterate / promote channel / kill channel / hold scale
+        │
+        ▼
+Write growth/ROUND_* + decision trace; only then expand spend or add a second channel
+```
+
+| Track | Question | Not proof of… |
+|-------|----------|----------------|
+| **A. Message / offer** | Does a clear offer get a **real next step** from the proven group? | Retention, lifetime value |
+| **B. Channel** | Can **one** channel reach that group without burning trust or budget? | Product–market fit forever |
+
+**Rules (portable):**
+
+1. **Outcomes over vanity.** Count meetings held, paid starts, completed jobs, or retained use — thresholds written **before** the round. Opens, total replies, and list size are diagnostics only.  
+2. **Audience quality before AI personalization.** Personalizing a bad or unproven list only scales noise.  
+3. **One primary channel hypothesis at a time** (solo). Rank channels; demote; do not multi-GTM.  
+4. **Pain owner, then budget owner** when the motion is a human conversation.  
+5. **Reuse known history first** (closed-won patterns, champion continuity, churned power users) before buying cold volume — *if* that history exists.  
+6. **Evidence labels still apply.** A reply is not retention. Spend is not product–market fit.
+
+**Founder gate after each growth round:**
+
+| Decision | Meaning |
+|----------|---------|
+| **Iterate** | Fix message, offer, or audience quality; re-run with caps |
+| **Promote channel** | Channel cleared thresholds; allow limited expansion |
+| **Kill channel** | Fails cost, trust, or fit; stop |
+| **Hold scale** | Interesting but weak; no spend expansion |
+
+**Artifacts:** short notes under `growth/` (or equivalent) per round — hypothesis, cap, counts vs thresholds, decision, date. Live-loop stage 7 writes back scores and the next question.
+
+**Not in this pack:** deliverability ops, data-vendor stacks, channel-specific tooling. Optional private motion notes after a channel is chosen — never core OS law.
+
+---
+
 ## Reward / Risk Thinking & Customer Group Ranking
 
 Not every customer group is equally attractive for a bootstrapped solo founder.  
@@ -490,11 +551,18 @@ This is how you stay in charge of the company operating system.
 
 ### What you must always be able to see
 
-- Current **journey phase** and **live loop stage**, and whether the next gate is **open**, **ready for review**, **blocked**, or **waiting for your decision**
-- The top open questions or risks
-- Current scores for the **active hypotheses and slices** (not only vanity product metrics)
-- Clear moments when the system recommends you make a decision
-- Recent important actions and the reasons they were taken (plain language)
+**Hard rule — transparency:** You must always be able to ask **“Where do we stand?”** and get a **crisp, plain-language company snapshot** in under two minutes. No cryptic dumps. No insider jargon as the only answer. Simple words a teenager can follow.
+
+That snapshot must include, in everyday language:
+
+- How far you are on **proving the business** (slow journey: step N of 9 + one plain sentence)
+- What the **weekly learning loop** is doing (fast loop: step M of 7 + one plain sentence)
+- Whether the next gate is open, waiting for you, blocked, or ready for review — **in plain words**
+- How free the AI is (Strict / Auto / Dangerous) — **with what that means for you**
+- Top open questions or risks
+- Honest scores for the **active hypotheses and slices** (not only vanity product metrics)
+- Last important action and why (plain language)
+- Whether the weekly check-in and stage 7 memory write happened recently
 
 ### Natural language queries and Socratic dialogue
 
@@ -520,7 +588,29 @@ The system should surface moments where your judgment is especially valuable:
 - Deciding when to add people (hire / co-founder / contractor)
 - Declaring that something has enough proof to grow (or enough weakness to kill)
 - Choosing which **monetization path** to test next
-- Setting **autonomy levels** (what the system may draft or do without you vs hard gates)
+- Setting or changing the **autonomy posture** (how much the system may do alone)
+
+### Autonomy postures (how much the system may do alone)
+
+Pick one default for the company this week. You can only get **stricter** in a narrower context — not looser.
+
+| Posture | What AI / tools may do alone | What always waits for you |
+|---------|------------------------------|---------------------------|
+| **Strict** | Drafts, research notes, dry-runs only | Send, spend, journey advance, public claims, delete or change real accounts |
+| **Auto** | Internal drafts + safe research loops | Same high-stakes list as Strict |
+| **Dangerous** | Almost never. No pauses. Easy to hurt yourself. | You still own the outcomes |
+
+Default for early solo founders: **Strict**.  
+**Auto** is not “the AI runs the company.” High-stakes stay gated.
+
+### Standing deny list (always on — every posture)
+
+1. Never advance a journey phase without explicit founder OK.  
+2. Never live-send, charge money, or change a real account without explicit OK.  
+3. Never treat simulated prices or “I would buy” as demand.  
+4. Never put secrets or personal customer data in public git or casual chat dumps.  
+5. Never invent a fake staffed role (“Marketing Bot”) that hides who approves.  
+6. Never skip stage 7 memory write after meaningful work if you claim you ran the loop.
 
 ### When solo vs add people (lightweight test)
 
@@ -595,6 +685,7 @@ Suggested minimal template:
 ```text
 Date:
 Journey phase / loop stage:
+Autonomy posture (Strict | Auto | Dangerous):
 Decision:
 Options considered:
 Evidence used (run type: synthetic | real | mixed; claim labels if needed):
@@ -603,6 +694,20 @@ Expected outcome:
 Actual outcome (fill later):
 Next review:
 ```
+
+### Learning rituals (your “crons” without servers)
+
+Recurring work that keeps the OS honest. Put it on a calendar or ask your AI every time. These are not product features.
+
+| Ritual | When | Done means |
+|--------|------|------------|
+| **Control-plane snapshot** | Weekly | Journey phase, loop stage, posture, gate, top open questions — under two minutes |
+| **Stage 7 memory write** | After every real or heavy synthetic cycle | Scores, open questions, and hypothesis notes updated |
+| **Scoreboard glance** | Weekly | The numbers you track still make sense (completion, willingness, escalation, …) |
+| **Coordination-tax check** | Monthly, or after you almost hire | Three bullets: who else needs an agent? multiplayer work? pain if two people share one workspace? |
+
+Skipping these is how you get chat logs instead of a company.  
+Stage 7 is the **write-back**. The weekly snapshot is the **read-back**. Details: [`live-runtime.md`](live-runtime.md).
 
 ---
 
@@ -621,7 +726,7 @@ Everything important lives in one place so both you and the AI agents can see th
 | **product/** | Working product pieces (app, agents, channels, flows) |
 | **evals/** | Tests, scores, harnesses, pass/fail records, stress scenarios |
 | **traces/** | Decision records from synthetic and real runs |
-| **growth/** | Experiments, messaging, channel tests (once you reach that stage) |
+| **growth/** | Growth-pack round notes after proof ([growth pack](#after-proof-the-growth-pack)) — not pre-proof spray |
 | **docs/** | This operating system, open questions, thesis, ADRs |
 | **AGENTS.md** (root) | Thin always-on enforcement for the primary AI agent |
 | *Optional:* **company/** | Policies, autonomy rules, workflow schemas |
@@ -643,7 +748,7 @@ your-startup/
   product/ or app/        # What you ship
   evals/ or tests/        # Automated + synthetic scenario tests
   traces/ or docs/decisions/
-  growth/                 # Later
+  growth/                 # After proof — growth-pack rounds
   company/                # Optional: policies, autonomy rules
   support/                # Optional: escalation playbooks
   infrastructure/         # Optional: shared synthetic tooling
@@ -741,16 +846,21 @@ Hard rules you must follow:
 2. Never treat an early idea or customer group as proven until both synthetic and real-world evidence support it.
 3. Label claims honestly: outside facts, company signals, assumed capability, or needs real-world proof.
    Never treat simulated prices or "I would buy" as demand.
-4. Always be able to tell me clearly where we are (journey phase + live loop stage), what evidence we have, and what the next gate is.
-5. When an important decision needs human judgment, say so directly.
-6. Prefer small, honest tests and evaluation-driven increments (Spec → Harness → Implement → Gate) over big unmeasured builds.
-7. After ranked synthetic research, prefer the next pack: light synthetic product sandbox and/or real interest tests before a heavy build.
-8. Record the reason for important actions (decision traces); close stage 7 (memory update) after meaningful runs.
-9. Answer me in plain language I can understand. Avoid cryptic abbreviations.
-10. Surface recommended human interjections when judgment is high-leverage (including autonomy levels and monetization path).
-11. Keep reward/risk thinking visible when ranking customer groups or monetization paths.
-12. Do not import another company's product thesis or market as mine unless I explicitly adopt it.
-13. Treat agent frameworks as optional implementors of the live loop — principles first, framework second.
+4. When I ask “Where are we?” or “Where do we stand?”, answer with a crisp plain-language
+   company snapshot — journey and loop in everyday words, how free the AI is, gate in plain words,
+   evidence, open questions, honest scores. No cryptic dumps.
+5. The standing deny list applies in every posture (no silent live-send, spend, or fake staffing).
+6. When an important decision needs human judgment, say so directly.
+7. Prefer small, honest tests and evaluation-driven increments (Spec → Harness → Implement → Gate) over big unmeasured builds.
+8. After ranked synthetic research, prefer the next pack: light synthetic product sandbox and/or real interest tests before a heavy build.
+9. Record the reason for important actions (decision traces); close stage 7 (memory update) after meaningful runs.
+10. If stage 7 or the weekly control-plane snapshot is missing after meaningful work, say so.
+11. Answer me in plain language I can understand. Avoid cryptic abbreviations.
+12. Surface recommended human interjections when judgment is high-leverage
+    (customer group, thresholds, hire/cofounder, grow/kill, monetization path, autonomy posture).
+13. Keep reward/risk thinking visible when ranking customer groups or monetization paths.
+14. Do not import another company's product thesis or market as mine unless I explicitly adopt it.
+15. Treat agent frameworks as optional implementors of the live loop — principles first, framework second.
 
 If you are unsure, ask me. Do not guess on strategy or protect weak ideas.
 ```
@@ -848,12 +958,16 @@ Thin-slice gates should set numeric thresholds on at least Completion, Extractio
 9. Do deeper real conversations and small paid or concierge tests with the strongest groups.  
 10. Only then lock a primary focus and a tiny first slice (with the slice artifact checklist).  
 11. Sketch a **virtual office**: who does each function today, what comes out this week, who approves external claims.  
-12. Put the thin AI instructions into root `AGENTS.md` / your main tool.  
-13. Define clear **numeric** pass/fail thresholds for the first slice **before** building further.  
-14. Keep sandbox scenario ids as the seed of a **minimal evaluation harness** ([`live-runtime.md`](live-runtime.md)).  
-15. Run evaluation-driven increments (Spec → Harness → Implement → Gate).  
-16. Keep asking: “What evidence do we actually have?” and “What would make us kill this hypothesis?”  
-17. Keep decision traces for anything that changes phase, customer group, monetization path, autonomy, or spend.
+12. Pick an **autonomy posture** this week (default **Strict**) and keep the standing deny list visible.  
+13. Put the thin AI instructions into root `AGENTS.md` / your main tool.  
+14. Define clear **numeric** pass/fail thresholds for the first slice **before** building further.  
+15. Keep sandbox scenario ids as the seed of a **minimal evaluation harness** ([`live-runtime.md`](live-runtime.md)).  
+16. Run evaluation-driven increments (Spec → Harness → Implement → Gate).  
+17. Keep asking: “What evidence do we actually have?” and “What would make us kill this hypothesis?”  
+18. Keep decision traces for anything that changes phase, customer group, monetization path, autonomy posture, or spend.  
+19. Run the **learning rituals**: weekly control-plane snapshot; stage 7 after every real or heavy synthetic cycle.  
+20. When proof markers exist, run the **[growth pack](#after-proof-the-growth-pack)** before multi-channel spend.  
+21. Keep growth round notes under `growth/`; vanity metrics are not phase-9 exit.
 
 ---
 
@@ -866,14 +980,18 @@ Every company should maintain its own list. Starter prompts:
 - Did real interest tests clear pre-written thresholds (waitlist, replies, calls)?  
 - What exact price (if any) are people willing to pay? (real-world proof only — not simulated tables)  
 - What are the **numeric pass thresholds** for the current thin slice?  
-- How often should the system ask the human for approval versus acting within a safe draft/dry-run band (**how much the system may do alone**)?  
+- What **autonomy posture** are we on this week (Strict / Auto / Dangerous)?  
+- How often should the system ask the human for approval versus acting within a safe draft/dry-run band?  
+- Did we run the weekly control-plane snapshot and close stage 7 after the last real cycle?  
 - What legal and ethical rules apply to outreach in our channels?  
 - When do the risks of staying solo become larger than the risks of adding help?  
 - What is the **smallest set of channels** that still produces real value?  
 - How aggressively should multi-party outreach run in **parallel** vs building trust one step at a time?  
 - How will real usage data be captured and fed back into synthetic personas and decision traces?  
 - Which failures become permanent **stress scenarios**?  
-- What would make us **kill** the current hypothesis cleanly?
+- What would make us **kill** the current hypothesis cleanly?  
+- Do we have **proof markers** that unlock the growth pack, or are we still in hold-scale?  
+- What is the **one** primary channel hypothesis for the next growth round, and what outcome threshold kills it?
 
 ---
 
@@ -890,11 +1008,16 @@ Every company should maintain its own list. Starter prompts:
 - Scaling paid ads while the thin path fails sandbox runs  
 - Optimizing operational scores while ignoring a weak hypothesis  
 - Letting AI silently change strategy or phase  
+- Defaulting to **Dangerous** autonomy (no pauses) just to “move faster”  
 - Building without an evaluation harness or numeric gate  
 - Copying another startup’s product because their OS docs lived in the same monorepo  
 - Expanding channels or multi-agent complexity before the thin slice works  
 - Fake org charts (generic bot labels, empty roles with no outputs or human gates)  
+- Skipping weekly snapshot and stage 7 while claiming the company OS is “running”  
 - Silently rewriting this template every time one product ships a feature  
+- Running multi-channel growth machinery before proof of value or payment  
+- Treating opens, total replies, or list size as growth success  
+- AI personalization on an unproven audience as a substitute for offer/channel fit  
 
 ---
 
@@ -909,6 +1032,8 @@ Every company should maintain its own list. Starter prompts:
 | 2.3 | Enhance-only recovery from earlier drafts: formal lifecycle aliases; EDD loop; AGENTS.md thin enforcement; structured phase gates; TTR / channel distribution / early-revenue metrics; thin-slice artifact checklist; autonomy interjection; optional company/support/infrastructure leaves; template change policy pointer |
 | 2.4 | Evidence labels (outside facts / company signals / assumed capability / needs real-world proof); staged trust reveal; market “supports vs does not establish”; optional “what to say” fields on scorecards; virtual office cards + hire triggers; plain-language pass on ranking section |
 | 2.5 | Next pack after synthetic ranking: light isolated synthetic product sandbox (capability/feasibility under multi-party mess) + real interest tests; parallel/sequence rules; founder gate before heavy build |
+| 2.6 | Autonomy postures (Strict / Auto / Dangerous); standing deny list (always on); learning rituals (weekly snapshot, stage 7, scoreboard glance, coordination-tax check) |
+| 2.7 | After proof: growth pack (entry gate; message/channel experiment tracks; outcome metrics; founder promote/kill/hold; growth/ artifacts). Phase 9 pointer. No new phase; no channel-tooling folklore. |
 
 ---
 

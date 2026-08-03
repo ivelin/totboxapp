@@ -33,6 +33,7 @@ export function defaultCompanyState(companyId = 'totboxapp'): CompanyOsState {
     journeyPhase: 6,
     loopStage: 4,
     gateStatus: 'open',
+    autonomyPosture: 'strict',
     scores: {
       completion: 0.86,
       notes:
@@ -40,25 +41,94 @@ export function defaultCompanyState(companyId = 'totboxapp'): CompanyOsState {
     },
     founderApprovals: [],
     openQuestions: [
-      'What numeric Phase 1 business thresholds lock before more build scope?',
-      'When will the next real household job produce a redacted stage-6 feedback note?',
+      'What numbers must a real job hit before we build more?',
+      'When is the next real household job, with a short honest write-up after?',
+      'When is the next weekly “where do we stand?” check-in?',
     ],
-    lastAction: 'seeded_default_state',
+    lastAction: 'seeded default company state',
     createdAt: at,
     updatedAt: at,
   };
 }
 
+/** Plain-English posture lines for founders (no cryptic jargon). */
+const POSTURE_PLAIN: Record<string, string> = {
+  strict: 'Strict — AI may only draft and dry-run; you approve send, spend, and big moves',
+  auto: 'Auto — AI may do safe internal work; you still approve send, spend, and big moves',
+  dangerous: 'Dangerous — almost no pauses (easy to mess up; avoid early)',
+};
+
+const GATE_PLAIN: Record<string, string> = {
+  open: 'Open — you can keep going',
+  ready_for_review: 'Ready for your review — a decision is waiting',
+  blocked: 'Blocked — something is stuck',
+  waiting_for_founder: 'Waiting for you — system will not advance without your OK',
+};
+
+/**
+ * Founder-facing "Where do we stand?" board.
+ * Hard rule: plain language, easy to scan, no cryptic dumps.
+ */
 export function statusSummary(state: CompanyOsState): string {
   const jLabel = JOURNEY_PHASE_LABELS[state.journeyPhase] ?? `phase ${state.journeyPhase}`;
   const lLabel = LOOP_STAGE_LABELS[state.loopStage] ?? `stage ${state.loopStage}`;
+  const posture = state.autonomyPosture ?? 'strict';
+  const postureLine = POSTURE_PLAIN[posture] ?? posture;
+  const gateLine = GATE_PLAIN[state.gateStatus] ?? state.gateStatus;
+  const snapshot =
+    state.lastSnapshotAt != null && state.lastSnapshotAt !== ''
+      ? state.lastSnapshotAt.slice(0, 10)
+      : 'never — do a weekly check-in';
+  const scores = state.scores;
+  const scoreLines: string[] = [];
+  if (scores.completion != null) {
+    scoreLines.push(
+      `  · Finish rate (engineering tests): ${scores.completion} — not the same as “customers love it”`
+    );
+  }
+  if (scores.traceCompleteness != null) {
+    scoreLines.push(
+      `  · Did we write down why we decided things?: ${scores.traceCompleteness}`
+    );
+  }
+  if (scores.notes) {
+    scoreLines.push(`  · Note: ${scores.notes}`);
+  }
+  const scoreBlock =
+    scoreLines.length > 0 ? scoreLines.join('\n') : '  · (none yet — fill honest scores)';
+  const questions =
+    state.openQuestions.length > 0
+      ? state.openQuestions.map((q, i) => `  ${i + 1}. ${q}`).join('\n')
+      : '  (none)';
+  // lastAction may be machine-ish; show as-is but never as the only story
+  const last = state.lastAction ?? '(none)';
+
   return [
-    `company: ${state.companyId}`,
-    `journey: ${state.journeyPhase}/9 — ${jLabel}`,
-    `loop: ${state.loopStage}/7 — ${lLabel}`,
-    `gate: ${state.gateStatus}`,
-    `last: ${state.lastAction ?? '(none)'}`,
-    `updated: ${state.updatedAt}`,
+    '══════════════════════════════════════',
+    '  WHERE DO WE STAND?  (company snapshot)',
+    '══════════════════════════════════════',
+    `Company:  ${state.companyId}`,
+    '',
+    `Slow clock — proving the business:  step ${state.journeyPhase} of 9`,
+    `  ${jLabel}`,
+    `Fast clock — learning this week:    step ${state.loopStage} of 7`,
+    `  ${lLabel}`,
+    '',
+    `How free is the AI?`,
+    `  ${postureLine}`,
+    `Next gate`,
+    `  ${gateLine}`,
+    `Last weekly check-in:  ${snapshot}`,
+    `Last action:           ${last}`,
+    '',
+    'Scores (be honest — green tests ≠ product-market fit):',
+    scoreBlock,
+    '',
+    'Top open questions:',
+    questions,
+    '──────────────────────────────────────',
+    'One-line read: slow clock step · fast clock step · gate · what proof is still missing.',
+    'Ask anytime: “Where are we?” — answer from this board in plain words.',
   ].join('\n');
 }
 

@@ -44,6 +44,10 @@ export function loadState(paths: StorePaths, seedIfMissing = true): CompanyOsSta
       `unsupported company-os state version: ${String((parsed as { version?: unknown }).version)}`
     );
   }
+  // v2.6 dogfood: older state files may lack posture — default Strict
+  if (!parsed.autonomyPosture) {
+    parsed.autonomyPosture = 'strict';
+  }
   return parsed;
 }
 

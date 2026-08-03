@@ -2,15 +2,39 @@
 
 Machine scores live in `company/state/company-state.json`. Update both when you close a loop cycle.
 
+## Where do we stand? (plain English)
+
+Run anytime: `npm run company-os -- status` — same board in the terminal.
+
+| Question | Answer right now |
+|----------|------------------|
+| How far are we on proving the business? | Step **6 of 9** — building the tiny slice and testing it hard |
+| What are we doing in this week’s learning loop? | Step **4 of 7** — automated / synthetic testing |
+| Can we keep going without a founder decision? | **Yes** — gate is open |
+| How free is the AI? | **Strict** — drafts and dry-runs only; you approve send, money, and big moves |
+| Did we do this week’s check-in? | **Not yet** — stamp when you run the weekly ritual |
+| Did we write memory after the last real job? | **No** — no real job stage-6 note yet |
+
+**One-line read:** Slow clock step 6 · fast clock step 4 · gate open · proof still missing = real jobs that feel easier than Gmail alone.
+
+### Standing deny list (always on — this instance)
+
+- No silent journey advance  
+- No live-send / money-time / real-account change without founder OK  
+- No synthetic “I would buy” as demand  
+- No PII / secrets in public git  
+- No fake bot staffing  
+- Close stage 7 after meaningful real or heavy synthetic work  
+
+## Scores
+
 | Score | Current (approx) | Notes |
 |-------|------------------|--------|
-| Completion | 0.86 eng | From unit/smoke; not business job completion |
-| Extraction | — | Quote paste hints work; not scored formally |
-| Escalation | — | Safety gates force human on send/money/time |
-| Trace completeness | improving | Company OS now appends decision traces |
-| Trust / approval friction | design-ok | Host approval required |
-| Reward vs risk | informal | Beachhead: single-DM strong_fit; dual deferred A/B |
-| Early-revenue attractiveness | low until Phase 1 exit | No paid pilots yet |
+| Did the thin path finish in tests? | 0.86 | Engineering only — not “customers love it” |
+| Did we write down decisions? | 0.7 | Improving |
+| How often do we need a human? | high by design | You approve send / money / time (Strict) |
+| Will people pay? | unknown | Needs real-world proof |
+| Is this customer group worth it? | informal | Beachhead still a hypothesis |
 
 **Beachhead (founder agree_ready, shadow tests only):** `household-single-decision-maker-recurring` first full cycle; dual-income only after.  
 **First real job type:** **cleaning** (exception / rebook / rescope — not pure standing-Tuesday autopilot).  
