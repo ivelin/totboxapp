@@ -10,6 +10,7 @@
  *   npm run company-os -- advance-journey --approve
  *   npm run company-os -- run-stage [--signal "..."]
  *   npm run company-os -- set-gate open|blocked|waiting_for_founder|ready_for_review
+ *   npm run company-os -- set-ready-for-eyes unknown|blocked|green [--note TEXT] [--evidence PATH] [--blockers "a; b"] [--url URL]
  *
  * Entry: company/scripts/company-os.ts
  * State: company/state/company-state.json
@@ -25,9 +26,11 @@ import {
   loadState,
   orchestrateCurrentStage,
   setGateStatus,
+  setReadyForHumanEyes,
   startLoop,
   statusSummary,
   type GateStatus,
+  type ReadyForHumanEyesStatus,
 } from '../../src/lib/company-os';
 
 function usage(): never {
@@ -40,6 +43,8 @@ Commands:
   advance-journey [--approve] [--note TEXT]
   run-stage [--signal TEXT]
   set-gate <open|blocked|waiting_for_founder|ready_for_review>
+  set-ready-for-eyes <unknown|blocked|green>
+      [--note TEXT] [--evidence PATH] [--blockers "a; b"] [--url URL] [--happy-path TEXT]
 `);
   process.exit(2);
 }
@@ -50,8 +55,16 @@ function parseArgs(argv: string[]) {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--approve') flags.approve = true;
-    else if (a === '--note' || a === '--signal') {
-      flags[a.slice(2)] = argv[++i] ?? '';
+    else if (
+      a === '--note' ||
+      a === '--signal' ||
+      a === '--evidence' ||
+      a === '--blockers' ||
+      a === '--url' ||
+      a === '--happy-path'
+    ) {
+      const key = a.slice(2).replace(/-/g, '_'); // happy_path
+      flags[key === 'happy_path' ? 'happyPath' : key] = argv[++i] ?? '';
     } else if (a.startsWith('--')) {
       flags[a.slice(2)] = true;
     } else {
@@ -136,6 +149,32 @@ function main() {
     console.log(result.message);
     console.log(statusSummary(result.state));
     process.exit(0);
+  }
+
+  if (cmd === 'set-ready-for-eyes') {
+    const s = positional[1] as ReadyForHumanEyesStatus | undefined;
+    const allowed: ReadyForHumanEyesStatus[] = ['unknown', 'blocked', 'green'];
+    if (!s || !allowed.includes(s)) usage();
+    const blockersRaw = flags.blockers != null ? String(flags.blockers) : '';
+    const blockers =
+      blockersRaw.trim() !== ''
+        ? blockersRaw
+            .split(';')
+            .map((b) => b.trim())
+            .filter(Boolean)
+        : undefined;
+    const result = setReadyForHumanEyes(state, s, {
+      note: flags.note != null ? String(flags.note) : undefined,
+      evidencePath: flags.evidence != null ? String(flags.evidence) : undefined,
+      blockers,
+      url: flags.url != null ? String(flags.url) : undefined,
+      happyPath: flags.happyPath != null ? String(flags.happyPath) : undefined,
+    });
+    commitTransition(paths, result);
+    console.log(result.message);
+    if (result.error) console.error('error:', result.error);
+    console.log(statusSummary(result.state));
+    process.exit(result.ok ? 0 : 1);
   }
 
   usage();

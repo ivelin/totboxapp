@@ -3,6 +3,8 @@ import type {
   DecisionTrace,
   FounderApproval,
   GateStatus,
+  ReadyForHumanEyes,
+  ReadyForHumanEyesStatus,
   TraceLabel,
   TransitionResult,
 } from './types';
@@ -34,6 +36,11 @@ export function defaultCompanyState(companyId = 'totboxapp'): CompanyOsState {
     loopStage: 4,
     gateStatus: 'open',
     autonomyPosture: 'strict',
+    readyForHumanEyes: {
+      status: 'unknown',
+      happyPath:
+        'Cold user can complete thin household job path on a shareable surface without founder babysitting',
+    },
     scores: {
       completion: 0.86,
       notes:
@@ -44,6 +51,7 @@ export function defaultCompanyState(companyId = 'totboxapp'): CompanyOsState {
       'What numbers must a real job hit before we build more?',
       'When is the next real household job, with a short honest write-up after?',
       'When is the next weekly “where do we stand?” check-in?',
+      'Is Ready for human eyes green before any mentor “try this product” ask?',
     ],
     lastAction: 'seeded default company state',
     createdAt: at,
@@ -64,6 +72,27 @@ const GATE_PLAIN: Record<string, string> = {
   blocked: 'Blocked — something is stuck',
   waiting_for_founder: 'Waiting for you — system will not advance without your OK',
 };
+
+const HUMAN_EYES_PLAIN: Record<ReadyForHumanEyesStatus, string> = {
+  unknown:
+    'Unknown — do not ask mentors/users to try a product link until a cold happy path is checked',
+  blocked:
+    'Blocked — cold happy path failed; fix blockers before external product-test asks',
+  green:
+    'Green — cold happy path passed (not demand or PMF); external product-test asks OK',
+};
+
+function readyEyesLine(state: CompanyOsState): string {
+  const r = state.readyForHumanEyes ?? { status: 'unknown' as const };
+  const base = HUMAN_EYES_PLAIN[r.status] ?? HUMAN_EYES_PLAIN.unknown;
+  const bits: string[] = [`  ${base}`];
+  if (r.checkedAt) bits.push(`  Last checked: ${r.checkedAt.slice(0, 10)}`);
+  if (r.blockers && r.blockers.length > 0) {
+    bits.push(`  Blockers: ${r.blockers.join('; ')}`);
+  }
+  if (r.evidencePath) bits.push(`  Evidence: ${r.evidencePath}`);
+  return bits.join('\n');
+}
 
 /**
  * Founder-facing "Where do we stand?" board.
@@ -102,6 +131,7 @@ export function statusSummary(state: CompanyOsState): string {
       : '  (none)';
   // lastAction may be machine-ish; show as-is but never as the only story
   const last = state.lastAction ?? '(none)';
+  const eyes = state.readyForHumanEyes?.status ?? 'unknown';
 
   return [
     '══════════════════════════════════════',
@@ -118,6 +148,8 @@ export function statusSummary(state: CompanyOsState): string {
     `  ${postureLine}`,
     `Next gate`,
     `  ${gateLine}`,
+    `Ready for human eyes?`,
+    readyEyesLine(state),
     `Last weekly check-in:  ${snapshot}`,
     `Last action:           ${last}`,
     '',
@@ -127,9 +159,107 @@ export function statusSummary(state: CompanyOsState): string {
     'Top open questions:',
     questions,
     '──────────────────────────────────────',
-    'One-line read: slow clock step · fast clock step · gate · what proof is still missing.',
+    `One-line read: slow clock step · fast clock step · gate · human-eyes ${eyes} · what proof is still missing.`,
     'Ask anytime: “Where are we?” — answer from this board in plain words.',
   ].join('\n');
+}
+
+/**
+ * OS v2.8 — set Ready for human eyes ship gate.
+ * green requires a note or evidence path (what cold path passed).
+ */
+export function setReadyForHumanEyes(
+  state: CompanyOsState,
+  status: ReadyForHumanEyesStatus,
+  opts: {
+    note?: string;
+    evidencePath?: string;
+    blockers?: string[];
+    happyPath?: string;
+    url?: string;
+  } = {}
+): TransitionResult {
+  if (status === 'green' && !opts.note && !opts.evidencePath) {
+    return {
+      ok: false,
+      state,
+      error: 'READY_FOR_HUMAN_EYES_GREEN_NEEDS_EVIDENCE',
+      message:
+        'REFUSED: marking Ready for human eyes green needs --note or --evidence (what cold path passed).',
+    };
+  }
+  if (status === 'blocked' && (!opts.blockers || opts.blockers.length === 0) && !opts.note) {
+    return {
+      ok: false,
+      state,
+      error: 'READY_FOR_HUMAN_EYES_BLOCKED_NEEDS_REASON',
+      message:
+        'REFUSED: marking blocked needs --note or --blockers (plain-language why cold path failed).',
+    };
+  }
+
+  const prev = state.readyForHumanEyes ?? { status: 'unknown' as const };
+  // blocked: keep reasons; green/unknown: clear blockers unless explicitly passed
+  const blockers =
+    status === 'blocked'
+      ? opts.blockers ?? (opts.note ? [opts.note] : prev.blockers)
+      : opts.blockers;
+
+  const ready: ReadyForHumanEyes = {
+    status,
+    checkedAt: nowIso(),
+    evidencePath: opts.evidencePath ?? (status === 'green' ? prev.evidencePath : undefined),
+    blockers,
+    happyPath: opts.happyPath ?? prev.happyPath,
+    url: opts.url ?? prev.url,
+  };
+
+  const approvals = [...state.founderApprovals];
+  if (status === 'green') {
+    const approval: FounderApproval = {
+      id: id('ap'),
+      kind: 'ready_for_human_eyes',
+      granted: true,
+      at: nowIso(),
+      note: opts.note ?? opts.evidencePath,
+    };
+    approvals.push(approval);
+  }
+
+  const next: CompanyOsState = touch(
+    {
+      ...state,
+      readyForHumanEyes: ready,
+      founderApprovals: approvals,
+    },
+    `ready_for_human_eyes:${status}`
+  );
+
+  const trace = makeTrace(
+    next,
+    'ready_for_human_eyes',
+    `Set Ready for human eyes to ${status}`,
+    opts.note ??
+      (blockers?.length ? blockers.join('; ') : opts.evidencePath ?? status),
+    status === 'green'
+      ? 'External product-test asks allowed (not PMF)'
+      : status === 'blocked'
+        ? 'Fix cold-path blockers; re-run gate before mentor/user product asks'
+        : 'Run cold happy path before external product-test asks',
+    'mixed'
+  );
+
+  return {
+    ok: true,
+    state: next,
+    trace,
+    message:
+      status === 'green'
+        ? 'Ready for human eyes: GREEN (cold path evidence recorded — not demand/PMF).'
+        : status === 'blocked'
+          ? 'Ready for human eyes: BLOCKED — do not draft external product-test asks.'
+          : 'Ready for human eyes: UNKNOWN — cold path not yet verified.',
+  };
 }
 
 function makeTrace(

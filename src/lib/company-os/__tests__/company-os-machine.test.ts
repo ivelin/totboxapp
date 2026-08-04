@@ -1,5 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, rmSync, existsSync, readFileSync, readdirSync } from 'fs';
+import {
+  mkdtempSync,
+  rmSync,
+  existsSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+} from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import {
@@ -12,6 +19,7 @@ import {
   loadState,
   orchestrateCurrentStage,
   saveState,
+  setReadyForHumanEyes,
   startLoop,
   statusSummary,
 } from '../index';
@@ -23,6 +31,7 @@ describe('company-os machine (shipped transitions)', () => {
     expect(s.journeyPhase).toBe(6);
     expect(s.loopStage).toBe(4);
     expect(s.autonomyPosture).toBe('strict');
+    expect(s.readyForHumanEyes.status).toBe('unknown');
     const board = statusSummary(s);
     // Article promise: plain-language control plane — no cryptic dumps
     expect(board).toContain('WHERE DO WE STAND?');
@@ -32,11 +41,45 @@ describe('company-os machine (shipped transitions)', () => {
     expect(board).toContain('Run tests (fixtures and automated checks)');
     expect(board).toContain('Strict');
     expect(board).toContain('How free is the AI?');
+    expect(board).toContain('Ready for human eyes?');
+    expect(board).toContain('human-eyes unknown');
     expect(board).toContain('Top open questions');
     expect(board).toContain('One-line read');
     expect(board).not.toContain('posture: strict');
     expect(board).not.toContain('Evaluation-Driven');
     expect(board).not.toMatch(/scores:\s*\{/);
+  });
+
+  it('REFUSES ready-for-eyes green without evidence', () => {
+    const s = defaultCompanyState();
+    const r = setReadyForHumanEyes(s, 'green');
+    expect(r.ok).toBe(false);
+    expect(r.error).toBe('READY_FOR_HUMAN_EYES_GREEN_NEEDS_EVIDENCE');
+    expect(s.readyForHumanEyes.status).toBe('unknown');
+  });
+
+  it('sets ready-for-eyes green with evidence and blocked with reason', () => {
+    const s = defaultCompanyState();
+    const blocked = setReadyForHumanEyes(s, 'blocked', {
+      blockers: ['iframe missing allow-scripts', 'OAuth scope denied'],
+    });
+    expect(blocked.ok).toBe(true);
+    expect(blocked.state.readyForHumanEyes.status).toBe('blocked');
+    expect(blocked.state.readyForHumanEyes.blockers?.length).toBe(2);
+    expect(statusSummary(blocked.state)).toContain('Blocked');
+
+    const green = setReadyForHumanEyes(blocked.state, 'green', {
+      note: 'Cold path passed on preview URL',
+      evidencePath: 'product/READY_FOR_HUMAN_EYES.md',
+      url: 'https://example.preview.test/app',
+    });
+    expect(green.ok).toBe(true);
+    expect(green.state.readyForHumanEyes.status).toBe('green');
+    expect(green.state.readyForHumanEyes.blockers).toBeUndefined();
+    expect(
+      green.state.founderApprovals.some((a) => a.kind === 'ready_for_human_eyes' && a.granted)
+    ).toBe(true);
+    expect(statusSummary(green.state)).toContain('human-eyes green');
   });
 
   it('startLoop resets to stage 1 without changing journey', () => {
@@ -170,5 +213,22 @@ describe('company-os state store (real filesystem)', () => {
     saveState(paths, s);
     const loaded = loadState(paths, false);
     expect(loaded.scores.rewardVsRisk).toBe(0.55);
+  });
+
+  it('loadState defaults missing readyForHumanEyes to unknown', () => {
+    const paths = defaultStorePaths(root);
+    const s = defaultCompanyState();
+    // Simulate pre-v2.8 state on disk
+    const { readyForHumanEyes: _drop, ...legacy } = s as typeof s & {
+      readyForHumanEyes?: unknown;
+    };
+    void _drop;
+    saveState(paths, legacy as typeof s);
+    // Write raw without the field
+    const raw = JSON.parse(readFileSync(paths.statePath, 'utf8')) as Record<string, unknown>;
+    delete raw.readyForHumanEyes;
+    writeFileSync(paths.statePath, JSON.stringify(raw, null, 2));
+    const loaded = loadState(paths, false);
+    expect(loaded.readyForHumanEyes.status).toBe('unknown');
   });
 });

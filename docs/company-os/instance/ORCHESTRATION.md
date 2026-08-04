@@ -32,6 +32,7 @@ Template allows LangGraph/CrewAI as optional implementors. Upgrade when multi-ac
 |---------------|----------|
 | `status` | Agent reads instance state + prints where we are; flags research stages |
 | `continue` | If loop stage 1–2 or journey 1–3 and no `research/icps/READY_FOR_REAL_WORLD.md`, **blocks** with handoff to `user-research` (override: `skip_research_handoff=true`) |
+| Ready for human eyes | Sibling workflow `ready-for-human-eyes`; CLI `set-ready-for-eyes`; evidence `product/READY_FOR_HUMAN_EYES.md`. **ask-for-feedback refuses** unless state is green (or founder override + decision trace) |
 | `user-research` | Explicit handoff card → run sibling `user-research` workflow |
 | `start` | Start or restart live loop at stage 1 |
 | `advance-journey` | Founder-gated journey advance only |

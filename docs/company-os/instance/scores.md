@@ -14,8 +14,9 @@ Run anytime: `npm run company-os -- status` — same board in the terminal.
 | How free is the AI? | **Strict** — drafts and dry-runs only; you approve send, money, and big moves |
 | Did we do this week’s check-in? | **Not yet** — stamp when you run the weekly ritual |
 | Did we write memory after the last real job? | **No** — no real job stage-6 note yet |
+| Ready for human eyes? | **Unknown** — no cold happy path recorded; do not ask mentors to “try the product” until green |
 
-**One-line read:** Slow clock step 6 · fast clock step 4 · gate open · proof still missing = real jobs that feel easier than Gmail alone.
+**One-line read:** Slow clock step 6 · fast clock step 4 · gate open · human-eyes unknown · proof still missing = real jobs that feel easier than Gmail alone.
 
 ### Standing deny list (always on — this instance)
 
@@ -25,6 +26,7 @@ Run anytime: `npm run company-os -- status` — same board in the terminal.
 - No PII / secrets in public git  
 - No fake bot staffing  
 - Close stage 7 after meaningful real or heavy synthetic work  
+- **No external product-test asks** until Ready for human eyes is **green** (or founder override + decision trace)
 
 ## Scores
 
@@ -38,7 +40,7 @@ Run anytime: `npm run company-os -- status` — same board in the terminal.
 
 **Beachhead (founder agree_ready, shadow tests only):** `household-single-decision-maker-recurring` first full cycle; dual-income only after.  
 **First real job type:** **cleaning** (exception / rebook / rescope — not pure standing-Tuesday autopilot).  
-**Marker:** `research/icps/READY_FOR_REAL_WORLD.md`.
+**Markers:** research `research/icps/READY_FOR_REAL_WORLD.md` · product ship gate `product/READY_FOR_HUMAN_EYES.md` (unknown until cold path).
 
 ### Phase 1 pass / kill (founder accepted — plain English)
 
