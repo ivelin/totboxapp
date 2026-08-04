@@ -51,6 +51,7 @@ Product phase language (“Phase 0/1/2…”) is **Totbox’s** bootstrap roadma
 | Instance index | [`instance/README.md`](instance/README.md) |
 | Grok loop workflow | `.grok/workflows/company-operating-loop.rhai` |
 | Synthetic ICP research | `.grok/workflows/user-research.rhai` → `research/icps/` (founder-gated rounds until `READY_FOR_REAL_WORLD.md`) |
+| Ready for human eyes (OS v2.8) | State `readyForHumanEyes`; CLI `set-ready-for-eyes`; workflow `ready-for-human-eyes`; evidence `product/READY_FOR_HUMAN_EYES.md` — **unknown** until cold path recorded |
 
 ---
 
@@ -70,6 +71,7 @@ This is the **faithful gap analysis** for applying [`live-runtime.md`](live-runt
 | Scores snapshot | Engineering: tests green; business: informal | Explicit scoreboard for Phase 1 exit (touchpoints, completion, escalation) |
 | Loop cursor | `journeyPhase` / `loopStage` / `gateStatus` in `company-state.json` | Keep CLI + scores.md in sync after each cycle |
 | Autonomy posture | **Strict** in state (v2.6 dogfood) | Change only with founder decision + decision trace |
+| Ready for human eyes | **unknown** in state (v2.8); marker `product/READY_FOR_HUMAN_EYES.md` | Run cold path on shareable URL before any mentor product-test ask; set green with evidence |
 | Learning rituals | Scoreboard has slots; snapshot not yet stamped | Weekly: status + scores.md; after real job: stage 6 note → stage 7 |
 | Product job state | `.data/jobs.json`, job PM | Remains product runtime — link job_ids into company traces when useful |
 
@@ -98,6 +100,7 @@ This is the **faithful gap analysis** for applying [`live-runtime.md`](live-runt
 | Stage 6 real input path | Manual (runbook); needs discipline |
 | Stage 7 writes next question | Ad hoc — **ritual required after next real job** |
 | Autonomy posture written down | **Yes — Strict** |
+| Ready for human eyes tracked | **Yes — unknown** (not green); no external product-test ask until cold path |
 | Weekly control-plane snapshot | **Not yet** (scores.md board ready; stamp when run) |
 | “Where are we?” under two minutes | Product job: yes via MCP; **company**: `company-os status` + scores.md |
 

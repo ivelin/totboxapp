@@ -5,18 +5,24 @@
   "loopStage": 4,
   "gateStatus": "open",
   "autonomyPosture": "strict",
+  "readyForHumanEyes": {
+    "status": "unknown",
+    "checkedAt": "2026-08-04T16:15:33.048Z",
+    "happyPath": "Cold user can complete thin household job path on a shareable surface without founder babysitting"
+  },
   "scores": {
     "completion": 0.86,
     "traceCompleteness": 0.7,
-    "notes": "Engineering tests look good. That is not proof people will pay or that real jobs get easier. Real household jobs still needed."
+    "notes": "Engineering tests look good. That is not proof people will pay or that real jobs get easier. Real household jobs still needed. Ready for human eyes not yet green for external product-test asks."
   },
   "founderApprovals": [],
   "openQuestions": [
     "What numbers must a real job hit before we build more?",
     "When is the next real household job, with a short honest write-up after?",
-    "When is the next weekly “where do we stand?” check-in?"
+    "When is the next weekly “where do we stand?” check-in?",
+    "Is Ready for human eyes green before any mentor “try this product” ask?"
   ],
-  "lastAction": "made status board plain English (observability hard rule)",
+  "lastAction": "ready_for_human_eyes:unknown",
   "createdAt": "2026-07-27T00:00:00.000Z",
-  "updatedAt": "2026-08-03T14:00:00.000Z"
+  "updatedAt": "2026-08-04T16:15:33.048Z"
 }

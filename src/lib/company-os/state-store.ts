@@ -48,6 +48,10 @@ export function loadState(paths: StorePaths, seedIfMissing = true): CompanyOsSta
   if (!parsed.autonomyPosture) {
     parsed.autonomyPosture = 'strict';
   }
+  // v2.8: Ready for human eyes ship gate — default unknown
+  if (!parsed.readyForHumanEyes || !parsed.readyForHumanEyes.status) {
+    parsed.readyForHumanEyes = { status: 'unknown' };
+  }
   return parsed;
 }
 

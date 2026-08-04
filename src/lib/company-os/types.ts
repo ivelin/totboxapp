@@ -28,7 +28,26 @@ export type FounderApprovalKind =
   | 'autonomy_posture'
   /** @deprecated use autonomy_posture */
   | 'autonomy_level'
+  /** OS v2.8 — mark Ready for human eyes green (or override to share anyway) */
+  | 'ready_for_human_eyes'
   | 'other';
+
+/** OS v2.8 — may we ask cold humans to try a product URL? */
+export type ReadyForHumanEyesStatus = 'unknown' | 'blocked' | 'green';
+
+export interface ReadyForHumanEyes {
+  status: ReadyForHumanEyesStatus;
+  /** ISO time of last check or status change */
+  checkedAt?: string;
+  /** Path to evidence report (e.g. product/READY_FOR_HUMAN_EYES.md) */
+  evidencePath?: string;
+  /** Plain-language blockers when blocked */
+  blockers?: string[];
+  /** Happy path one-liner or scenario id */
+  happyPath?: string;
+  /** URL that was checked (public-safe; no secrets) */
+  url?: string;
+}
 
 export interface FounderApproval {
   id: string;
@@ -65,6 +84,8 @@ export interface CompanyOsState {
   gateStatus: GateStatus;
   /** OS v2.6 — how much AI/tools may do alone. Default strict. */
   autonomyPosture: AutonomyPosture;
+  /** OS v2.8 — cold-path ship gate before external product-test asks. Default unknown. */
+  readyForHumanEyes: ReadyForHumanEyes;
   /** ISO time of last weekly control-plane snapshot (learning ritual). */
   lastSnapshotAt?: string;
   scores: CompanyScores;

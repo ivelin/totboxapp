@@ -6,14 +6,16 @@ It is a **living mentorship blueprint**: best practices and lessons for solo fou
 
 | File | What it is |
 |------|------------|
-| [`operating-system.md`](operating-system.md) | **Blueprint** — principles, journey phases, evidence labels, next pack (sandbox + interest tests), reward/risk, virtual office |
-| [`live-runtime.md`](live-runtime.md) | **Live OS shape** — state + 7-stage loop, next pack in stage 2, eval harness; optional frameworks |
+| [`operating-system.md`](operating-system.md) | **Blueprint** — principles, journey phases, evidence labels, next pack, **Ready for human eyes**, growth pack, reward/risk, virtual office |
+| [`live-runtime.md`](live-runtime.md) | **Live OS shape** — state + 7-stage loop, human-eyes ship gate, eval harness; optional frameworks |
+| [`ready-for-human-eyes.md`](ready-for-human-eyes.md) | **Ship gate checklist** — cold URL + happy path before mentor/user product asks |
 | [`ai-instructions.md`](ai-instructions.md) | Thin enforcement layer — copy-paste for your main AI tool (`AGENTS.md` / rules / system prompt) |
 | [`applied-here.md`](applied-here.md) | **Instance only** — Totbox hypothesis, architecture, gap analysis (not the template) |
 | [`instance/`](instance/) | **Living Totbox instance index** — state pointer, scores, orchestration, thesis snapshot |
 | CLI | `npm run company-os -- status` — durable state machine entry (`company/scripts/`) |
 | Workflow | `.grok/workflows/company-operating-loop.rhai` — outer loop (status/continue/start/user-research handoff) |
 | User research | `.grok/workflows/user-research.rhai` — multi-round synthetic ICP filter + founder gates → `research/icps/` |
+| Ready for eyes | `.grok/workflows/ready-for-human-eyes.rhai` — cold-path gate before external product-test asks |
 | Repo layout | Template categories at root: `company/`, `research/`, `product/`, `evals/`, `traces/`, `growth/`, `support/`, `infrastructure/`, `docs/` |
 
 ---
@@ -37,7 +39,7 @@ As **this product repo (Totbox)** evolves, useful patterns may emerge. Treat pro
 | Layer | Default when Totbox changes |
 |-------|-----------------------------|
 | **Instance** — `applied-here.md`, product docs under `docs/`, app code | Update as the product learns (public-safe; no PII) |
-| **Template** — `operating-system.md`, `live-runtime.md`, `ai-instructions.md`, this README | **Do not change** unless the founder **explicitly approves** a template edit |
+| **Template** — `operating-system.md`, `live-runtime.md`, `ai-instructions.md`, `ready-for-human-eyes.md`, this README | **Do not change** unless the founder **explicitly approves** a template edit |
 
 ### When extraction is allowed
 
@@ -62,8 +64,9 @@ As **this product repo (Totbox)** evolves, useful patterns may emerge. Treat pro
 1. Read [`operating-system.md`](operating-system.md), then [`live-runtime.md`](live-runtime.md).  
 2. Optionally skim [`applied-here.md`](applied-here.md) to see one real project’s **gap analysis**.  
 3. Put [`ai-instructions.md`](ai-instructions.md) into Cursor / Claude / Grok / root `AGENTS.md` / etc.  
-4. **Do not** copy Totbox’s product thesis, customer group, or stack as your product. Copy the *method*.  
-5. Start with markdown state + a weekly loop before adopting agent frameworks.
+4. Before any mentor/user “try my link” ask, use the [`ready-for-human-eyes.md`](ready-for-human-eyes.md) checklist (or workflow `ready-for-human-eyes`).  
+5. **Do not** copy Totbox’s product thesis, customer group, or stack as your product. Copy the *method*.  
+6. Start with markdown state + a weekly loop before adopting agent frameworks.
 
 ---
 
@@ -85,10 +88,18 @@ When a founder says: *“Take the Company OS from this repo and apply what’s u
 
 | Doc | Current |
 |-----|---------|
-| Operating system blueprint | **v2.7** |
-| Live runtime | **v2.7** (growth pack after proof; next pack in stage 2; postures / deny list / learning rituals) |
+| Operating system blueprint | **v2.8** |
+| Live runtime | **v2.8** (Ready for human eyes; growth pack; next pack; postures / deny list / learning rituals) |
 
 ### Recent template additions (portable only)
+
+**v2.8 — Ready for human eyes (ship gate)**
+
+- Fail-closed gate before mentor/user product-test asks  
+- Cold URL + happy path + console/iframe/auth evidence (minimal pack)  
+- Sandbox browser / NL synthetic cold user as vehicle — not founder CS homework  
+- State field `readyForHumanEyes`; checklist [`ready-for-human-eyes.md`](ready-for-human-eyes.md)  
+- Method in [`operating-system.md`](operating-system.md#ready-for-human-eyes-ship-gate-before-external-feedback)  
 
 **v2.7 — growth pack (after proof)**
 

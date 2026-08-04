@@ -1,7 +1,7 @@
 # Live Company Runtime  
 ## Persistent state + continuous learning loop
 
-**Part of:** [Company Operating System](operating-system.md) (v2.7+)  
+**Part of:** [Company Operating System](operating-system.md) (v2.8+)  
 **Audience:** Solo founders implementing the OS; AI helpers; mentors  
 **Portable:** Yes — this is the *runtime shape*, not any one product  
 **Totbox mapping:** [`applied-here.md`](applied-here.md)  
@@ -65,6 +65,7 @@ Whatever tools you pick, the **live OS needs durable, versioned state** that bot
 | **Scores snapshot** | Current board | Completion, willingness, escalation, trust, etc. |
 | **Loop cursor** | Where the runtime is | Current stage 1–7, last run id, blocked reason; optional: last snapshot date |
 | **Autonomy posture** | How much the system may do alone | Strict / Auto / Dangerous ([blueprint](operating-system.md#autonomy-postures-how-much-the-system-may-do-alone)); default Strict |
+| **Ready for human eyes** | May we ask cold humans to try a product URL? | `unknown` \| `blocked` \| `green` + optional evidence path / blockers ([blueprint](operating-system.md#ready-for-human-eyes-ship-gate-before-external-feedback)); default **unknown** |
 
 ### 3.2 Design rules for state
 
@@ -174,19 +175,19 @@ Founder gates sit between stages when strategy or spend would change.
 
 | | |
 |--|--|
-| **Goal** | Prove the slice **works** under control (fixtures, sims, unit/integration) |
-| **Inputs** | Product build, personas, scenarios, stress cases from prior failures |
-| **Work** | Automated tests; synthetic end-to-end runs; safety/refusal cases; re-run same scenario ids |
-| **Outputs** | Pass/fail against engineering and scenario suites; bug list |
-| **Founder gate?** | Soft — stop the line if safety tests fail |
+| **Goal** | Prove the slice **works** under control (fixtures, sims, unit/integration) **and** cold-user happy path where a product URL exists |
+| **Inputs** | Product build, personas, scenarios, stress cases from prior failures; cold URL + happy-path definition |
+| **Work** | Automated tests; synthetic end-to-end runs; safety/refusal cases; re-run same scenario ids; **Ready for human eyes** cold-path check (sandbox browser and/or NL synthetic user) before external asks |
+| **Outputs** | Pass/fail against engineering and scenario suites; bug list; `readyForHumanEyes` update (`unknown` / `blocked` / `green`) + evidence path |
+| **Founder gate?** | Soft — stop the line if safety tests fail; **hard** — do not draft external product-test asks while human-eyes is not green (unless explicit override + decision trace) |
 
 #### 5 — Evaluation
 
 | | |
 |--|--|
 | **Goal** | Score quality, not just “did it run?” |
-| **Inputs** | Test artifacts, score definitions, baselines, numeric thresholds |
-| **Work** | Score completion, extraction, escalation, time-to-resolution, trust, channel distribution, customer-group attractiveness; compare to thresholds |
+| **Inputs** | Test artifacts, score definitions, baselines, numeric thresholds; human-eyes evidence if seeking external product feedback |
+| **Work** | Score completion, extraction, escalation, time-to-resolution, trust, channel distribution, customer-group attractiveness; compare to thresholds; separate “engineering green” from “cold path green” from “people care” |
 | **Outputs** | Scoreboard update; Advance/Iterate/Hold/Kill **recommendation** (not auto-apply) |
 | **Founder gate?** | Yes — journey phase advance or kill |
 
@@ -195,8 +196,8 @@ Founder gates sit between stages when strategy or spend would change.
 | | |
 |--|--|
 | **Goal** | Bring **reality** into state (lawfully, redacted) |
-| **Inputs** | Conversations, usage, support, pilots |
-| **Work** | Capture outcomes; separate what people *said* vs *did*; link to hypotheses |
+| **Inputs** | Conversations, usage, support, pilots — **prefer** after Ready for human eyes is green when the ask is “try my product link” |
+| **Work** | Capture outcomes; separate what people *said* vs *did*; link to hypotheses; if feedback was “link broken,” write stress scenario and set human-eyes **blocked** |
 | **Outputs** | Feedback store entries; contradictions vs synthetic beliefs |
 | **Founder gate?** | Yes — when real evidence overturns synthetic ranking |
 
@@ -300,11 +301,25 @@ Do not let high-value traces die in chat history.
 
 ```text
 Stage 3  Spec + implement thin increment
-Stage 4  Harness / synthetic + automated re-runs
+Stage 4  Harness / synthetic + automated re-runs + cold-path (human eyes)
 Stage 5  Gate on scores → founder Advance/Iterate/Hold/Kill
 ```
 
-See [Evaluation-Driven Development](operating-system.md#evaluation-driven-development-edd).
+See [Evaluation-Driven Development](operating-system.md#evaluation-driven-development-edd) and [Ready for human eyes](operating-system.md#ready-for-human-eyes-ship-gate-before-external-feedback).
+
+### Ready for human eyes (runtime)
+
+Before stage 6 product asks that depend on a **working URL** (mentor beta, “try this link,” interactive survey):
+
+1. Founder states who + happy path + done-means + URL (plain language).  
+2. Harness runs cold path (sandbox browser and/or NL synthetic first-time user).  
+3. Set `readyForHumanEyes`: `blocked` (with blockers) or `green` (with evidence path).  
+4. Only if **green** (or founder override + decision trace): draft external ask.  
+5. Material path/deploy change → reset to `unknown` or re-run.
+
+Checklist template: [`ready-for-human-eyes.md`](ready-for-human-eyes.md).
+
+This is **not** Track A sandbox feasibility alone (sim capability). It is **cold deploy surface + happy path alive for a stranger**.
 
 ---
 
@@ -320,8 +335,9 @@ Before heavy agent frameworks, a solo founder can run an honest loop with:
 6. A weekly pass through stages 1→7 with written outputs (even if stage 3 is “no build this week”)  
 7. After ranking: next pack — light synthetic product sandbox and/or real interest tests  
 8. Product tests that encode pass/fail for the tiny slice (reuse sandbox scenario ids)  
-9. Reward/risk scorecards for top groups ([operating-system](operating-system.md#reward--risk-thinking--customer-group-ranking))  
-10. Optional one-page virtual office (who does each function this week)  
+9. **Ready for human eyes** field + cold-path check before external product-test asks ([checklist](ready-for-human-eyes.md))  
+10. Reward/risk scorecards for top groups ([operating-system](operating-system.md#reward--risk-thinking--customer-group-ranking))  
+11. Optional one-page virtual office (who does each function this week)  
 
 **Then** add durable agent graphs when:
 
@@ -353,6 +369,9 @@ Before heavy agent frameworks, a solo founder can run an honest loop with:
 | Growth pack without proof markers | Spend/reputation burn before the business is real ([growth pack](operating-system.md#after-proof-the-growth-pack)) |
 | Multi-channel spray in phase 9 | Solo complexity without comparable signal |
 | Vanity metrics as growth success | Optimizes noise; hides weak offer/channel |
+| Ask mentor/user to try product while human-eyes is not green | Wastes human attention on deploy/path debris |
+| “Works in my chat / my cookies” as ready for eyes | Cold users hit different failures |
+| Green human-eyes treated as PMF | Path alive ≠ people care or pay |
 
 ---
 
@@ -373,7 +392,9 @@ Before heavy agent frameworks, a solo founder can run an honest loop with:
 - [ ] If claiming “growth,” proof markers and a growth-round note exist — or explicit hold-scale ([growth pack](operating-system.md#after-proof-the-growth-pack))  
 - [ ] Autonomy posture is written down (default Strict); standing deny list known  
 - [ ] Weekly control-plane snapshot happened recently  
-- [ ] Virtual office (if used) names who approves external claims — no fake bot titles
+- [ ] Virtual office (if used) names who approves external claims — no fake bot titles  
+- [ ] `readyForHumanEyes` is tracked; external product-test asks only when **green** (or override + trace)  
+- [ ] Cold happy path was run outside founder-only session before last mentor/user product ask  
 
 ---
 

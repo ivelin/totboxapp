@@ -16,21 +16,23 @@
 | Evals | [`evals/`](../../../evals/) |
 | Gap map (legacy) | [`../applied-here.md`](../applied-here.md) |
 | Portable template | [`../operating-system.md`](../operating-system.md) · [`../live-runtime.md`](../live-runtime.md) |
-| Grok workflows | [`.grok/workflows/company-operating-loop.rhai`](../../../.grok/workflows/company-operating-loop.rhai) (outer) · [`.grok/workflows/user-research.rhai`](../../../.grok/workflows/user-research.rhai) (ICP synthetic rounds) |
+| Grok workflows | [`.grok/workflows/company-operating-loop.rhai`](../../../.grok/workflows/company-operating-loop.rhai) (outer) · [`.grok/workflows/user-research.rhai`](../../../.grok/workflows/user-research.rhai) (ICP) · [`.grok/workflows/ready-for-human-eyes.rhai`](../../../.grok/workflows/ready-for-human-eyes.rhai) (ship gate) |
+| Ready for human eyes | [`product/READY_FOR_HUMAN_EYES.md`](../../../product/READY_FOR_HUMAN_EYES.md) · portable [`../ready-for-human-eyes.md`](../ready-for-human-eyes.md) |
 
 ## Where are we? (commands)
 
 ```bash
 npm run company-os -- status
-# prints journey, loop, posture (Strict/Auto/Dangerous), gate, last snapshot
+# prints journey, loop, posture, gate, Ready for human eyes, last snapshot
 npm run company-os -- run-stage --signal "optional product note"
 npm run company-os -- continue
 npm run company-os -- advance-journey          # REFUSES without --approve
 npm run company-os -- advance-journey --approve
 npm run company-os -- start
+npm run company-os -- set-ready-for-eyes unknown|blocked|green --note "..."
 ```
 
-**OS v2.6 dogfood (instance):** autonomy posture defaults to **Strict** in `company/state/company-state.json`. Learning rituals live on the human scoreboard ([`scores.md`](scores.md)) — weekly snapshot + stage 7 after real jobs.
+**OS v2.8 dogfood (instance):** `readyForHumanEyes` defaults to **unknown** — cold happy path not yet recorded. Do not draft mentor “try this product” asks until **green**. Autonomy posture remains **Strict**. Learning rituals: weekly snapshot + stage 7 after real jobs ([`scores.md`](scores.md)).
 
 ### User research (synthetic ICP filter)
 
@@ -42,6 +44,16 @@ npm run company-os -- start
 ```
 
 Founder loop: read `research/icps/ROUND_*_report.md` → edit `FOUNDER_FEEDBACK.md` (`iterate` | `agree_ready` | `kill`) → resume workflow.
+
+### Ready for human eyes (before external product-test asks)
+
+```text
+/workflow ready-for-human-eyes   args: { "mode": "status" }
+/workflow ready-for-human-eyes   args: { "mode": "check", "url": "https://…", "happy_path": "…" }
+/workflow ready-for-human-eyes   args: { "mode": "ask-for-feedback" }  # refuses unless green
+```
+
+Evidence marker: `product/READY_FOR_HUMAN_EYES.md`. Portable rules: [`../ready-for-human-eyes.md`](../ready-for-human-eyes.md).
 
 ## Layout vs template categories
 

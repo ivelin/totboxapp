@@ -1,8 +1,8 @@
 # Company Operating System  
 ## For Solo Founders in Bootstrapping Mode
 
-**Version:** 2.7  
-**Last Updated:** 2026-08-03  
+**Version:** 2.8  
+**Last Updated:** 2026-08-04  
 **Status:** Living guideline (blueprint — not any one company’s live runtime)  
 **Audience:** Independent solo founders; mentors (e.g. Founder Institute, SCORE); AI helpers instructed to follow this system  
 **Isolation:** Portable across startups. Totbox-specific application lives in [`applied-here.md`](applied-here.md) only.  
@@ -820,6 +820,92 @@ The **next product increment** after a thin slice passes uses the **same discipl
 
 ---
 
+## Ready for Human Eyes (ship gate before external feedback)
+
+**Problem this gate solves:** Solo founders (especially non-technical) often:
+
+1. Build something that works in *their* session / private chat / logged-in browser  
+2. Immediately ask a mentor or early user to “try it” or “beta test”  
+3. Discover the happy path is broken for anyone else (permissions, JS errors, iframe/sandbox blocks, private-only deploys)
+
+That wastes mentor time, erodes confidence, and slows learning. It is usually **not** “AI wrote bad code.” It is a **missing readiness gate** before asking humans for feedback.
+
+This gate is the product-side twin of **Ready for real-world research** (ICP filter before real conversations). Different question:
+
+| Gate | Question |
+|------|----------|
+| Ready for real-world *research*? | Have we filtered customer groups honestly enough to talk to real people about the *problem*? |
+| **Ready for human *eyes* on the product?** | Can a **cold external person** complete the happy path without the founder in the room? |
+
+### When it applies
+
+Before any of these:
+
+- Asking a mentor to beta-test or “click around”  
+- Sending a product link to a prospect or survey respondent  
+- Posting “try my app” publicly  
+- Opening an interactive survey / waitlist that depends on working UI  
+
+### Founder inputs (steering only — not a CS degree)
+
+In plain language, the founder (or agent with founder confirmation) states:
+
+1. **Who** — one-line customer / persona  
+2. **Happy path** — e.g. “open link → sign in → complete main action → see success”  
+3. **Done means** — e.g. “finish once without help; no red errors”  
+4. **URL** — public or stable shareable preview (not only localhost / private chat)
+
+### Required evidence (minimal, fail-closed)
+
+| Evidence | Pass looks like | Typical failure this catches |
+|----------|-----------------|------------------------------|
+| **Cold URL** | Public or shareable preview strangers can open | “Works only in my session” |
+| **Happy path complete** | Cold context finishes the path (sandbox browser and/or natural-language synthetic user) | Core flow dead |
+| **Blocking console clean** | No uncaught JS / failed critical network on the path | Silent JS break on first external open |
+| **Embed / frame policy OK** | Interactive surface actually runs where users land | iframe missing `allow-scripts` / sandbox killing UI |
+| **Third-party auth / scopes** | Permission grant + return works once in a real browser | OAuth / Photos / cookie-domain denials |
+| **Optional: founder cold confirm** | ~5 minutes on another device, phone, or incognito | Residual “only works for me” |
+
+**Not required for this gate:** full browser matrix, load tests, deep SRE, high unit-test coverage %. Those can grow later. This gate is **mentor/user dignity** and honest learning — not production theater.
+
+### How to check without becoming a mechanic
+
+Use modern tools as the **vehicle**, not a curriculum:
+
+| Tool class | Job | Founder experience |
+|------------|-----|--------------------|
+| Deployed / preview URL | Same surface strangers hit | “Here’s the link” |
+| Sandbox browser E2E | Clicks path; catches JS / blank screens / iframe | Agent runs; founder sees pass/fail in English |
+| Permission checks | OAuth scopes, cookies, third-party grants | Attempted in a real browser context |
+| NL synthetic user (AI as cold user) | “You’re a first-time user. Complete …” | Stresses product language + flow |
+| Console / network fail-closed | Blocking errors = gate red | No “looks fine to me” |
+
+**Least-disruptive rule:** founders do **not** invent CI matrices. They state who + path + done-means + URL. The company OS harness (scripts, agents, sandbox browser) runs the cold path and reports blockers in plain language.
+
+### Fail closed
+
+- AI **must refuse** to draft “please test this” / beta-ask emails until the gate is **green** (or the founder explicitly overrides with a written decision trace: *why* they share a known-broken path).  
+- Mark state: `readyForHumanEyes` = `unknown` | `blocked` | `green` (see [`live-runtime.md`](live-runtime.md)).  
+- Prefer a short evidence artifact (e.g. `READY_FOR_HUMAN_EYES.md` or report path) with date, URL, path steps, pass/fail, blockers.  
+- Green does **not** mean demand, payment, or product–market fit. It only means: *cold humans can exercise the path you want feedback on.*
+
+### Mentor practice (shared language)
+
+Mentors can say: *I only spend deep time on links that pass cold-stranger happy path.*  
+Company OS makes that systemic so mentors are not the only backstop.
+
+### Anti-patterns for this gate
+
+- Localhost-only or founder-session-only “proof”  
+- Private iframe / sandbox that kills scripts for external users  
+- “Works in my AI chat” treated as shippable  
+- Asking for feedback on a path never run outside the founder’s cookies  
+- Treating green human-eyes as PMF or willingness to pay  
+
+Portable checklist + evidence template: [`ready-for-human-eyes.md`](ready-for-human-eyes.md).
+
+---
+
 ## Instructions for Your Main AI Helper
 
 ### Thin enforcement layer vs full constitution
@@ -853,14 +939,15 @@ Hard rules you must follow:
 6. When an important decision needs human judgment, say so directly.
 7. Prefer small, honest tests and evaluation-driven increments (Spec → Harness → Implement → Gate) over big unmeasured builds.
 8. After ranked synthetic research, prefer the next pack: light synthetic product sandbox and/or real interest tests before a heavy build.
-9. Record the reason for important actions (decision traces); close stage 7 (memory update) after meaningful runs.
-10. If stage 7 or the weekly control-plane snapshot is missing after meaningful work, say so.
-11. Answer me in plain language I can understand. Avoid cryptic abbreviations.
-12. Surface recommended human interjections when judgment is high-leverage
-    (customer group, thresholds, hire/cofounder, grow/kill, monetization path, autonomy posture).
-13. Keep reward/risk thinking visible when ranking customer groups or monetization paths.
-14. Do not import another company's product thesis or market as mine unless I explicitly adopt it.
-15. Treat agent frameworks as optional implementors of the live loop — principles first, framework second.
+9. Never draft or send a request for external human product testing (mentor beta, “try my link,” interactive survey) unless Ready for human eyes is green: cold URL, happy path completed in a non-founder context (sandbox browser and/or synthetic cold user), no blocking console/iframe/auth failures — or I explicitly override with a written decision trace.
+10. Record the reason for important actions (decision traces); close stage 7 (memory update) after meaningful runs.
+11. If stage 7 or the weekly control-plane snapshot is missing after meaningful work, say so.
+12. Answer me in plain language I can understand. Avoid cryptic abbreviations.
+13. Surface recommended human interjections when judgment is high-leverage
+    (customer group, thresholds, hire/cofounder, grow/kill, monetization path, autonomy posture, ready-for-human-eyes).
+14. Keep reward/risk thinking visible when ranking customer groups or monetization paths.
+15. Do not import another company's product thesis or market as mine unless I explicitly adopt it.
+16. Treat agent frameworks as optional implementors of the live loop — principles first, framework second.
 
 If you are unsure, ask me. Do not guess on strategy or protect weak ideas.
 ```
@@ -992,6 +1079,8 @@ Every company should maintain its own list. Starter prompts:
 - What would make us **kill** the current hypothesis cleanly?  
 - Do we have **proof markers** that unlock the growth pack, or are we still in hold-scale?  
 - What is the **one** primary channel hypothesis for the next growth round, and what outcome threshold kills it?
+- Is **Ready for human eyes** green before we ask mentors or users to try a product link?  
+- What blockers (iframe, auth, JS, private URL) still kill the cold happy path?
 
 ---
 
@@ -1018,6 +1107,9 @@ Every company should maintain its own list. Starter prompts:
 - Running multi-channel growth machinery before proof of value or payment  
 - Treating opens, total replies, or list size as growth success  
 - AI personalization on an unproven audience as a substitute for offer/channel fit  
+- Asking mentors or users to “try it” before **Ready for human eyes** is green  
+- Treating “works on my machine / in my chat” as ready for external feedback  
+- Treating green human-eyes as demand or product–market fit  
 
 ---
 
@@ -1034,6 +1126,7 @@ Every company should maintain its own list. Starter prompts:
 | 2.5 | Next pack after synthetic ranking: light isolated synthetic product sandbox (capability/feasibility under multi-party mess) + real interest tests; parallel/sequence rules; founder gate before heavy build |
 | 2.6 | Autonomy postures (Strict / Auto / Dangerous); standing deny list (always on); learning rituals (weekly snapshot, stage 7, scoreboard glance, coordination-tax check) |
 | 2.7 | After proof: growth pack (entry gate; message/channel experiment tracks; outcome metrics; founder promote/kill/hold; growth/ artifacts). Phase 9 pointer. No new phase; no channel-tooling folklore. |
+| 2.8 | **Ready for human eyes** ship gate before external product feedback; cold URL + happy path + console/iframe/auth evidence; fail-closed ask-for-feedback; sandbox browser / NL synthetic user as vehicle (not founder CS homework); state field + checklist. |
 
 ---
 

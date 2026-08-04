@@ -5,7 +5,7 @@ Living **company operating system** instance for this repository — not the por
 | Path | Role |
 |------|------|
 | [`state/company-state.json`](state/company-state.json) | Durable journey phase + loop stage + scores + gate |
-| [`scripts/company-os.ts`](scripts/company-os.ts) | CLI: `npm run company-os -- status` |
+| [`scripts/company-os.ts`](scripts/company-os.ts) | CLI: `npm run company-os -- status` · `set-ready-for-eyes` |
 | [`../docs/company-os/instance/`](../docs/company-os/instance/) | Human-readable index, scoreboard notes, orchestration choice |
 | [`../research/icps/`](../research/icps/) | ICP notes (public-safe) |
 | [`../traces/decisions/`](../traces/decisions/) | Decision traces (json files gitignored except README) |
