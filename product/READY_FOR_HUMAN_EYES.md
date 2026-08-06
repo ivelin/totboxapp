@@ -1,7 +1,7 @@
 # Ready for human eyes (Totbox instance)
 
 **Status:** `unknown` — not green  
-**OS:** Company OS v2.8 ship gate ([portable checklist](../docs/company-os/ready-for-human-eyes.md))  
+**OS:** Bootstrap OS v2.8 ship gate ([portable checklist](../docs/company-os/ready-for-human-eyes.md))  
 **Date:** 2026-08-04  
 
 ## What this means

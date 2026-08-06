@@ -6,9 +6,15 @@ Totbox.app helps busy families cut the chore of researching, comparing, coordina
 
 Everything happens primarily in the chat apps you already use (Grok, Claude, ChatGPT, etc.) via simple **MCP** endpoints + OAuth — not another consumer app to install.
 
-### Company OS instance
+### Bootstrap OS instance
 
-This repository is **both** a product codebase **and** a living **instance** of the portable [Company Operating System](docs/company-os/) for solo founders (bootstrap mentorship blueprint).
+This repository is **both** a product codebase **and** a living **instance** of the portable [Bootstrap OS](docs/company-os/) for solo founders.
+
+**Bootstrap OS** is the starter system for solo, non-technical founders going from zero to a running company without a team or funding.
+
+It helps you take stock of what you already have — skills, constraints, customers, cash — so you can load real operations and AI agents without drowning in tools built for funded teams. Think of it as a **preflight check for your company**.
+
+*For the technical-minded: this is the founder's BIOS. It runs the basic inventory check, then hands off so the full company system can load.*
 
 | Layer | What it is | Start here |
 |-------|------------|------------|
@@ -26,7 +32,7 @@ Mentees and agents: use the template for *how to decide*; treat Totbox product t
 **Why:** Anonymized multi-year household coordination research shows the highest multi-turn friction here (often 6–12+ emails per decision): parallel vendor comparison, PDF/plan quotes, review research, partner approvals, FSM invoices, and forgotten preventive cadence. That is the chore stack agents should own.
 
 **Thesis:** Scheduling/coordination workflow — **not** a vendor registry (discovery is Google/AI).  
-**Host LLM first:** Grok / Claude / OpenClaw / Codex draft and use **user’s existing tools** (memory, Gmail, SMS/voice MCP). Totbox is the **job PM** (checklist, gates, audit).  
+**Host LLM first:** Grok / Claude / OpenClaw / Codex draft and use **user's existing tools** (memory, Gmail, SMS/voice MCP). Totbox is the **job PM** (checklist, gates, audit).  
 **Safety before convenience:** explicit user approval for send/PII/money; dry-run default; validate every step (FSD: must not do harm).
 
 | Doc | Purpose |
@@ -42,7 +48,7 @@ Mentees and agents: use the template for *how to decide*; treat Totbox product t
 | [`docs/product_thesis.md`](docs/product_thesis.md) | Scheduling not discovery |
 | [`docs/totbox_product_spec.md`](docs/totbox_product_spec.md) | Broader product plan |
 | [`AGENTS.md`](AGENTS.md) | Public repo: no PII |
-| [`docs/company-os/`](docs/company-os/) | **Company OS:** portable template + **this repo as living instance** (see callout above) |
+| [`docs/company-os/`](docs/company-os/) | **Bootstrap OS:** portable template + **this repo as living instance** (see callout above) |
 
 ---
 
@@ -62,9 +68,9 @@ Mentees and agents: use the template for *how to decide*; treat Totbox product t
 
 Ask naturally, for example:
 
-- “Find AC maintenance plans for my area in the next 2 weeks under $300 with good recent reviews”
-- “Book a 3hr priority clean focusing on blinds, windows, under beds, corners — share options before I confirm”
-- “Get live-oak pruning quotes and flag Oak Wilt season constraints”
+- "Find AC maintenance plans for my area in the next 2 weeks under $300 with good recent reviews"
+- "Book a 3hr priority clean focusing on blinds, windows, under beds, corners — share options before I confirm"
+- "Get live-oak pruning quotes and flag Oak Wilt season constraints"
 
 **For providers (small operators)**
 
@@ -130,7 +136,7 @@ npm run dev:mcp      # start_job, get_workflow, record_user_approval, …
 
 **Workflow visibility:** ask the host anytime — `get_workflow` (general or `service_kind`) or `get_workflow({ job_id })` / `get_job` for the live strip. Same 8 steps for every house service; you stay in control of approvals. Structured as `totbox.workflow_def` / `totbox.workflow_progress` with optional Mermaid projection (`diagrams.mermaid`) — see [`docs/workflows/format.md`](docs/workflows/format.md).
 
-**Interactive sample (browser):** `npm run dev` → open [**/workflow**](http://localhost:3000/workflow) — mobile-friendly strip, tap a step for You vs App, sample “approve message” card.
+**Interactive sample (browser):** `npm run dev` → open [**/workflow**](http://localhost:3000/workflow) — mobile-friendly strip, tap a step for You vs App, sample "approve message" card.
 
 Host loop: follow each `next_action` (prefer host memory/Gmail/SMS/voice tools) → `record_user_approval` → never send without grant → dry-run or `hostPerformed` send → `ingest_provider_message`.
 
@@ -159,7 +165,7 @@ npm test && npm run typecheck && npm run build
 | `evals/` | Eval harness + fixtures |
 | `traces/` | Decision traces |
 | `growth/` · `support/` · `infrastructure/` | Stubs (later) |
-| `docs/company-os/` | Portable OS template + Totbox instance index |
+| `docs/company-os/` | Bootstrap OS template + Totbox instance index |
 
 MCP job tools: `get_workflow`, `start_job`, `get_job`, `list_jobs`, `update_job_facts`, `submit_draft_for_approval`, `record_user_approval`, `approve_and_send_message`, `ingest_provider_message`, `normalize_quote`, `confirm_appointment`, `record_job_completion`, …
 
@@ -174,9 +180,9 @@ MCP job tools: `get_workflow`, `start_job`, `get_job`, `list_jobs`, `update_job_
 | Phase 1 full household path (paste quote → book → next-due) | **Now** — see Bootstrap roadmap |
 | Always-on 24/7 daemon / real SMS vendor | Non-goal for now |
 | Operator paid pilots (Phase 2) | Deferred until shadow PMF |
-| Stages 10a–10c (ServiceTitan design → prototype → pilot) | Spec’d; **after** revenue/LOI |
-| Multi-level “Shopify-like” provider MCP suite | **Not** bootstrap; long-horizon option |
-| Stage 11 (dual-sided referrals) | Spec’d; after core loop |
+| Stages 10a–10c (ServiceTitan design → prototype → pilot) | Spec'd; **after** revenue/LOI |
+| Multi-level "Shopify-like" provider MCP suite | **Not** bootstrap; long-horizon option |
+| Stage 11 (dual-sided referrals) | Spec'd; after core loop |
 
 ---
 
@@ -190,7 +196,7 @@ Survive and learn before platform depth. Every stage either **completes more hou
 | **1 — now** | Shadow PMF: real HVAC/cleaning jobs via MCP; quote-from-paste; confirm appointment; explicit completion + next-due | ≥5 jobs with touchpoint drop; runbook works for your house |
 | **2** | First $: structured inbound for local operators (or household sub if faster) | 1–3 paid pilots / LOIs |
 | **3** | Stickiness: harden quote/calendar/rebook from pilot feedback | Retention + case study |
-| **4** | Adjacent only with cash/LOI: ST private pilot, “Agentic Ready” packaging, second vertical | Demand-funded adapters |
+| **4** | Adjacent only with cash/LOI: ST private pilot, "Agentic Ready" packaging, second vertical | Demand-funded adapters |
 
 **Explicit non-goals until Phase 2+ exit:** city provider directory, multi-FSM integration matrix, viral referral GTM, kids/FEC GTM, claiming a full field-services agent commerce platform.
 
@@ -217,19 +223,21 @@ Feedback from households and small operators is extremely valuable.
 - Agent hard rule (public repo, no PII): [`AGENTS.md`](AGENTS.md)
 - Issues and discussions welcome
 
-### Mentorship: Company Operating System (portable)
+### Mentorship: Bootstrap OS (portable)
 
-This repo also hosts a **standalone** bootstrap OS for solo founders (FI / SCORE / mentees). It is **not** Totbox product policy.
+This repo also hosts a **standalone** Bootstrap OS for solo founders (FI / SCORE / mentees). It is **not** Totbox product policy.
+
+**Bootstrap OS** is a preflight check for your company: inventory first, then load operations and agents. (*Tech: founder's BIOS.*)
 
 - Start: [`docs/company-os/README.md`](docs/company-os/README.md)
 - Blueprint: [`docs/company-os/operating-system.md`](docs/company-os/operating-system.md)
 - Live runtime (state + 7-stage loop): [`docs/company-os/live-runtime.md`](docs/company-os/live-runtime.md)
 - How Totbox applies it (example + gap analysis): [`docs/company-os/applied-here.md`](docs/company-os/applied-here.md)
 - Living instance index: [`docs/company-os/instance/`](docs/company-os/instance/)
-- Instance CLI: `npm run company-os -- status`
+- Instance CLI: `npm run company-os -- status` (path/CLI names unchanged for now)
 - Grok workflow: `.grok/workflows/company-operating-loop.rhai`
 
-Point an AI at the repo and ask it to apply the OS to *their* startup — not to copy Totbox’s market.
+Point an AI at the repo and ask it to apply the OS to *their* startup — not to copy Totbox's market.
 
 ## License
 
