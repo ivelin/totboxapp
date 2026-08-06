@@ -1,6 +1,6 @@
 # Company instance root (Totbox)
 
-Living **company operating system** instance for this repository — not the portable mentorship blueprint.
+Living **Bootstrap OS** instance for this repository — not the portable mentorship blueprint.
 
 | Path | Role |
 |------|------|
@@ -13,5 +13,5 @@ Living **company operating system** instance for this repository — not the por
 | [`../product/`](../product/) | Shipped product (MCP server, product scripts) |
 | [`../evals/`](../evals/) | Eval harness + fixtures |
 
-Portable template: [`../docs/company-os/operating-system.md`](../docs/company-os/operating-system.md).  
+Portable **Bootstrap OS** template: [`../docs/company-os/operating-system.md`](../docs/company-os/operating-system.md).  
 Template edits remain approval-gated; this instance may evolve freely (public-safe).

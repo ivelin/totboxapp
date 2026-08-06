@@ -1,8 +1,14 @@
-# Company Operating System for Solo Founders
+# Bootstrap OS for Solo Founders
 
 **This folder is intentionally isolated from Totbox product docs.**
 
 It is a **living mentorship blueprint**: best practices and lessons for solo founders in bootstrapping mode (Founder Institute, SCORE, and similar). Totbox is one **application** of the system — not the definition of the system.
+
+**What it is:** the starter system for solo, non-technical founders going from zero to a running company without a team or funding. A **preflight check for your company** — inventory skills, constraints, customers, and cash before you load tools and AI agents.
+
+*For the technical-minded: the founder's BIOS. Basic inventory, then handoff to the full company system.*
+
+*(Folder path remains `docs/company-os/` and CLI remains `npm run company-os` until a deliberate code rename.)*
 
 | File | What it is |
 |------|------------|
@@ -34,7 +40,7 @@ operating-system.md                live-runtime.md
 
 ## Template change policy (standing rule)
 
-As **this product repo (Totbox)** evolves, useful patterns may emerge. Treat promotion into the **Company OS template** as rare, deliberate work — not a continuous sync from product PRs.
+As **this product repo (Totbox)** evolves, useful patterns may emerge. Treat promotion into the **Bootstrap OS template** as rare, deliberate work — not a continuous sync from product PRs.
 
 | Layer | Default when Totbox changes |
 |-------|-----------------------------|
@@ -52,7 +58,7 @@ As **this product repo (Totbox)** evolves, useful patterns may emerge. Treat pro
 ### Anti-patterns
 
 - Auto-promoting every product win into the OS  
-- Copying MCP, a beachhead market, or pricing into the blueprint “because we use them”  
+- Copying MCP, a beachhead market, or pricing into the blueprint "because we use them"  
 - Silent template edits inside product PRs without template approval  
 
 **Agents:** Default to instance docs for Totbox work. Do not edit the template files above without founder approval for that change.
@@ -62,24 +68,24 @@ As **this product repo (Totbox)** evolves, useful patterns may emerge. Treat pro
 ## For mentees
 
 1. Read [`operating-system.md`](operating-system.md), then [`live-runtime.md`](live-runtime.md).  
-2. Optionally skim [`applied-here.md`](applied-here.md) to see one real project’s **gap analysis**.  
+2. Optionally skim [`applied-here.md`](applied-here.md) to see one real project's **gap analysis**.  
 3. Put [`ai-instructions.md`](ai-instructions.md) into Cursor / Claude / Grok / root `AGENTS.md` / etc.  
-4. Before any mentor/user “try my link” ask, use the [`ready-for-human-eyes.md`](ready-for-human-eyes.md) checklist (or workflow `ready-for-human-eyes`).  
-5. **Do not** copy Totbox’s product thesis, customer group, or stack as your product. Copy the *method*.  
+4. Before any mentor/user "try my link" ask, use the [`ready-for-human-eyes.md`](ready-for-human-eyes.md) checklist (or workflow `ready-for-human-eyes`).  
+5. **Do not** copy Totbox's product thesis, customer group, or stack as your product. Copy the *method*.  
 6. Start with markdown state + a weekly loop before adopting agent frameworks.
 
 ---
 
 ## For AI agents pointed at this repo
 
-When a founder says: *“Take the Company OS from this repo and apply what’s useful to my startup”*:
+When a founder says: *"Take the Bootstrap OS from this repo and apply what's useful to my startup"*:
 
 1. Prefer **`operating-system.md` + `live-runtime.md`** over Totbox product files.  
-2. Use **`applied-here.md` only as an illustration** of discipline and gap analysis — never as the mentee’s default market or feature list.  
-3. Product files under `docs/strategy/`, `docs/workflows/`, root `README.md`, etc. are **one company’s product runtime**, not universal advice.  
+2. Use **`applied-here.md` only as an illustration** of discipline and gap analysis — never as the mentee's default market or feature list.  
+3. Product files under `docs/strategy/`, `docs/workflows/`, root `README.md`, etc. are **one company's product runtime**, not universal advice.  
 4. Instantiate **their** thesis, customer groups, state stores, journey phase, loop stage, and tiny slice.  
 5. Recommend frameworks (LangGraph, CrewAI, …) only when they reduce pain vs git + scripts.  
-6. Respect public-repo privacy norms if contributing here (`AGENTS.md`); mentees’ private customer data belongs in *their* private stores.  
+6. Respect public-repo privacy norms if contributing here (`AGENTS.md`); mentees' private customer data belongs in *their* private stores.  
 7. Respect the **Template change policy** above when editing this folder.
 
 ---
@@ -123,7 +129,7 @@ When a founder says: *“Take the Company OS from this repo and apply what’s u
 **v2.4 — research and ops hygiene**
 
 - Four claim labels; staged trust reveal; market supports vs does not establish  
-- Optional “what to say” on scorecards; virtual office cards  
+- Optional "what to say" on scorecards; virtual office cards  
 
 Improve the OS when principles get clearer — not when Totbox ships a feature. Template edits require founder approval (see policy above).
 
