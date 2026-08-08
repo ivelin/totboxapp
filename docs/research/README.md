@@ -31,7 +31,8 @@ If you are unsure whether something is identifying, **omit it**.
 
 | Doc | What it is |
 |-----|------------|
-| [`ROADMAP_public_data_impact_ranked.md`](ROADMAP_public_data_impact_ranked.md) | **Canonical impact rank** of synthetic-validated public-data ideas (2026-08-08) |
+| [`ROADMAP_public_data_impact_ranked.md`](ROADMAP_public_data_impact_ranked.md) | **Canonical impact rank** (public-data + host-side; high-signal only) |
+| [`host_expectation_calibration_synthetic.md`](host_expectation_calibration_synthetic.md) | Synthetic validation: host concept viz + provider sign-off (H7) |
 | [`home_services_email_insights.md`](home_services_email_insights.md) | Anonymized coordination friction patterns (home services) |
 | [`public_permit_data_opportunity.md`](public_permit_data_opportunity.md) | Backlog: free public building-permit data as workflow context |
 | [`permit_data_synthetic_prioritization.md`](permit_data_synthetic_prioritization.md) | Synthetic prioritization of permit-data benefits |
