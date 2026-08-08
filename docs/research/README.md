@@ -32,8 +32,10 @@ If you are unsure whether something is identifying, **omit it**.
 | Doc | What it is |
 |-----|------------|
 | [`home_services_email_insights.md`](home_services_email_insights.md) | Anonymized coordination friction patterns (home services) |
-| [`public_permit_data_opportunity.md`](public_permit_data_opportunity.md) | **Backlog:** free public building-permit data as workflow context (Austin/TX/US) |
-| [`permit_data_synthetic_prioritization.md`](permit_data_synthetic_prioritization.md) | **Synthetic prioritization** of permit-data benefits vs strong_fit ICPs |
+| [`public_permit_data_opportunity.md`](public_permit_data_opportunity.md) | Backlog: free public building-permit data as workflow context |
+| [`permit_data_synthetic_prioritization.md`](permit_data_synthetic_prioritization.md) | Synthetic prioritization of permit-data benefits |
+| [`proactive_public_data_living_standards.md`](proactive_public_data_living_standards.md) | **Proactive living-standards** from permits + satellite/aerial + parcel public data |
+| [`proactive_data_synthetic_prioritization.md`](proactive_data_synthetic_prioritization.md) | Synthetic ICP prioritization of proactive ideas (high-impact only) |
 | [`servicetitan_integration.md`](servicetitan_integration.md) | ST design annex (Tier 2; not bootstrap) |
 | [`../strategy/bootstrap_pmf_and_agentic_gap.md`](../strategy/bootstrap_pmf_and_agentic_gap.md) | **Why** services lag e‑com agent MCP; bootstrap phases; what not to build |
 | [`../eval/continuous_sim_eval.md`](../eval/continuous_sim_eval.md) | Multi-actor sandbox + continuous eval design |
