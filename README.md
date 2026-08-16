@@ -25,6 +25,8 @@ Mentees and agents: use the template for *how to decide*; treat Totbox product t
 
 ---
 
+> **Shape A is parked (2026-08-16).** The engineering path in this repo is **not** a Phase 1 business exit. Host Grok Bot + Booking Agent already finds vendors, fills forms, and reads mail. Zero household job notes. Do not treat the beachhead below as live GTM. Decision: [`traces/decisions/2026-08-16-shape-a-parked.md`](traces/decisions/2026-08-16-shape-a-parked.md) · Scorecards: [`docs/company-os/instance/reward-risk-2026-08-16.md`](docs/company-os/instance/reward-risk-2026-08-16.md).
+
 ## Current beachhead (v3.1)
 
 **Primary MVP:** Recurring **home services** in Austin — **HVAC preventive maintenance** and **house cleaning**, with **tree/arborist** next (seasonal rules).
