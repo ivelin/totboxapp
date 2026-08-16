@@ -45,21 +45,26 @@ Scorecards for this gate: [`docs/company-os/instance/reward-risk-2026-08-16.md`]
 Demand, price, and “would a fair household job feel easier than the host?” stay **needs real-world proof**. That proof was not collected. The OS says do not keep building while it is missing.
 
 
-## Fail fast and reward-to-risk (why we weeded this project)
+## Fail fast and reward-to-risk (SoT-checked 2026-08-16)
 
-Bootstrap OS is built so a founder can **fail fast** on a thin slice and keep putting scarce time into the **best remaining reward-to-risk**, not the story they already spent money on.
+Reconciled with portable Bootstrap OS v2.8.3 ([ivelin/bootstrap](https://github.com/ivelin/bootstrap/blob/main/company-os/operating-system.md)). Do **not** write “Bootstrap OS = fail-fast” as a heading.
 
-What the portable OS already says (SoT [ivelin/bootstrap](https://github.com/ivelin/bootstrap/blob/main/company-os/operating-system.md)):
+**What the OS says (use these words):**
 
-- Define **one** slice that can **fail fast**, with pass/fail written before the build. ([First tiny slice](../../docs/company-os/operating-system.md#first-tiny-slice-template))
-- **Evidence beats narrative.** Time spent is not proof. Preference is not proof. ([Core beliefs](../../docs/company-os/operating-system.md#core-beliefs))
-- If evidence is weak, keep looking or **kill the idea**. Do not protect it because you already spent time. ([Ranking rule](../../docs/company-os/operating-system.md#ranking-rule))
-- Keep **reward/risk** scorecards visible. Use scores to **Advance / Iterate / Hold / Kill**, not to decorate a pitch. Improving a weak hypothesis is less valuable than finding a stronger one. ([Reward / risk](../../docs/company-os/operating-system.md#reward--risk-thinking--customer-group-ranking) · [Scoring](../../docs/company-os/operating-system.md#scoring-metrics-we-watch))
-- The live loop exists so the next decision uses **current** traces, not last month’s narrative. ([Live runtime](../../docs/company-os/live-runtime.md))
+- Fail-fast is scoped to the **first thin slice**, not a company slogan. “For the primary customer group, define **one** slice that can fail fast.” ([First tiny slice](../../docs/company-os/operating-system.md#first-tiny-slice-template))
+- Same spirit: form a thesis, test it hard, be willing to change or **kill** it. If evidence is weak, kill the idea. Do not protect it because you already spent time. ([Core beliefs](../../docs/company-os/operating-system.md#core-beliefs) · [Ranking rule](../../docs/company-os/operating-system.md#ranking-rule))
+- **Evidence beats narrative.** Time spent is not proof. Preference is not proof. A scorecard beats “this group seems good.” Reachable market, not a fantasy TAM slide. Do not leap from “market is big” to “they will buy from me.” ([Core beliefs §6](../../docs/company-os/operating-system.md#core-beliefs) · [Outside market facts](../../docs/company-os/operating-system.md#outside-market-facts-supports-vs-does-not-establish) · [Reward / risk](../../docs/company-os/operating-system.md#reward--risk-thinking--customer-group-ranking))
+- Reward/risk ranks **customer groups inside one company thesis**, not a multi-project book. Scores decide Advance / Iterate / Hold / Kill. AI does not auto-weed. The founder still gates. ([Reward / risk](../../docs/company-os/operating-system.md#reward--risk-thinking--customer-group-ranking) · [Scoring](../../docs/company-os/operating-system.md#scoring-metrics-we-watch))
 
-What this instance adds (founder application, not a portable OS quote):
+**What the OS does not say:**
 
-A founder usually has **more than one project** drawing time, effort, and money for outside return. The same honesty that ranks ICPs inside one company should rank those projects against each other. When hard facts plus current (including AI-assisted) analysis show a low reward-to-risk, **weed it** as soon as that is flagged — the way you would trim a public-equity or crypto book you hold as a liquid portfolio. Do not wait for a story to recover. Totbox Shape A was that weed.
+- “Take all latest events” as a rule. Founder insight is required (“You supply the insight. AI supplies the speed.”).
+- “Every project must keep the highest possible reward-to-risk ratio.” That sentence is not in the template.
+- That the OS is a multi-company portfolio manager, or that you can exit a bootstrap project like a ticker.
+
+**Founder analogy (instance commentary only — not OS text):**
+
+A founder with more than one project drawing time, effort, and money for outside return may apply the same honesty *across* those projects: when hard facts flag a weak bet, stop protecting sunk time. The liquid public-equity / crypto “weed the book” picture is the founder’s analogy. It is misleading if it implies a fast clean exit or that AI auto-closes companies. The portable equivalent is already: do not protect an idea because you already spent time on it. Totbox Shape A was killed under that OS rule; the analogy is extra color, not the gate.
 
 
 ## Why (plain English)
