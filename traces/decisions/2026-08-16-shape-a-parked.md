@@ -16,9 +16,9 @@ Park / kill Totbox Shape A as a product-company bet.
 - Un-park requires a **new** `founder_gate` in writing. No silent reopen.
 
 
-## OS honest-assessment rules (this gate)
+## Founder Kill (OS labels the evidence; it does not park the company)
 
-This park is a [Bootstrap OS](https://github.com/ivelin/bootstrap/blob/main/company-os/operating-system.md) **honest research & validation** gate, not a mood, a brand story, or a TAM slide.
+The founder chose **Kill**. Portable Bootstrap OS [ranks customer groups](https://github.com/ivelin/bootstrap/blob/main/company-os/operating-system.md#reward--risk-thinking--customer-group-ranking), [labels evidence](https://github.com/ivelin/bootstrap/blob/main/company-os/operating-system.md#how-to-do-honest-research--validation), and offers **Advance / Iterate / Hold / Kill**. It does **not** scan “latest market events” and then park a company. This file is the founder call on **weak evidence**, not an OS market-radar verdict.
 
 Portable rules (SoT: [ivelin/bootstrap](https://github.com/ivelin/bootstrap/blob/main/company-os/operating-system.md); this instance copies them at [`docs/company-os/operating-system.md`](../../docs/company-os/operating-system.md)):
 
@@ -42,7 +42,7 @@ Scorecards for this gate: [`docs/company-os/instance/reward-risk-2026-08-16.md`]
 | **Supports** | A general host agent (Grok Bot + Booking Agent) can find Austin commercial cleaners and submit quote forms **without Totbox** (**outside facts** + **company signals**). Totbox has **zero** recorded real household jobs; Ready for human eyes is unknown; journey 6 was a coding clock while Phase 4 never closed (**company signals**). The homepage still sells dual-sided booking the slice did not prove (**assumed capability**). |
 | **Does not establish** | That households will never pay for a job PM. That Totbox would have closed the office-clean (Totbox was unused). That “agentic home services” as a **market** is dead — TAM, press, and vendor forecasts are outside hype, not this gate. That founder tiredness or remaining excitement is a reason either way (**preference is not proof**). |
 
-Demand, price, and “would a fair household job feel easier than the host?” stay **needs real-world proof**. That proof was not collected. The OS says do not keep building while it is missing.
+Demand, price, and “would a fair household job feel easier than the host?” stay **needs real-world proof**. That proof was not collected. The founder chose Kill rather than keep building on a missing gate.
 
 
 ## Fail fast and reward-to-risk (SoT-checked 2026-08-16)
@@ -64,7 +64,7 @@ Reconciled with portable Bootstrap OS v2.8.3 ([ivelin/bootstrap](https://github.
 
 **Founder analogy (instance commentary only — not OS text):**
 
-A founder with more than one project drawing time, effort, and money for outside return may apply the same honesty *across* those projects: when hard facts flag a weak bet, stop protecting sunk time. The liquid public-equity / crypto “weed the book” picture is the founder’s analogy. It is misleading if it implies a fast clean exit or that AI auto-closes companies. The portable equivalent is already: do not protect an idea because you already spent time on it. Totbox Shape A was killed under that OS rule; the analogy is extra color, not the gate.
+A founder with more than one project drawing time, effort, and money for outside return may apply the same honesty *across* those projects: when hard facts flag a weak bet, stop protecting sunk time. The liquid public-equity / crypto “weed the book” picture is the founder’s analogy. It is misleading if it implies a fast clean exit or that AI auto-closes companies. The portable equivalent is already: do not protect an idea because you already spent time on it. The founder killed Totbox Shape A on that weak-evidence rule; the analogy is extra color, not the gate.
 
 
 ## Why (plain English)

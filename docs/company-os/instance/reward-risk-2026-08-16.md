@@ -1,6 +1,6 @@
 # Reward / risk scorecards — 2026-08-16 Shape A gate
 
-These cards follow Bootstrap OS v2.8 [Reward / risk](../operating-system.md#reward--risk-thinking--customer-group-ranking) and [honest research & validation](../operating-system.md#how-to-do-honest-research--validation) (canonical: [ivelin/bootstrap operating-system.md](https://github.com/ivelin/bootstrap/blob/main/company-os/operating-system.md)). They rank options on **labeled market and company facts**, not founder emotion or outside hype.
+These cards follow Bootstrap OS v2.8 [Reward / risk](../operating-system.md#reward--risk-thinking--customer-group-ranking) and [honest research & validation](../operating-system.md#how-to-do-honest-research--validation) (canonical: [ivelin/bootstrap operating-system.md](https://github.com/ivelin/bootstrap/blob/main/company-os/operating-system.md)). They rank **customer-group / option** cards on labeled facts. The OS does not scan latest market events or park a company. The founder chose **Kill** on weak evidence.
 
 Labels: **outside facts** / **company signals** / **assumed capability** / **needs real-world proof** — see [Label every claim](../operating-system.md#label-every-claim-what-kind-of-evidence-is-this).
 

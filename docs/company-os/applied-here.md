@@ -6,7 +6,7 @@
 
 Mentees: **do not adopt Totbox’s market or features by default.** Steal the discipline, not the beachhead.
 
-**Honest status (2026-08-16):** Shape A is **parked** as a product-company bet under Bootstrap OS [honest research & validation](operating-system.md#how-to-do-honest-research--validation) and [fail-fast on the thin slice](operating-system.md#first-tiny-slice-template) (evidence beats narrative; reward/risk is customer-group ranking, not a multi-project book). Founder analogy only: prune a weak project like a liquid book. See [`traces/decisions/2026-08-16-shape-a-parked.md`](../../traces/decisions/2026-08-16-shape-a-parked.md).
+**Honest status (2026-08-16):** Shape A is **parked** because the founder chose **Kill** on weak evidence. The OS [ranks customer groups](operating-system.md#reward--risk-thinking--customer-group-ranking) and [labels evidence](operating-system.md#how-to-do-honest-research--validation); it does not scan latest market events and park a company. Fail-fast is the thin slice. Reward/risk is not a multi-project book. Founder analogy only: prune a weak project like a liquid book. See [`traces/decisions/2026-08-16-shape-a-parked.md`](../../traces/decisions/2026-08-16-shape-a-parked.md).
 
 ---
 

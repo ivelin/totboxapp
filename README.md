@@ -25,7 +25,7 @@ Mentees and agents: use the template for *how to decide*; treat Totbox product t
 
 ---
 
-> **Shape A is parked (2026-08-16).** Bootstrap OS honest-assessment gate ([rules](docs/company-os/operating-system.md#how-to-do-honest-research--validation) · [canonical](https://github.com/ivelin/bootstrap/blob/main/company-os/operating-system.md#how-to-do-honest-research--validation)): market and company **facts**, labeled; not founder emotion or outside hype. Engineering path ≠ Phase 1 exit. OS: fail-fast on the thin slice; kill if evidence is weak; reward/risk ranks customer groups (not a multi-project book). Founder analogy only: prune a low-ratio project the way you would weed a liquid book. Decision: [`traces/decisions/2026-08-16-shape-a-parked.md`](traces/decisions/2026-08-16-shape-a-parked.md) · Scorecards: [`docs/company-os/instance/reward-risk-2026-08-16.md`](docs/company-os/instance/reward-risk-2026-08-16.md).
+> **Shape A is parked (2026-08-16).** Founder **Kill** on weak evidence. The OS [ranks groups](docs/company-os/operating-system.md#reward--risk-thinking--customer-group-ranking) and [labels claims](docs/company-os/operating-system.md#how-to-do-honest-research--validation); it does not scan latest market events and park a company. Engineering path ≠ Phase 1 exit. Fail-fast is the thin slice. Reward/risk is customer-group ranking, not a multi-project book. Founder analogy only: prune a low-ratio project like a liquid book. Decision: [`traces/decisions/2026-08-16-shape-a-parked.md`](traces/decisions/2026-08-16-shape-a-parked.md) · Scorecards: [`docs/company-os/instance/reward-risk-2026-08-16.md`](docs/company-os/instance/reward-risk-2026-08-16.md).
 
 ## Current beachhead (v3.1)
 
