@@ -2,27 +2,35 @@
   "version": 1,
   "companyId": "totboxapp",
   "journeyPhase": 6,
-  "loopStage": 4,
-  "gateStatus": "open",
+  "loopStage": 7,
+  "gateStatus": "waiting_for_founder",
   "autonomyPosture": "strict",
   "readyForHumanEyes": {
     "status": "unknown",
     "checkedAt": "2026-08-04T16:15:33.048Z",
     "happyPath": "Cold user can complete thin household job path on a shareable surface without founder babysitting"
   },
+  "lastSnapshotAt": "2026-08-16T17:16:03.000Z",
   "scores": {
     "completion": 0.86,
     "traceCompleteness": 0.7,
-    "notes": "Engineering tests look good. That is not proof people will pay or that real jobs get easier. Real household jobs still needed. Ready for human eyes not yet green for external product-test asks."
+    "notes": "PARKED 2026-08-16. Engineering is not demand. Phase 1 not passed. Host Grok Bot + Booking Agent already owns find→form→inbox. Zero redacted stage-6 household job notes. Ready for human eyes still unknown."
   },
-  "founderApprovals": [],
-  "openQuestions": [
-    "What numbers must a real job hit before we build more?",
-    "When is the next real household job, with a short honest write-up after?",
-    "When is the next weekly “where do we stand?” check-in?",
-    "Is Ready for human eyes green before any mentor “try this product” ask?"
+  "founderApprovals": [
+    {
+      "id": "park_shape_a_2026-08-16",
+      "kind": "journey_kill",
+      "granted": true,
+      "at": "2026-08-16T17:16:03.000Z",
+      "note": "park Shape A"
+    }
   ],
-  "lastAction": "ready_for_human_eyes:unknown",
+  "openQuestions": [
+    "Un-park Shape A? Only with a new founder_gate in writing.",
+    "Ready for human eyes still unknown — do we ever run a cold path, or is that moot while parked?",
+    "Extract OS pieces into ivelin/bootstrap without leaking HVAC/MCP Totbox specifics into the template?"
+  ],
+  "lastAction": "park Shape A 2026-08-16 (journey_kill; loop stage 7 memory write)",
   "createdAt": "2026-07-27T00:00:00.000Z",
-  "updatedAt": "2026-08-04T16:15:33.048Z"
+  "updatedAt": "2026-08-16T17:16:03.000Z"
 }

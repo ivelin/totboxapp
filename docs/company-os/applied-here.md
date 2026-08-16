@@ -6,6 +6,8 @@
 
 Mentees: **do not adopt Totbox’s market or features by default.** Steal the discipline, not the beachhead.
 
+**Honest status (2026-08-16):** Shape A is **parked** as a product-company bet. See [`traces/decisions/2026-08-16-shape-a-parked.md`](../../traces/decisions/2026-08-16-shape-a-parked.md).
+
 ---
 
 ## Journey phase (bootstrap) — where Totbox is
@@ -13,7 +15,7 @@ Mentees: **do not adopt Totbox’s market or features by default.** Steal the di
 | OS simple # | Formal alias | Totbox status (honest) |
 |-------------|--------------|-------------------------|
 | 1–2 | Ideation / Vision–ICP | Working hypothesis: household home-service job PM (HVAC + cleaning beachhead) |
-| 3–4 | Discovery / monetization validation | Synthetic filter historical; **real Phase 1 proof still open** |
+| 3–4 | Discovery / monetization validation | Synthetic filter historical; **real Phase 1 proof never closed; parked 2026-08-16** |
 | 5 | Architecture & agentic design | Host LLM + MCP job PM + safety gates; channels email/SMS/form first |
 | 6 | Build (EDD) | Job PM largely coded; harness Level ~1 (`smoke:job` + unit tests) — not full multi-actor EDD yet |
 | 7–8 | Test / early launch → traction | Engineering green; business touchpoint wins not yet documented at scale |
