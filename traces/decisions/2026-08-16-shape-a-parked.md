@@ -44,6 +44,24 @@ Scorecards for this gate: [`docs/company-os/instance/reward-risk-2026-08-16.md`]
 
 Demand, price, and “would a fair household job feel easier than the host?” stay **needs real-world proof**. That proof was not collected. The OS says do not keep building while it is missing.
 
+
+## Fail fast and reward-to-risk (why we weeded this project)
+
+Bootstrap OS is built so a founder can **fail fast** on a thin slice and keep putting scarce time into the **best remaining reward-to-risk**, not the story they already spent money on.
+
+What the portable OS already says (SoT [ivelin/bootstrap](https://github.com/ivelin/bootstrap/blob/main/company-os/operating-system.md)):
+
+- Define **one** slice that can **fail fast**, with pass/fail written before the build. ([First tiny slice](../../docs/company-os/operating-system.md#first-tiny-slice-template))
+- **Evidence beats narrative.** Time spent is not proof. Preference is not proof. ([Core beliefs](../../docs/company-os/operating-system.md#core-beliefs))
+- If evidence is weak, keep looking or **kill the idea**. Do not protect it because you already spent time. ([Ranking rule](../../docs/company-os/operating-system.md#ranking-rule))
+- Keep **reward/risk** scorecards visible. Use scores to **Advance / Iterate / Hold / Kill**, not to decorate a pitch. Improving a weak hypothesis is less valuable than finding a stronger one. ([Reward / risk](../../docs/company-os/operating-system.md#reward--risk-thinking--customer-group-ranking) · [Scoring](../../docs/company-os/operating-system.md#scoring-metrics-we-watch))
+- The live loop exists so the next decision uses **current** traces, not last month’s narrative. ([Live runtime](../../docs/company-os/live-runtime.md))
+
+What this instance adds (founder application, not a portable OS quote):
+
+A founder usually has **more than one project** drawing time, effort, and money for outside return. The same honesty that ranks ICPs inside one company should rank those projects against each other. When hard facts plus current (including AI-assisted) analysis show a low reward-to-risk, **weed it** as soon as that is flagged — the way you would trim a public-equity or crypto book you hold as a liquid portfolio. Do not wait for a story to recover. Totbox Shape A was that weed.
+
+
 ## Why (plain English)
 
 The host LLM got fat. Grok Bot + Booking Agent already finds vendors, fills website forms, and reads mail. Totbox was a thin PM sidecar next to a thin EA. That split died.

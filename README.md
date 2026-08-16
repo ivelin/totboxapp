@@ -25,7 +25,7 @@ Mentees and agents: use the template for *how to decide*; treat Totbox product t
 
 ---
 
-> **Shape A is parked (2026-08-16).** Bootstrap OS honest-assessment gate ([rules](docs/company-os/operating-system.md#how-to-do-honest-research--validation) · [canonical](https://github.com/ivelin/bootstrap/blob/main/company-os/operating-system.md#how-to-do-honest-research--validation)): market and company **facts**, labeled; not founder emotion or outside hype. Engineering path ≠ Phase 1 exit. Decision: [`traces/decisions/2026-08-16-shape-a-parked.md`](traces/decisions/2026-08-16-shape-a-parked.md) · Scorecards: [`docs/company-os/instance/reward-risk-2026-08-16.md`](docs/company-os/instance/reward-risk-2026-08-16.md).
+> **Shape A is parked (2026-08-16).** Bootstrap OS honest-assessment gate ([rules](docs/company-os/operating-system.md#how-to-do-honest-research--validation) · [canonical](https://github.com/ivelin/bootstrap/blob/main/company-os/operating-system.md#how-to-do-honest-research--validation)): market and company **facts**, labeled; not founder emotion or outside hype. Engineering path ≠ Phase 1 exit. Fail-fast / reward-to-risk: weed low-ratio projects when hard facts flag them (OS kill + scorecards; this instance also treats the founder’s project list like a book to prune). Decision: [`traces/decisions/2026-08-16-shape-a-parked.md`](traces/decisions/2026-08-16-shape-a-parked.md) · Scorecards: [`docs/company-os/instance/reward-risk-2026-08-16.md`](docs/company-os/instance/reward-risk-2026-08-16.md).
 
 ## Current beachhead (v3.1)
 

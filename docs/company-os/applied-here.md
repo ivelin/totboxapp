@@ -6,7 +6,7 @@
 
 Mentees: **do not adopt Totbox’s market or features by default.** Steal the discipline, not the beachhead.
 
-**Honest status (2026-08-16):** Shape A is **parked** as a product-company bet under Bootstrap OS [honest research & validation](operating-system.md#how-to-do-honest-research--validation) (facts labeled; preference and outside hype are not proof). See [`traces/decisions/2026-08-16-shape-a-parked.md`](../../traces/decisions/2026-08-16-shape-a-parked.md).
+**Honest status (2026-08-16):** Shape A is **parked** as a product-company bet under Bootstrap OS [honest research & validation](operating-system.md#how-to-do-honest-research--validation) and [fail-fast / reward-risk](operating-system.md#first-tiny-slice-template) (hard facts; preference and outside hype are not proof). This instance also treats the founder’s project list like a book to prune when reward-to-risk goes bad. See [`traces/decisions/2026-08-16-shape-a-parked.md`](../../traces/decisions/2026-08-16-shape-a-parked.md).
 
 ---
 
