@@ -1,0 +1,62 @@
+# Copy into <repo>/.github/workflows/user-path.yml
+# Runs the same command an independent verifier should run.
+# CI green here is necessary and still not a pstack verdict.
+name: user-path
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+concurrency:
+  group: user-path-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  user-path:
+    name: user-path
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run verify:user-path (never production)
+        run: |
+          set -euo pipefail
+          echo "CI green on this job is necessary and is not an independent pstack verdict."
+          has_script() {
+            python3 - "$1" <<'PY'
+          import json, sys
+          scripts = json.load(open(sys.argv[1])).get("scripts") or {}
+          sys.exit(0 if "verify:user-path" in scripts else 1)
+          PY
+          }
+          if [ -f mcp/package.json ] && has_script mcp/package.json; then
+            cd mcp
+            if [ -f package-lock.json ]; then npm ci; else npm install; fi
+            npm run verify:user-path
+          elif [ -f package.json ] && has_script package.json; then
+            if [ -f bun.lock ] || [ -f bun.lockb ]; then
+              npm install -g bun
+              bun install --frozen-lockfile
+              bun run verify:user-path
+            elif [ -f pnpm-lock.yaml ]; then
+              corepack enable
+              pnpm install --frozen-lockfile
+              pnpm run verify:user-path
+            elif [ -f package-lock.json ]; then
+              npm ci
+              npm run verify:user-path
+            else
+              npm install
+              npm run verify:user-path
+            fi
+          else
+            echo "Add a verify:user-path script that exercises the real CLI/HTTP/UI path (not unit-only)."
+            echo "Unit/lint green without that job is not close to pstack verification."
+            exit 1
+          fi
